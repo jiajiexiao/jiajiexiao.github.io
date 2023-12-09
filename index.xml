@@ -8,6 +8,15 @@
     <language>en-us</language>
     <lastBuildDate>Sun, 03 Dec 2023 11:50:43 -0800</lastBuildDate><atom:link href="https://jiajiexiao.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>About</title>
+      <link>https://jiajiexiao.github.io/about/</link>
+      <pubDate>Sat, 09 Dec 2023 12:34:09 -0800</pubDate>
+      
+      <guid>https://jiajiexiao.github.io/about/</guid>
+      <description>hello adfasdf</description>
+    </item>
+    
+    <item>
       <title>Hello World</title>
       <link>https://jiajiexiao.github.io/posts/hello_world/</link>
       <pubDate>Sun, 03 Dec 2023 11:50:43 -0800</pubDate>
@@ -16,6 +25,7 @@
       <description>Greetings! This is JJ, and I am thrilled to welcome you to my corner of the internet! Taking inspiration from Lilian Weng, whose blog has been an invaluable resource during my studies and work in AI/ML, I&amp;rsquo;ve decided to also share my learning notes, thoughts, and updates through here.
 Why Blogging? While I used to constantly write some diary during my childhood, I have to admit that I haven&amp;rsquo;t done so for quite a while.</description>
     </item>
+    
     
   </channel>
 </rss>

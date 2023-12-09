@@ -2,6 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://jiajiexiao.github.io/about/</loc>
+    <lastmod>2023-12-09T12:34:09-08:00</lastmod>
+  </url><url>
     <loc>https://jiajiexiao.github.io/posts/hello_world/</loc>
     <lastmod>2023-12-03T11:50:43-08:00</lastmod>
   </url><url>
@@ -12,6 +15,8 @@
     <lastmod>2023-12-03T11:50:43-08:00</lastmod>
   </url><url>
     <loc>https://jiajiexiao.github.io/categories/</loc>
+  </url><url>
+    <loc>https://jiajiexiao.github.io/search/</loc>
   </url><url>
     <loc>https://jiajiexiao.github.io/tags/</loc>
   </url>
