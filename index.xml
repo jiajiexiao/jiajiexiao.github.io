@@ -18,13 +18,13 @@ Why Blogging? While I used to constantly write some diary during my childhood, I
     </item>
     
     <item>
-      <title>About Me</title>
+      <title></title>
       <link>https://jiajiexiao.github.io/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://jiajiexiao.github.io/about/</guid>
-      <description>Welcome to my personal website! I&amp;rsquo;m Jiajie &amp;ldquo;JJ&amp;rdquo; Xiao, and I&amp;rsquo;m excited to share a bit about myself, my research interests, and my professional experiences.
-Profile Summary I am a researcher with a passion for improving healthcare with data-driven innovations. Currently, I serve as a Staff Machine Learning Scientist at Freenome, building multi-domain (e.g. multiomics, EHR) models to enable sensitive and specific blood-based early cancer diagnosis. My experience and interests also extend to therapeutic development such as ML-guided protein design and drug discovery, gained during my time at GSK and WFU.</description>
+      <description>Hi 👋, I&#39;m Jiajie &#34;JJ&#34; Xiao. Thank you for visiting my personal website and taking an interest in my journey.
+I am passionate about contributing to a better world through the lens of science and technology. Currently, I serve as a Staff Machine Learning Scientist at Freenome, where I work on multi-domain (e.g. multiomics, EHR) models to facilitate sensitive and specific blood-based early cancer diagnosis. My expertise also extends to therapeutic development such as ML-guided protein design and drug discovery, gained through my experiences at GSK and WFU.</description>
     </item>
     
     
