@@ -9,20 +9,20 @@
     <lastBuildDate>Sun, 03 Dec 2023 11:50:43 -0800</lastBuildDate><atom:link href="https://jiajiexiao.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Hello World</title>
-      <link>https://jiajiexiao.github.io/posts/2023-12-03_hello_world/</link>
+      <link>https://jiajiexiao.github.io/posts/2023-12-03_hello_world.html</link>
       <pubDate>Sun, 03 Dec 2023 11:50:43 -0800</pubDate>
       
-      <guid>https://jiajiexiao.github.io/posts/2023-12-03_hello_world/</guid>
+      <guid>https://jiajiexiao.github.io/posts/2023-12-03_hello_world.html</guid>
       <description>Greetings! This is JJ, and I am thrilled to welcome you to my corner of the internet! Taking inspiration from Lilian Weng, whose blog has been an invaluable resource during my studies and work in AI/ML, I&amp;rsquo;ve decided to also share my learning notes, thoughts, and updates through here.
 Why Blogging? While I used to constantly write some diary during my childhood, I have to admit that I haven&amp;rsquo;t done so for quite a while.</description>
     </item>
     
     <item>
       <title></title>
-      <link>https://jiajiexiao.github.io/about/</link>
+      <link>https://jiajiexiao.github.io/about.html</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://jiajiexiao.github.io/about/</guid>
+      <guid>https://jiajiexiao.github.io/about.html</guid>
       <description>Hi 👋, I&#39;m Jiajie &#34;JJ&#34; Xiao. Thank you for visiting my personal website and taking an interest in my journey.
 I am passionate about contributing to a better world through the lens of science and technology. Currently, I serve as a Staff Machine Learning Scientist at Freenome, where I work on multi-domain (e.g. multiomics, EHR) models to facilitate sensitive and specific blood-based early cancer diagnosis. My expertise also extends to therapeutic development such as ML-guided protein design and drug discovery, gained through my experiences at GSK and WFU.</description>
     </item>

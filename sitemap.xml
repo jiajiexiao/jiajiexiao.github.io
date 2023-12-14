@@ -2,27 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://jiajiexiao.github.io/posts/2023-12-03_hello_world/</loc>
+    <loc>https://jiajiexiao.github.io/posts/2023-12-03_hello_world.html</loc>
     <lastmod>2023-12-03T11:50:43-08:00</lastmod>
   </url><url>
     <loc>https://jiajiexiao.github.io/</loc>
     <lastmod>2023-12-03T11:50:43-08:00</lastmod>
   </url><url>
-    <loc>https://jiajiexiao.github.io/tags/life/</loc>
+    <loc>https://jiajiexiao.github.io/tags/life.html</loc>
     <lastmod>2023-12-03T11:50:43-08:00</lastmod>
   </url><url>
-    <loc>https://jiajiexiao.github.io/posts/</loc>
+    <loc>https://jiajiexiao.github.io/posts.html</loc>
     <lastmod>2023-12-03T11:50:43-08:00</lastmod>
   </url><url>
-    <loc>https://jiajiexiao.github.io/tags/</loc>
+    <loc>https://jiajiexiao.github.io/tags.html</loc>
     <lastmod>2023-12-03T11:50:43-08:00</lastmod>
   </url><url>
-    <loc>https://jiajiexiao.github.io/about/</loc>
+    <loc>https://jiajiexiao.github.io/about.html</loc>
   </url><url>
     <loc>https://jiajiexiao.github.io/archives/</loc>
   </url><url>
-    <loc>https://jiajiexiao.github.io/categories/</loc>
+    <loc>https://jiajiexiao.github.io/categories.html</loc>
   </url><url>
-    <loc>https://jiajiexiao.github.io/search/</loc>
+    <loc>https://jiajiexiao.github.io/search.html</loc>
   </url>
 </urlset>
