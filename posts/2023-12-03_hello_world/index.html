@@ -11,8 +11,8 @@
 Why Blogging? While I used to constantly write some diary during my childhood, I have to admit that I haven&rsquo;t done so for quite a while.">
 <meta name="author" content="Jiajie Xiao">
 <link rel="canonical" href="https://jiajiexiao.github.io/posts/2023-12-03_hello_world/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.5cfc680b1eeaeef9efbced92d46c2a9e876b72ee14fba85846afc4cff9e6e6f8.css" integrity="sha256-XPxoCx7q7vnvvO2S1Gwqnodrcu4U&#43;6hYRq/Ez/nm5vg=" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.d1f45ecd460cd33e471e99bce57f0b26274af463662b6240c24dc5a4fd44eac2.css" integrity="sha256-0fRezUYM0z5HHpm85X8LJidK9GNmK2JAwk3FpP1E6sI=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="../../assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
     onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://jiajiexiao.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://jiajiexiao.github.io/favicon-16x16.png">
@@ -58,6 +58,23 @@ Why Blogging? While I used to constantly write some diary during my childhood, I
 
     </style>
 </noscript>
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+  </head>
+  ...
+</html>
+
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT65G42LLD"></script>
 <script>
 var doNotTrack = false;
@@ -221,24 +238,85 @@ Why Blogging? While I used to constantly write some diary during my childhood, I
     <div class="post-meta"><span title='2023-12-03 11:50:43 -0800 PST'>2023-12-03</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;Jiajie Xiao
 
 </div>
-  </header> <div class="toc">
-    <details >
-        <summary accesskey="c" title="(Alt + C)">
-            <span class="details">Table of Contents</span>
-        </summary>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">Table of Contents</span>
+            </summary>
 
-        <div class="inner"><ul>
-                <li>
-                    <a href="#why-blogging" aria-label="Why Blogging?">Why Blogging?</a></li>
-                <li>
-                    <a href="#learning-from-the-best" aria-label="Learning from the Best">Learning from the Best</a></li>
-                <li>
-                    <a href="#what-to-expect" aria-label="What to Expect">What to Expect</a>
-                </li>
-            </ul>
-        </div>
-    </details>
-</div>
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#why-blogging" aria-label="Why Blogging?">Why Blogging?</a></li>
+                    <li>
+                        <a href="#learning-from-the-best" aria-label="Learning from the Best">Learning from the Best</a></li>
+                    <li>
+                        <a href="#what-to-expect" aria-label="What to Expect">What to Expect</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
 
   <div class="post-content"><p>Greetings! This is JJ, and I am thrilled to welcome you to my corner of the internet! Taking
 inspiration from <a href="https://lilianweng.github.io/">Lilian Weng</a>, whose blog has been an
