@@ -1,0 +1,15 @@
+[submodule "jxlog/themes/PaperMod"]
+	path = jxlog/themes/PaperMod
+	url = https://github.com/adityatelange/hugo-PaperMod.git
+# [submodule "jxlog/themes/PaperModX"]
+# 	path = jxlog/themes/PaperModX
+# 	url = https://github.com/reorx/hugo-PaperModX.git
+[submodule "jxlog/public"]
+	path = jxlog/public
+	url = https://github.com/jiajiexiao/jiajiexiao.github.io.git
+# [submodule "jxlog/themes/loveit"]
+# 	path = jxlog/themes/loveit
+# 	url = https://github.com/dillonzq/LoveIt.git
+# [submodule "jxlog/themes/DoIt"]
+# 	path = jxlog/themes/DoIt
+# 	url = https://github.com/HEIGE-PCloud/DoIt.git

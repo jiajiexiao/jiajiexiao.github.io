@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>JX&#39;s log</title>
+    <link>https://jiajiexiao.github.io/</link>
+    <description>Recent content on JX&#39;s log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 17 Dec 2023 14:06:46 -0800</lastBuildDate>
+    <atom:link href="https://jiajiexiao.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Toward Robust AI (1): Why Robustness Matters</title>
+      <link>https://jiajiexiao.github.io/posts/2023-12-17_why_robust_ai/</link>
+      <pubDate>Sun, 17 Dec 2023 14:06:46 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/2023-12-17_why_robust_ai/</guid>
+      <description>Brilliant AI/ML Models Remain Brittle Artificial intelligence (AI) and machine learning (ML) have garnered significant attention for their potential to emulate, and sometimes surpass, human capabilities across diverse domains such as vision, translation, and planning. The popularity of groundbreaking models like ChatGPT and Stable Diffusion has fueled optimism, with many speculating not if, but when, Artificial General Intelligence (AGI) will emerge.
+Yet, beneath the in silico surface, AI/ML systems remain at their core parametrized mathematical models.</description>
+    </item>
+    <item>
+      <title>Hello World</title>
+      <link>https://jiajiexiao.github.io/posts/2023-12-03_hello_world/</link>
+      <pubDate>Sun, 03 Dec 2023 11:50:43 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/2023-12-03_hello_world/</guid>
+      <description>Greetings! This is JJ, and I am thrilled to welcome you to my corner of the internet! Taking inspiration from Lilian Weng, whose blog has been an invaluable resource during my studies and work in AI/ML, I&amp;rsquo;ve decided to also share my learning notes, thoughts, and updates through here.
+Why Blogging? While I used to constantly write some diary during my childhood, I have to admit that I haven&amp;rsquo;t done so for quite a while.</description>
+    </item>
+    <item>
+      <title></title>
+      <link>https://jiajiexiao.github.io/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://jiajiexiao.github.io/about/</guid>
+      <description>Hi 👋, I&#39;m Jiajie &#34;JJ&#34; Xiao. Thank you for visiting my personal website and taking an interest in my journey.
+I am passionate about contributing to a better world through the lens of science and technology. Currently, I serve as a Staff Machine Learning Scientist at Freenome, where I work on multi-domain (e.g. multiomics, EHR) models to facilitate sensitive and specific blood-based early cancer diagnosis. My expertise also extends to therapeutic development such as ML-guided protein design and drug discovery, gained through my experiences at GSK and WFU.</description>
+    </item>
+  </channel>
+</rss>

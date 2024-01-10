@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>life on JX&#39;s log</title>
+    <link>https://jiajiexiao.github.io/tags/life/</link>
+    <description>Recent content in life on JX&#39;s log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 03 Dec 2023 11:50:43 -0800</lastBuildDate>
+    <atom:link href="https://jiajiexiao.github.io/tags/life/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello World</title>
+      <link>https://jiajiexiao.github.io/posts/2023-12-03_hello_world/</link>
+      <pubDate>Sun, 03 Dec 2023 11:50:43 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/2023-12-03_hello_world/</guid>
+      <description>Greetings! This is JJ, and I am thrilled to welcome you to my corner of the internet! Taking inspiration from Lilian Weng, whose blog has been an invaluable resource during my studies and work in AI/ML, I&amp;rsquo;ve decided to also share my learning notes, thoughts, and updates through here.
+Why Blogging? While I used to constantly write some diary during my childhood, I have to admit that I haven&amp;rsquo;t done so for quite a while.</description>
+    </item>
+  </channel>
+</rss>
