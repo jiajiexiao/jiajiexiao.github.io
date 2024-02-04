@@ -39,5 +39,12 @@ Why Blogging? While I used to constantly write some diary during my childhood, I
       <description>Hi 👋, I&#39;m Jiajie &#34;JJ&#34; Xiao. Thank you for visiting my personal website and taking an interest in my journey.
 I am passionate about contributing to a better world through the lens of science and technology. Currently, I serve as a Staff Machine Learning Scientist at Freenome, where I work on multi-domain (e.g. multiomics, EHR) models to facilitate sensitive and specific blood-based early cancer diagnosis. My expertise also extends to therapeutic development such as ML-guided protein design and drug discovery, gained through my experiences at GSK and WFU.</description>
     </item>
+    <item>
+      <title></title>
+      <link>https://jiajiexiao.github.io/posts/sidenote/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/sidenote/</guid>
+      <description>https://acdlite.github.io/jquery.sidenotes/</description>
+    </item>
   </channel>
 </rss>
