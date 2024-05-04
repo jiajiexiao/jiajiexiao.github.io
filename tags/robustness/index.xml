@@ -6,8 +6,15 @@
     <description>Recent content in Robustness on JX&#39;s log</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 06 Jan 2024 20:44:25 -0800</lastBuildDate>
+    <lastBuildDate>Mon, 29 Apr 2024 08:36:29 -0700</lastBuildDate>
     <atom:link href="https://jiajiexiao.github.io/tags/robustness/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>What a large p for small n</title>
+      <link>https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/</link>
+      <pubDate>Mon, 29 Apr 2024 08:36:29 -0700</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/</guid>
+      <description>&amp;ldquo;Large p small n&amp;rdquo; describes a scenario where the number of features ($p$) is much greater than the number of observations ($n$) for model training. While it is not a new problem, it continues to pose significant challenges in real-world applications of machine learning, especially for domains lacking rich data or fast and cheap data generation processes. In this blog post, I&amp;rsquo;ll document my recent thoughts on the &amp;ldquo;large p small n&amp;rdquo; problem.</description>
+    </item>
     <item>
       <title>Toward Robust AI (2): How To Achieve Robust AI</title>
       <link>https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/</link>

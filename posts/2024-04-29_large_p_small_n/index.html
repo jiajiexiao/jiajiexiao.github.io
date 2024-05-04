@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>What a large p for small n | JX&#39;s log</title>
+<meta name="keywords" content="AI/ML, Small Data, Robustness">
+<meta name="description" content="&ldquo;Large p small n&rdquo; describes a scenario where the number of features ($p$) is much greater than the number of observations ($n$) for model training. While it is not a new problem, it continues to pose significant challenges in real-world applications of machine learning, especially for domains lacking rich data or fast and cheap data generation processes. In this blog post, I&rsquo;ll document my recent thoughts on the &ldquo;large p small n&rdquo; problem.">
+<meta name="author" content="Jiajie Xiao">
+<link rel="canonical" href="https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.afe408fbde9e6232e4bb41db6dc1a6f427226bd3dcc8f7bd3765525b7678f46b.css" integrity="sha256-r&#43;QI&#43;96eYjLku0HbbcGm9Ccia9PcyPe9N2VSW3Z49Gs=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jiajiexiao.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jiajiexiao.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jiajiexiao.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jiajiexiao.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jiajiexiao.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload='renderMathInElement(
+          document.body, 
+          {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\(", right: "\\)", display: false},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "\\begin{equation}", right: "\\end{equation}", display: true},
+                {left: "\\begin{align}", right: "\\end{align}", display: true},
+                {left: "\\begin{alignat}", right: "\\end{alignat}", display: true},
+                {left: "\\begin{gather}", right: "\\end{gather}", display: true},
+                {left: "\\begin{CD}", right: "\\end{CD}", display: true},
+            ]
+          }
+        );'></script>
+  </head>
+</html>
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VT65G42LLD"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-VT65G42LLD', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="What a large p for small n" />
+<meta property="og:description" content="&ldquo;Large p small n&rdquo; describes a scenario where the number of features ($p$) is much greater than the number of observations ($n$) for model training. While it is not a new problem, it continues to pose significant challenges in real-world applications of machine learning, especially for domains lacking rich data or fast and cheap data generation processes. In this blog post, I&rsquo;ll document my recent thoughts on the &ldquo;large p small n&rdquo; problem." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-04-29T08:36:29-07:00" />
+<meta property="article:modified_time" content="2024-04-29T08:36:29-07:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="What a large p for small n"/>
+<meta name="twitter:description" content="&ldquo;Large p small n&rdquo; describes a scenario where the number of features ($p$) is much greater than the number of observations ($n$) for model training. While it is not a new problem, it continues to pose significant challenges in real-world applications of machine learning, especially for domains lacking rich data or fast and cheap data generation processes. In this blog post, I&rsquo;ll document my recent thoughts on the &ldquo;large p small n&rdquo; problem."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://jiajiexiao.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "What a large p for small n",
+      "item": "https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "What a large p for small n",
+  "name": "What a large p for small n",
+  "description": "\u0026ldquo;Large p small n\u0026rdquo; describes a scenario where the number of features ($p$) is much greater than the number of observations ($n$) for model training. While it is not a new problem, it continues to pose significant challenges in real-world applications of machine learning, especially for domains lacking rich data or fast and cheap data generation processes. In this blog post, I\u0026rsquo;ll document my recent thoughts on the \u0026ldquo;large p small n\u0026rdquo; problem.",
+  "keywords": [
+    "AI/ML", "Small Data", "Robustness"
+  ],
+  "articleBody": "“Large p small n” describes a scenario where the number of features ($p$) is much greater than the number of observations ($n$) for model training. While it is not a new problem, it continues to pose significant challenges in real-world applications of machine learning, especially for domains lacking rich data or fast and cheap data generation processes. In this blog post, I’ll document my recent thoughts on the “large p small n” problem.\n1. Toy Problem Setup For simplicity and easy illustration, let’s look at a binary classification problem with linearly separable data, where at least one hyperplane can perfectly distinguish between the two classes.\nThe equation of a hyperplane in a $p$-dimensional space is given by:\n\\begin{equation} \\begin{aligned} w_1 x_1 + w_2 x_2 + … + w_p x_p + b = 0. \\end{aligned} \\end{equation}\nHere, $x_1$, $x_2$, …, $x_p$ are the coordinates of a point (called features) in the $p$-dimensional space, and $w_1$, $w_2$, …, $w_p$, and $b$ are special numbers (called weights and bias) that determine the exact position and the norm direction of the hyperplane. Now, if we have a new point ($x’$) and want to know which group it belongs to, we can do two things:\nGeometrically: We can look at where the point is located in relation to the line. If it’s on one side of the line, it belongs to one group; if it’s on the other side, it belongs to the other group.\nAlgebraically: We can plug the coordinates of the point into the left side of the eq 1 and calculate the result. If the result is positive, the point belongs to one group; otherwise, it belongs to the other group.\nThese weights and bias constitute $p+1$ unknown parameters that govern predictions. Our goal is to find the “true” values of these parameters that define the class assignments in the underlying data generation process, so that we can reliably predict the class of any future unseen point in the $p$-dimensional space. To achieve this, we typically convert this into an optimization problem and use maximum likelihood estimation based on the observed samples. This involves finding the optimal values of the parameters that minimize a loss function such as binary cross-entropy $\\mathcal{L_b}$ or hinge loss $\\mathcal{L_h}$:\n\\begin{equation} \\begin{aligned} \\mathcal{L_b} (y, \\hat{y}) = -\\frac{1}{N} \\sum_{i=1}^{N} [y_i \\cdot \\log(\\hat{y}_i) + (1 - y_i) \\cdot \\log(1 - \\hat{y}_i)], \\end{aligned} \\end{equation}\n\\begin{equation} \\begin{aligned} \\mathcal{L_h}(y, \\hat{y}) = \\frac{1}{N} \\sum_{i=1}^{N} \\max(0, 1 - y_i \\cdot \\hat{y}_i), \\end{aligned} \\end{equation}\nwhere $y_i$ is the true label of the $i^{th}$ observation, and $\\hat{y}_i$ is the predicted label or the generalized form of predicted probability for positive class assignment of the $i^{th}$ observation derived by applying an activation function $\\sigma$, such as the sigmoid (which is a smoothed step function), to the weighted sum:\n\\begin{equation} \\begin{aligned} \\hat{y_i} = \\sigma(w_1 x_{i1} + w_2 x_{i2} +… + w_p x_{ip} + b). \\end{aligned} \\end{equation}\nWhen finding a minimum value of a function, in math and physics, we often to check for points where the gradient is zero and the Hessian matrix is positive definite 1. That means we may want to first solve $\\nabla_{w, b} \\mathcal{L} = 0$ to find the critical points in the parameter space. However, there appear to have no closed form solution due to the involved nonlinearity in deriving $\\hat{y}_i$ in this case (Lipovetsky2015 or see discussions in link1 and link2). Consequently, gradient descent-based algorithms are often employed to find values for $w$ and $b$ that minimize the loss function $\\mathcal{L}$.\n2. Not All Solutions Are Equally Generalizable While binary cross-entropy and hinge loss are both convex concerning $\\hat{y}$ 2, this convexity is not strict 3 due to the possible zero values of second-order derivatives of the losses with respect to $\\hat{y}$. So, there exist infinitely many sets of weight and bias values capable of separating data points. Moreover, as the feature dimension increases, the volume of the feature space grows exponentially, reducing the likelihood of obtaining an unbiased or well-representative sample for model training exponentially 4. As a result, the infinitely many separating hyperplanes are not equally generalizable to unseen data that are far from the sampled space.\nAs seen, in large $p$ small $n$ scenarios, even with a simple linear model exhibiting perfect performance on the training set, obtaining parameters conducive to predicting labels accurately on unseen test data can be challenging. When it involves non-linear components, the convex optimization can turn into a non-convex one. This will be more difficult because the number of local minima can increase along with input dimension $p$. Any corresponding performance degrades in the unseen test set can be a result of overfitting on the limited training set.\n3. Tackling the Problem of Large P Small N To address this problem, we may often need to leverage additional information to guide feature engineering, model design, model training, and so on.\n3.1 Feature selection Feature selection is probably the simplest thing we may consider to address the large $p$ small $n$ problem as it aims to cut the number of features so $p$ and $n$ are more comparable.\nIn order to know which features to keep for building models, we typically leverage some assumptions or intuition to decide which features are more useful for the problems we try to predict. For example, we may assume that the features that have a high association with the target variable are more predictive than the ones that have a low association with the target variable. We may also (iteratively) try different feature sets for modeling and see which combination of features could lead to the most favorable performance in the validation sets.\nWhile feature selection is simple and intuitive, the dropped features may actually be critical. In long-tailed problems, the dropped features may be the ones that are more likely to have a high variance in the training set. In this case, the model trained with a limited training set and reduced feature set may not be able to generalize well to the unseen test set.\n3.2 Regularization Regularization is another common approach to improve the robustness and generalization in the large $p$ small $n$ problem. The most common way to regularize the model training process is to add a penalty term to the loss function to penalize the model complexity, avoiding overfitting.\n3.2.1 $L_p$ regularization To penalize having non-zero values of the model parameters, $l_p$ regularization adds $L_P$ norm of the model’s parameters 5 raised to the power of $p$ to the loss function as below:\n\\begin{equation} \\begin{aligned} \\mathcal{L_{\\text{total}}} = \\mathcal{L_{\\text{original}}} + \\lambda_p \\mathcal{L_{p}}, \\end{aligned} \\end{equation}\n\\begin{equation} \\begin{aligned} \\mathcal{L_p} = ||w||^p_p = \\sum_{j=1}^{p} |w_j|^p, \\end{aligned} \\end{equation}\nwhere $\\lambda_p$ is a hyperparameter for regularization strength and $p$ is the order of the norm with typically non-negative value 6.\nDifferent values of $p$ may have different effects on the model training process (Goodfellow, et al 2016). For example, adding $L_2$ regularization can shrink the weights toward 0 and is equivalent to multiply your likelihood a gaussian prior in the maximum a posteriori (MAP) estimation from the view point of Bayesian. $L_1$ regularization is equivalent to applying a Laplacian prior in the MAP estimation and leads to sparser solutions than $L_2$ 7. A more extreme regularization is $L_0$ that adds the sum of number of non-zero weights to the loss to force the model have more zero weights for certain features than $L_1$ does 8.\nWhile $L_0$ and $L_1$ regularization may sometimes be used as a gradient-based feature selection method, they may introduce difficulties in optimization as the $L_0$ norm is not convex and the $L_1$ norm is not differentiable at the origin. Therefore, $L_2$ regularization might be more commonly used in practice.\nMoreover, since the Hessian for $\\mathcal{L_2}$ is positive definite 9, this makes the loss function landscape strictly convex as long as the original loss function $L_{original}$ in the parameter space is convex. This property of $L_2$ regularization ensures a single global optimal solution for simple but widely adopted linear models like logistic regression. In our previous toy problem, when applying $L_2$ regularization, there will be a unique hyperplane being found by the optimization process.\n3.2.2 Other regularization techniques In addition to $L_p$ regularization, there are other forms of regularization that allow us to incorporate domain knowledge into the model training process. For example, when there is a spurious correlation in the training data, the naively trained model may establish some unwanted behaviors such as a correlation between the model outputs and bias attributes that are spuriously correlated to the target variables (and features). Such a correlation indicates that the model leverages the spurious correlation to make predictions, leading to poor generalization in the test data that lacks such spurious correlation. To avoid this, we can add a penalty term $\\mathcal{L_{\\text{corr}}}$ to the loss function to penalize the model not to have such spurious correlation.\n\\begin{equation} \\begin{aligned} \\mathcal{L_{\\text{corr}}} = \\frac{1}{M} \\sum_{i=1}^{M} |(\\hat{y}_i -\\overline{\\hat{y}}) \\cdot (a_i- \\overline{a})|, \\end{aligned} \\end{equation}\nwhere $|(\\hat{y}_i -\\overline{\\hat{y}}) \\cdot (a_i- \\overline{a})|$ quantifies the magnitude of the correlation between model output $\\hat{y}_i$ and bias attribute $a_i$ for the $i$th sample among select $M$ samples in the training data. Except for this simple example, we may also come up with more complex regularization like what is done in generative adversarial network (GAN)(Goodfellow, et al 2014) and contrastive learning (Oord, et al 2018).\nWe may also apply controls on the model training dynamics to regularize the model. For example, we can stop the model training early when the validation loss is not improving even though the learning curve so far shows that the training loss is continuously decreasing. This is called early stopping, which prevents the model from overfitting the training data. We can also apply dropout, which randomly turns off some of the neurons during training to force the model to learn more robust features (Srivastava2014). This regularization also provides some data augmentation, which adds some synthetic training data to increase $n$. We may also introduce additional relevant tasks to regularize the model. In particular, we may use different portions of the model for different tasks. The shared components will likely better capture the key components in the data, and the resultant model thus more robust.\n3.3 Feature engineering Feature engineering is another way to incorporate domain knowledge into the model training process. This involves using expert knowledge to transform the raw features into a lower-dimensional space of more relevant features. Dimensionality reduction techniques can also be used for this purpose. While feature engineering is widely used in conventional machine learning, its effectiveness depends on the reliability and completeness of the expert knowledge.\n3.4 Architectural Biases A sister method of feature engineering is to design the model with appropriate architectural biases. The structure of the model itself can also impose potentially useful biases. For example, Convolutional neural netowrks (CNN) can learn how to extract local features in an image with hundreds to hundreds of thousands of pixels using weight-sharing convolution filters. These filters are applied along input features and provide translation-equivariant feature maps 10, which are much more efficient and effective than using mlp or feature engineering approaches. The translation-equivariance property allows the model to learn to recognize the same object in different locations in the image. Without such a bias, the model may require a lot of more training data to learn.\nHowever, the architectural bias can also be the bottleneck that limits the model generalization capability. For example, the CNN model may be biased towards leveraging the local patterns but fail to correctly recognize the distant global structure like a vision transformer can do (Dosovitskiy2020). Moreover, due to a lack of rotation-equivariance, the CNN model may fail to recognize rotated objects. In this case, we may need to have data augmentation via rotation or design a model that is rotation-equivariant.\n3.5 Pre-training and Foundation Models In recent years, foundation models pre-trained on large-scale datasets have become increasingly popular for tackling the large $p$ small $n$ problem. These models are trained on broad datasets using self-supervised learning objectives, which allows them to learn general-purpose feature representations that can be fine-tuned for specific tasks with limited data. For example, a model pre-trained on ImageNet can be fine-tuned on a small dataset of medical images to achieve good performance on disease classification. Foundation models in natural language processing, such as BERT (Devlin2018) and GPT (Brown2020), have also shown impressive performance on a wide range of tasks with limited fine-tuning data. These models are trained on massive text corpora and learn to capture complex linguistic patterns and world knowledge. By leveraging the knowledge learned during pre-training, foundation models can achieve good performance on downstream tasks with few or no labeled examples (i.e., few-shot or zero-shot).\nAs seen, with these pre-trained models, the models don’t just provide reasonable architectural biases but also better weight initialization, which helps effectively integrate large $p$ features than the model trained from scratch from the limited small $n$ training data. It also can significantly reduce the training time and generalization error.\nSummary All these methods, including feature selection, feature engineering, regularization, model design, and pre-training, are based on our prior understanding of the data generation process and the model training. They are sometimes called inductive biases, which refer to the assumptions, preferences, or prior knowledge that a learning algorithm incorporates to generalize beyond the training data and make predictions on unseen data. These biases guide the learning process and help the model to prioritize certain solutions or hypotheses over others. Whether the inductive biases being leveraged are sound or not determines whether we could generalize the model to unseen data.\nFor the large $p$ small $n$ problem, it is often believed that the most relevant information for modeling the problem lies in a low-dimensional manifold (Oord, et al 2018). Some methods use fewer parameters to learn this latent space but rely on stronger inductive biases, while others use more parameters with weaker inductive biases. In large $p$ small $n$ cases, models with more parameters are typically more prone to overfitting, requiring more data to estimate the optimal parameters.\nSince the ImageNet moment, the combination of big data and deep learning with suitable inductive biases has led to numerous successes in various applications. For domains with limited data, successful examples like AlphaFold2 highlight the importance of inductive biases. Developing appropriate inductive biases for large $p$ small $n$ problems remains an active area of research.\nIt is important to note that expanding the feature set can be costly and increase the risk of data biases and overfitting. Moreover, acquiring additional samples for training and evaluation becomes challenging in such scenarios. This issue is common across various predictive modeling domains, including healthcare, business, and science. Therefore, investing resources to augment feature sets requires careful strategic planning and consideration. Yep, what a large $p$ for small $n$ ;)\nIn summary, the large $p$ small $n$ problem presents unique challenges that require a balance between model complexity, inductive biases, and data availability. Addressing these challenges is crucial for developing effective predictive models in data-limited domains.\nCitation If you find this post helpful and are interested in referencing it in your write-up, you can cite it as\nXiao, Jiajie. (April 2024). What a large p for small n. JX’s log. Available at: https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/.\nor add the following to your BibTeX file.\n@article{xiao2023howtoachieverobustai, title = \"What a large p for small n\", author = \"Xiao, Jiajie\", journal = \"JX's log\", year = \"2024\", month = \"April\", url = \"https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/\" } References Lipovetsky, S. (2015). Analytical closed-form solution for binary logit regression by categorical predictors. Journal of applied statistics, 42(1), 37-49. https://stackoverflow.com/questions/37997253/can-we-use-normal-equation-for-logistic-regression https://sebastianraschka.com/faq/docs/logistic-analytical.html#is-there-an-analytical-solution-to-logistic-regression-similar-t Goodfellow, I., Bengio, Y., \u0026 Courville, A. (2016). Deep learning. MIT press. Chapter 7. Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., … \u0026 Bengio, Y. (2014). Generative adversarial nets. Advances in neural information processing systems, 27. Oord, A. V. D., Li, Y., \u0026 Vinyals, O. (2018). Representation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748. Theodoridis, S., \u0026 Koutroumbas, K. (2006). Pattern recognition. Elsevier. Chapter 5, Section 5.9. Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., \u0026 Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. The journal of machine learning research, 15(1), 1929-1958. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., … \u0026 Houlsby, N. (2020). An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929. Devlin, J., Chang, M. W., Lee, K., \u0026 Toutanova, K. (2018). Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805. Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J. D., Dhariwal, P., … \u0026 Amodei, D. (2020). Language models are few-shot learners. Advances in neural information processing systems, 33, 1877-1901. To check if the Hessian matrix is positive definite, we can examine whether all eigenvalues of the matrix are positive. In the 1D case, we can also simply use the second derivative test to check if the function is convex. If the second derivative is positive, the function is convex. If the second derivative is negative, the function is concave. If the second derivative is zero, the function is a flat line. It’s worth to note that, at a critical point, the function derivative can be undefined (such as $x=0$ for $f(x) = |x|$). ↩︎\nThe convexity of the loss function in the parameter space depends on the choice of activation function. If the activation function is convex, the loss will be convex in the parameter space, as the weighted sum is a linear (and thus convex) operation. On the other hand, like a typical neural network with at least two linear layers and some form of nonlinear activation function after each layer, the loss function landscape in the parameter space is not convex given the Hessian matrix $H$ is not positive semidefinite (meaning the eigenvalues of $H$ are non-negative). The composition of the loss function with the non-linear activation functions and the complex architecture of neural networks introduces non-convexity. Training a neural network thereby involves navigating a non-convex optimization landscape, which can have multiple local optima and saddle points (meaning the Hessian is indefinite, i.e., its eigenvalues have both positive and negative values). ↩︎\nStrictly convex guarantees that there is only one minimum. Different types of convexity are roughly told via the following:\n$f$ is convex if and only if $f’’(x) \\geq 0$ for all $x$ $f$ is strictly convex if and only if $f’’(x) \u003e 0$ for all $x$ (This is sufficient but not necessary for strictly convexity. When the function is not not differentiable, the gradient is replaced by the sub-gradient at the non-smooth point $x$.) $f$ is strongly convex if and only if $f’’(x) \\geq m \u003e 0$ for all $x$ (Strong convexity can provide faster convergence and tighter error bounds to the minimum compare to strictly convex function) ↩︎ This is an example of curse of dimensionality in sampling. For machine learning, a typical rule of thumb is that there should be at least 5 training examples for each dimension or 10 times the VC dimension in the representation space (Theodoridis2006). If one wants to apply this rule, the number of training examples required to learn a model in the training set grows exponentially with the number of dimensions. ↩︎\nThe calculation of $L_p$ regularization usually ignores the bias terms and moving averaged values in batch normalization since they don’t contribute to overfitting. However, for convenience, in many implementations, such as the widely adopted library PyTorch, all parameters that require updating by backpropagated gradients may be counted by the optimizer’s default weight decay calculation. Weight decay is a form of regularization that is sometimes (e.g., SGD without momentum or AdamW that has decoupled weight decay calculation) equivalent to $L_2$ regularization. ↩︎\nFor $p=0$, $L_0$ norm basically counts non-zero elements and $0^0\\equiv0$. ↩︎\nLaplacian prior has higher probability density near zero compared to a Gaussian prior, thus promoting sparsity. ↩︎\n$L_0$ regularization directly penalizes the number of non-zero weights, while $L_1$ regularization indirectly promotes sparsity by shrinking weights more aggressively than $L_2$. ↩︎\nThe Hessian for $\\mathcal{L_2}$ is a diagonal matrix with 2 as the diagonal elements. So the eigenvalues of the Hessian are equal to 2, which are always positive. Q.E.D. ↩︎\nTranslational equivariance means that the model can recognize the same object in different locations in the image. In math, a function or transformation is equivariant if it maintains a certain relationship between its input and output when both are transformed. In other words, if $f$ is equivariant with respect to transformations $T$ and $S$, then $f(T(x))=S(f(x))$ for all $x$. A stronger version of equivariance is invariance. A function or transformation is invariant if its output remains unchanged when its input is transformed in a certain way. For example, if a function $f(x)$ is invariant under translation, it means that $f(x+a)=f(x)$ for any value of $a$. For CNN, convolutional filters are translation-equivariant while max-pooling is translation-invariant. ↩︎\n",
+  "wordCount" : "3473",
+  "inLanguage": "en",
+  "datePublished": "2024-04-29T08:36:29-07:00",
+  "dateModified": "2024-04-29T08:36:29-07:00",
+  "author":{
+    "@type": "Person",
+    "name": "Jiajie Xiao"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "JX's log",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jiajiexiao.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jiajiexiao.github.io/" accesskey="h" title="JX&#39;s log (Alt + H)">JX&#39;s log</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jiajiexiao.github.io/" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/posts/" title="Blog">
+                    <span>Blog</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/tags/" title="Tag">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jiajiexiao.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://jiajiexiao.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      What a large p for small n
+    </h1>
+    <div class="post-meta"><span title='2024-04-29 08:36:29 -0700 PDT'>2024-04-29</span>&nbsp;·&nbsp;17 min&nbsp;·&nbsp;Jiajie Xiao
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">Table of Contents</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#1-toy-problem-setup" aria-label="1. Toy Problem Setup">1. Toy Problem Setup</a></li>
+                    <li>
+                        <a href="#2-not-all-solutions-are-equally-generalizable" aria-label="2. Not All Solutions Are Equally Generalizable">2. Not All Solutions Are Equally Generalizable</a></li>
+                    <li>
+                        <a href="#3-tackling-the-problem-of-large-p-small-n" aria-label="3. Tackling the Problem of Large P Small N">3. Tackling the Problem of Large P Small N</a><ul>
+                            
+                    <li>
+                        <a href="#31-feature-selection" aria-label="3.1 Feature selection">3.1 Feature selection</a></li>
+                    <li>
+                        <a href="#32-regularization" aria-label="3.2 Regularization">3.2 Regularization</a><ul>
+                            
+                    <li>
+                        <a href="#321-l_p-regularization" aria-label="3.2.1 $L_p$ regularization">3.2.1 $L_p$ regularization</a></li>
+                    <li>
+                        <a href="#322-other-regularization-techniques" aria-label="3.2.2 Other regularization techniques">3.2.2 Other regularization techniques</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#33-feature-engineering" aria-label="3.3 Feature engineering">3.3 Feature engineering</a></li>
+                    <li>
+                        <a href="#34-architectural-biases" aria-label="3.4 Architectural Biases">3.4 Architectural Biases</a></li>
+                    <li>
+                        <a href="#35-pre-training-and-foundation-models" aria-label="3.5 Pre-training and Foundation Models">3.5 Pre-training and Foundation Models</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#summary" aria-label="Summary">Summary</a></li>
+                    <li>
+                        <a href="#citation" aria-label="Citation">Citation</a></li>
+                    <li>
+                        <a href="#references" aria-label="References">References</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+
+  <div class="post-content"><p>&ldquo;Large p small n&rdquo; describes a scenario where the number of features ($p$) is much greater than the
+number of observations ($n$) for model training. While it is not a new problem, it continues to pose
+significant challenges in real-world applications of machine learning, especially for domains
+lacking rich data or fast and cheap data generation processes. In this blog post, I&rsquo;ll document my
+recent thoughts on the &ldquo;large p small n&rdquo; problem.</p>
+<h2 id="1-toy-problem-setup">1. Toy Problem Setup<a hidden class="anchor" aria-hidden="true" href="#1-toy-problem-setup">#</a></h2>
+<p>For simplicity and easy illustration, let&rsquo;s look at a binary classification problem with linearly
+separable data, where at least one hyperplane can perfectly distinguish between the two classes.</p>
+<p>The equation of a hyperplane in a $p$-dimensional space is given by:</p>
+<p><a id="eq1"></a>
+\begin{equation}
+\begin{aligned}
+w_1 x_1 + w_2 x_2 + &hellip; + w_p x_p + b = 0.
+\end{aligned}
+\end{equation}</p>
+<p>Here, $x_1$, $x_2$, &hellip;, $x_p$ are the coordinates of a point (called features) in the
+$p$-dimensional space, and $w_1$, $w_2$, &hellip;, $w_p$, and $b$ are special numbers (called weights and
+bias) that determine the exact position and the norm direction of the hyperplane. Now, if we have a
+new point ($x&rsquo;$) and want to know which group it belongs to, we can do two things:</p>
+<ul>
+<li>
+<p>Geometrically: We can look at where the point is located in relation to the line. If it&rsquo;s on one
+side of the line, it belongs to one group; if it&rsquo;s on the other side, it belongs to the other
+group.</p>
+</li>
+<li>
+<p>Algebraically: We can plug the coordinates of the point into the left side of the <a href="#eq1">eq 1</a> and
+calculate the result. If the result is positive, the point belongs to one group; otherwise, it
+belongs to the other group.</p>
+</li>
+</ul>
+<p>These weights and bias constitute $p+1$ unknown parameters that govern predictions. Our goal is to
+find the &ldquo;true&rdquo; values of these parameters that define the class assignments in the underlying data
+generation process, so that we can reliably predict the class of any future unseen point in the
+$p$-dimensional space. To achieve this, we typically convert this into an optimization problem and
+use <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation">maximum likelihood estimation</a>
+based on the observed samples. This involves finding the optimal values of the parameters that
+minimize a loss function such as binary cross-entropy $\mathcal{L_b}$ or hinge loss $\mathcal{L_h}$:</p>
+<p><a id="eq2"></a>
+\begin{equation}
+\begin{aligned}
+\mathcal{L_b} (y, \hat{y}) = -\frac{1}{N} \sum_{i=1}^{N} [y_i \cdot \log(\hat{y}_i) + (1 - y_i) \cdot \log(1 - \hat{y}_i)],
+\end{aligned}
+\end{equation}</p>
+<p><a id="eq3"></a>
+\begin{equation}
+\begin{aligned}
+\mathcal{L_h}(y, \hat{y}) = \frac{1}{N} \sum_{i=1}^{N} \max(0, 1 - y_i \cdot \hat{y}_i),
+\end{aligned}
+\end{equation}</p>
+<p>where $y_i$ is the true label of the $i^{th}$ observation, and $\hat{y}_i$ is the predicted label or
+the generalized form of predicted probability for positive class assignment of the $i^{th}$
+observation derived by applying an activation function $\sigma$, such as the sigmoid (which is a
+smoothed step function), to the weighted sum:</p>
+<p><a id="eq4"></a>
+\begin{equation}
+\begin{aligned}
+\hat{y_i} = \sigma(w_1 x_{i1} + w_2 x_{i2} +&hellip; + w_p x_{ip} + b).
+\end{aligned}
+\end{equation}</p>
+<p>When finding a minimum value of a function, in math and physics, we often to check for points where
+the gradient is zero and the <a href="https://en.wikipedia.org/wiki/Hessian_matrix">Hessian matrix</a> is
+positive definite <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>. That means we may want to first solve $\nabla_{w, b} \mathcal{L} = 0$ to
+find the critical points in the parameter space. However, there appear to have no closed form
+solution due to the involved nonlinearity in deriving $\hat{y}_i$ in this case
+(<a href="#Lipovetsky2015">Lipovetsky2015</a> or see discussions in <a href="#stackoverflow">link1</a> and
+<a href="#sebastianraschka">link2</a>). Consequently, gradient descent-based algorithms are often employed to
+find values for $w$ and $b$ that minimize the loss function $\mathcal{L}$.</p>
+<h2 id="2-not-all-solutions-are-equally-generalizable">2. Not All Solutions Are Equally Generalizable<a hidden class="anchor" aria-hidden="true" href="#2-not-all-solutions-are-equally-generalizable">#</a></h2>
+<p>While binary cross-entropy and hinge loss are both convex concerning $\hat{y}$ <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>, this convexity
+is not <em>strict</em> <sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> due to the possible zero values of second-order derivatives of the losses with
+respect to $\hat{y}$. So, there exist infinitely many sets of weight and bias values capable
+of separating data points. Moreover, as the feature dimension increases, the volume of the feature
+space grows exponentially, reducing the likelihood of obtaining an unbiased or well-representative
+sample for model training exponentially <sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>. As a result, the infinitely many separating
+hyperplanes are not equally generalizable to unseen data that are far from the sampled space.</p>
+<p>As seen, in large $p$ small $n$ scenarios, even with a simple linear model exhibiting perfect
+performance on the training set, obtaining parameters conducive to predicting labels accurately on
+unseen test data can be challenging. When it involves non-linear components, the convex optimization
+can turn into a non-convex one. This will be more difficult because the number of local minima can
+increase along with input dimension $p$. Any corresponding performance degrades in the unseen test
+set can be a result of overfitting on the limited training set.</p>
+<h2 id="3-tackling-the-problem-of-large-p-small-n">3. Tackling the Problem of Large P Small N<a hidden class="anchor" aria-hidden="true" href="#3-tackling-the-problem-of-large-p-small-n">#</a></h2>
+<p>To address this problem, we may often need to leverage additional information to guide feature
+engineering, model design, model training, and so on.</p>
+<h3 id="31-feature-selection">3.1 Feature selection<a hidden class="anchor" aria-hidden="true" href="#31-feature-selection">#</a></h3>
+<p>Feature selection is probably the simplest thing we may consider to address the large $p$ small $n$
+problem as it aims to cut the number of features so $p$ and $n$ are more comparable.</p>
+<p>In order to know which features to keep for building models, we typically leverage some assumptions
+or intuition to decide which features are more useful for the problems we try to predict. For
+example, we may assume that the features that have a high association with the target variable are
+more predictive than the ones that have a low association with the target variable. We may also
+(iteratively) try different feature sets for modeling and see which combination of features could
+lead to the most favorable performance in the validation sets.</p>
+<p>While feature selection is simple and intuitive, the dropped features may actually be critical. In
+long-tailed problems, the dropped features may be the ones that are more likely to have a high
+variance in the training set. In this case, the model trained with a limited training set and
+reduced feature set may not be able to generalize well to the unseen test set.</p>
+<h3 id="32-regularization">3.2 Regularization<a hidden class="anchor" aria-hidden="true" href="#32-regularization">#</a></h3>
+<p>Regularization is another common approach to improve the robustness and generalization in the large
+$p$ small $n$ problem. The most common way to regularize the model training process is to add a
+penalty term to the loss function to penalize the model complexity, avoiding overfitting.</p>
+<h4 id="321-l_p-regularization">3.2.1 $L_p$ regularization<a hidden class="anchor" aria-hidden="true" href="#321-l_p-regularization">#</a></h4>
+<p>To penalize having non-zero values of the model parameters, $l_p$ regularization adds $L_P$ norm of the
+model&rsquo;s parameters <sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup> raised to the power of $p$ to the loss function as below:</p>
+<p><a id="eq5"></a>
+\begin{equation}
+\begin{aligned}
+\mathcal{L_{\text{total}}} = \mathcal{L_{\text{original}}} + \lambda_p \mathcal{L_{p}},
+\end{aligned}
+\end{equation}</p>
+<p><a id="eq6"></a>
+\begin{equation}
+\begin{aligned}
+\mathcal{L_p} = ||w||^p_p = \sum_{j=1}^{p} |w_j|^p,
+\end{aligned}
+\end{equation}</p>
+<p>where $\lambda_p$ is a hyperparameter for regularization strength and $p$ is the order of the norm
+with typically non-negative value <sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>.</p>
+<p>Different values of $p$ may have different effects on the model training process (<a href="#Goodfellow2016">Goodfellow, et al
+2016</a>). For example, adding $L_2$ regularization can shrink the weights toward 0
+and is equivalent to multiply your likelihood a gaussian prior in the <a href="https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation">maximum a posteriori (MAP)
+estimation</a> from the view point of
+Bayesian. $L_1$ regularization is equivalent to applying a <a href="https://en.wikipedia.org/wiki/Laplace_distribution">Laplacian
+prior</a> in the MAP estimation and leads to
+sparser solutions than $L_2$ <sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>. A more extreme regularization is $L_0$ that adds the sum of
+number of non-zero weights to the loss to force the model have more zero weights for certain
+features than $L_1$ does <sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>.</p>
+<p>While $L_0$ and $L_1$ regularization may sometimes be used as a gradient-based feature selection
+method, they may introduce difficulties in optimization as the $L_0$ norm is not convex and the
+$L_1$ norm is not differentiable at the origin. Therefore, $L_2$ regularization might be more
+commonly used in practice.</p>
+<p>Moreover, since the Hessian for $\mathcal{L_2}$ is positive definite <sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup>, this makes the loss
+function landscape strictly convex as long as the original loss function $L_{original}$ in the
+parameter space is convex. This property of $L_2$ regularization ensures a single global optimal
+solution for simple but widely adopted linear models like logistic regression. In our previous toy
+problem, when applying $L_2$ regularization, there will be a unique hyperplane being found by the
+optimization process.</p>
+<h4 id="322-other-regularization-techniques">3.2.2 Other regularization techniques<a hidden class="anchor" aria-hidden="true" href="#322-other-regularization-techniques">#</a></h4>
+<p>In addition to $L_p$ regularization, there are other forms of regularization that allow us to
+incorporate domain knowledge into the model training process. For example, when there is a spurious
+correlation in the training data, the naively trained model may establish some unwanted behaviors
+such as a correlation between the model outputs and bias attributes that are spuriously correlated
+to the target variables (and features). Such a correlation indicates that the model leverages the
+spurious correlation to make predictions, leading to poor generalization in the test data that lacks
+such spurious correlation. To avoid this, we can add a penalty term $\mathcal{L_{\text{corr}}}$ to
+the loss function to penalize the model not to have such spurious correlation.</p>
+<p><a id="eq7"></a>
+\begin{equation}
+\begin{aligned}
+\mathcal{L_{\text{corr}}} = \frac{1}{M} \sum_{i=1}^{M} |(\hat{y}_i -\overline{\hat{y}}) \cdot (a_i- \overline{a})|,
+\end{aligned}
+\end{equation}</p>
+<p>where $|(\hat{y}_i -\overline{\hat{y}}) \cdot (a_i- \overline{a})|$ quantifies the magnitude of the
+correlation between model output $\hat{y}_i$ and bias attribute $a_i$ for the $i$th sample among
+select $M$ samples in the training data. Except for this simple example, we may also come up with
+more complex regularization like what is done in generative adversarial network (GAN)(<a href="#Goodfellow2014">Goodfellow,
+et al 2014</a>) and contrastive learning (<a href="#Oord2018">Oord, et al 2018</a>).</p>
+<p>We may also apply controls on the model training dynamics to regularize the model. For example, we
+can stop the model training early when the validation loss is not improving even though the learning
+curve so far shows that the training loss is continuously decreasing. This is called <a href="https://en.wikipedia.org/wiki/Early_stopping">early
+stopping</a>, which prevents the model from overfitting
+the training data. We can also apply dropout, which randomly turns off some of the neurons during
+training to force the model to learn more robust features (<a href="#Srivastava2014">Srivastava2014</a>). This
+regularization also provides some data augmentation, which adds some synthetic training data to
+increase $n$. We may also introduce additional relevant tasks to regularize the model. In
+particular, we may use different portions of the model for different tasks. The shared components
+will likely better capture the key components in the data, and the resultant model thus more robust.</p>
+<h3 id="33-feature-engineering">3.3 Feature engineering<a hidden class="anchor" aria-hidden="true" href="#33-feature-engineering">#</a></h3>
+<p>Feature engineering is another way to incorporate domain knowledge into the model training process.
+This involves using expert knowledge to transform the raw features into a lower-dimensional space of
+more relevant features. Dimensionality reduction techniques can also be used for this purpose. While
+feature engineering is widely used in conventional machine learning, its effectiveness depends on
+the reliability and completeness of the expert knowledge.</p>
+<h3 id="34-architectural-biases">3.4 Architectural Biases<a hidden class="anchor" aria-hidden="true" href="#34-architectural-biases">#</a></h3>
+<p>A sister method of feature engineering is to design the model with appropriate architectural biases.
+The structure of the model itself can also impose potentially useful biases. For example,
+<a href="https://en.wikipedia.org/wiki/Convolutional_neural_network">Convolutional neural netowrks (CNN)</a>
+can learn how to extract local features in an image with hundreds to hundreds of thousands of pixels
+using weight-sharing convolution filters. These filters are applied along input features and provide
+translation-equivariant feature maps <sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>, which are much more efficient and effective than using
+mlp or feature engineering approaches. The translation-equivariance property allows the model to
+learn to recognize the same object in different locations in the image. Without such a bias, the
+model may require a lot of more training data to learn.</p>
+<p>However, the architectural bias can also be the bottleneck that limits the model generalization
+capability. For example, the CNN model may be biased towards leveraging the local patterns but fail
+to correctly recognize the distant global structure like a vision transformer can do
+(<a href="#Dosovitskiy2020">Dosovitskiy2020</a>). Moreover, due to a lack of rotation-equivariance, the CNN
+model may fail to recognize rotated objects. In this case, we may need to have data augmentation via
+rotation or design a model that is rotation-equivariant.</p>
+<h3 id="35-pre-training-and-foundation-models">3.5 Pre-training and Foundation Models<a hidden class="anchor" aria-hidden="true" href="#35-pre-training-and-foundation-models">#</a></h3>
+<p>In recent years, foundation models pre-trained on large-scale datasets have become increasingly
+popular for tackling the large $p$ small $n$ problem. These models are trained on broad datasets
+using self-supervised learning objectives, which allows them to learn general-purpose feature
+representations that can be fine-tuned for specific tasks with limited data. For example, a model
+pre-trained on ImageNet can be fine-tuned on a small dataset of medical images to achieve good
+performance on disease classification. Foundation models in natural language processing, such as
+BERT (<a href="#Devlin2018">Devlin2018</a>) and GPT (<a href="#Brown2020">Brown2020</a>), have also shown impressive
+performance on a wide range of tasks with limited fine-tuning data. These models are trained on
+massive text corpora and learn to capture complex linguistic patterns and world knowledge. By
+leveraging the knowledge learned during pre-training, foundation models can achieve good performance
+on downstream tasks with few or no labeled examples (i.e., few-shot or zero-shot).</p>
+<p>As seen, with these pre-trained models, the models don&rsquo;t just provide reasonable architectural
+biases but also better weight initialization, which helps effectively integrate large $p$ features
+than the model trained from scratch from the limited small $n$ training data. It also can
+significantly reduce the training time and generalization error.</p>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<p>All these methods, including feature selection, feature engineering, regularization, model design,
+and pre-training, are based on our prior understanding of the data generation process and the model
+training. They are sometimes called <em>inductive biases</em>, which refer to the assumptions, preferences,
+or prior knowledge that a learning algorithm incorporates to generalize beyond the training data and
+make predictions on unseen data. These biases guide the learning process and help the model to
+prioritize certain solutions or hypotheses over others. Whether the inductive biases being leveraged
+are sound or not determines whether we could generalize the model to unseen data.</p>
+<p>For the large $p$ small $n$ problem, it is often believed that the most relevant information for
+modeling the problem lies in a low-dimensional manifold (<a href="#Oord2018">Oord, et al 2018</a>). Some
+methods use fewer parameters to learn this latent space but rely on stronger inductive biases, while
+others use more parameters with weaker inductive biases. In large $p$ small $n$ cases, models with
+more parameters are typically more prone to overfitting, requiring more data to estimate the optimal
+parameters.</p>
+<p>Since the ImageNet moment, the combination of big data and deep learning with suitable
+inductive biases has led to numerous successes in various applications. For domains with limited
+data, successful examples like AlphaFold2 highlight the importance of inductive biases. Developing
+appropriate inductive biases for large $p$ small $n$ problems remains an active area of research.</p>
+<p>It is important to note that expanding the feature set can be costly and increase the risk of data
+biases and overfitting. Moreover, acquiring additional samples for training and evaluation becomes
+challenging in such scenarios. This issue is common across various predictive modeling domains,
+including healthcare, business, and science. Therefore, investing resources to augment feature sets
+requires careful strategic planning and consideration. Yep, what a large $p$ for small $n$ ;)</p>
+<p>In summary, the large $p$ small $n$ problem presents unique challenges that require a balance
+between model complexity, inductive biases, and data availability. Addressing these challenges is
+crucial for developing effective predictive models in data-limited domains.</p>
+<h2 id="citation">Citation<a hidden class="anchor" aria-hidden="true" href="#citation">#</a></h2>
+<p>If you find this post helpful and are interested in referencing it in your write-up, you can cite it
+as</p>
+<blockquote>
+<p>Xiao, Jiajie. (April 2024). <em>What a large p for small n</em>. JX&rsquo;s log. Available
+at: <a href="https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/">https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/</a>.</p>
+</blockquote>
+<p>or add the following to your BibTeX file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bib" data-lang="bib"><span style="display:flex;"><span><span style="color:#a6e22e">@article</span>{xiao2023howtoachieverobustai,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">title</span>   = <span style="color:#e6db74">&#34;What a large p for small n&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">author</span>  = <span style="color:#e6db74">&#34;Xiao, Jiajie&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">journal</span> = <span style="color:#e6db74">&#34;JX&#39;s log&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">year</span>    = <span style="color:#e6db74">&#34;2024&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">month</span>   = <span style="color:#e6db74">&#34;April&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span>     = <span style="color:#e6db74">&#34;https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
+<ul>
+<li><a id="Lipovetsky2015"></a> Lipovetsky, S. (2015). <a href="https://www.tandfonline.com/doi/abs/10.1080/02664763.2014.932760">Analytical closed-form solution for binary logit regression by categorical predictors</a>. Journal of applied statistics, 42(1), 37-49.</li>
+<li><a id="stackoverflow"></a> <a href="https://stackoverflow.com/questions/37997253/can-we-use-normal-equation-for-logistic-regression">https://stackoverflow.com/questions/37997253/can-we-use-normal-equation-for-logistic-regression</a></li>
+<li><a id="sebastianraschka"></a> <a href="https://sebastianraschka.com/faq/docs/logistic-analytical.html#is-there-an-analytical-solution-to-logistic-regression-similar-t">https://sebastianraschka.com/faq/docs/logistic-analytical.html#is-there-an-analytical-solution-to-logistic-regression-similar-t</a></li>
+<li><a id="Goodfellow2016"></a>  Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). <a href="https://www.deeplearningbook.org/">Deep learning</a>. MIT press. Chapter 7.</li>
+<li><a id="Goodfellow2014"></a>  Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., &hellip; &amp; Bengio, Y. (2014). Generative adversarial nets. Advances in neural information processing systems, 27.</li>
+<li><a id="Oord2018"></a>  Oord, A. V. D., Li, Y., &amp; Vinyals, O. (2018). Representation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748.</li>
+<li><a id="Theodoridis2006"></a> Theodoridis, S., &amp; Koutroumbas, K. (2006). Pattern recognition. Elsevier. Chapter 5, Section 5.9.</li>
+<li><a id="Srivastava2014"></a> Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., &amp; Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. The journal of machine learning research, 15(1), 1929-1958.</li>
+<li><a id="Dosovitskiy2020"></a> Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., &hellip; &amp; Houlsby, N. (2020). An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929.</li>
+<li><a id="Devlin2018"></a> Devlin, J., Chang, M. W., Lee, K., &amp; Toutanova, K. (2018). Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805.</li>
+<li><a id="Brown2020"></a> Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J. D., Dhariwal, P., &hellip; &amp; Amodei, D. (2020). Language models are few-shot learners. Advances in neural information processing systems, 33, 1877-1901.</li>
+</ul>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>To check if the Hessian matrix is positive definite, we can examine whether all eigenvalues of
+the matrix are positive. In the 1D case, we can also simply use the second derivative test to check
+if the function is convex. If the second derivative is positive, the function is convex. If the
+second derivative is negative, the function is concave. If the second derivative is zero, the
+function is a flat line. It&rsquo;s worth to note that, at a critical point, the function derivative can
+be undefined (such as $x=0$ for $f(x) = |x|$).&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>The convexity of the loss function in the parameter space depends on the choice of activation
+function. If the activation function is convex, the loss will be convex in the parameter space, as
+the weighted sum is a linear (and thus convex) operation. On the other hand, like a typical neural
+network with at least two linear layers and some form of nonlinear activation function after each
+layer, the loss function landscape in the parameter space is not convex given the Hessian matrix $H$
+is not positive semidefinite (meaning the eigenvalues of $H$ are non-negative). The composition of
+the loss function with the non-linear activation functions and the complex architecture of neural
+networks introduces non-convexity. Training a neural network thereby involves navigating a
+non-convex optimization landscape, which can have multiple local optima and saddle points (meaning
+the Hessian is indefinite, i.e., its eigenvalues have both positive and negative values).&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>Strictly convex guarantees that there is only one minimum. Different types of convexity are
+roughly told via the following:</p>
+<ul>
+<li>$f$ is convex if and only if $f&rsquo;&rsquo;(x) \geq 0$  for all $x$</li>
+<li>$f$ is strictly convex if and only if $f&rsquo;&rsquo;(x) &gt; 0$ for all $x$ (This is sufficient but not
+necessary for strictly convexity. When the function is not not differentiable, the gradient is
+replaced by the sub-gradient at the non-smooth point $x$.)</li>
+<li>$f$ is strongly convex if and only if $f&rsquo;&rsquo;(x) \geq m &gt; 0$ for all $x$ (Strong convexity can
+provide faster convergence and tighter error bounds to the minimum compare to strictly convex
+function)</li>
+</ul>
+&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+<li id="fn:4">
+<p>This is an example of curse of dimensionality in sampling. For machine learning, a typical
+rule of thumb is that there should be at least 5 training examples for each dimension or 10
+times the <a href="https://en.wikipedia.org/wiki/Vapnik%E2%80%93Chervonenkis_dimension">VC dimension</a> in
+the representation space (<a href="#Theodoridis2006">Theodoridis2006</a>). If one wants to apply this rule,
+the number of training examples required to learn a model in the training set grows
+exponentially with the number of dimensions.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>The calculation of $L_p$ regularization usually ignores the bias terms and moving averaged
+values in batch normalization since they don&rsquo;t contribute to overfitting. However, for convenience,
+in many implementations, such as the widely adopted library PyTorch, all parameters that require
+updating by backpropagated gradients may be counted by the optimizer&rsquo;s default weight decay
+calculation. Weight decay is a form of regularization that is sometimes (e.g., SGD without momentum
+or AdamW that has decoupled weight decay calculation) equivalent to $L_2$ regularization.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>For $p=0$, $L_0$ norm basically counts non-zero elements and $0^0\equiv0$.&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p>Laplacian prior has higher probability density near zero compared to a Gaussian prior, thus
+promoting sparsity.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:8">
+<p>$L_0$ regularization directly penalizes the number of non-zero weights, while $L_1$
+regularization indirectly promotes sparsity by shrinking weights more aggressively than $L_2$.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:9">
+<p>The Hessian for $\mathcal{L_2}$ is a diagonal matrix with 2 as the diagonal elements.
+So the eigenvalues of the Hessian are equal to 2, which are always positive. Q.E.D.&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:10">
+<p>Translational equivariance means that the model can recognize the same object in different
+locations in the image. In math, a function or transformation is equivariant if it maintains a
+certain relationship between its input and output when both are transformed. In other words, if $f$
+is equivariant with respect to transformations $T$ and $S$, then $f(T(x))=S(f(x))$ for all $x$. A
+stronger version of equivariance is invariance. A function or transformation is invariant if its
+output remains unchanged when its input is transformed in a certain way. For example, if a function
+$f(x)$ is invariant under translation, it means that $f(x+a)=f(x)$ for any value of $a$. For CNN,
+convolutional filters are translation-equivariant while max-pooling is translation-invariant.&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://jiajiexiao.github.io/tags/ai/ml/">AI/ML</a></li>
+      <li><a href="https://jiajiexiao.github.io/tags/small-data/">Small Data</a></li>
+      <li><a href="https://jiajiexiao.github.io/tags/robustness/">Robustness</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Toward Robust AI (2): How To Achieve Robust AI</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share What a large p for small n on x"
+            href="https://x.com/intent/tweet/?text=What%20a%20large%20p%20for%20small%20n&amp;url=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-04-29_large_p_small_n%2f&amp;hashtags=AI%2fML%2cSmallData%2cRobustness">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share What a large p for small n on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-04-29_large_p_small_n%2f&amp;title=What%20a%20large%20p%20for%20small%20n&amp;summary=What%20a%20large%20p%20for%20small%20n&amp;source=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-04-29_large_p_small_n%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+<div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+      
+      
+      if (window.location.hostname === 'localhost') return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = 'jjxiao';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023-2024 <a href="https://jiajiexiao.github.io/">JX&#39;s log</a> | <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" 
+        target="_blank" rel="license noopener noreferrer">CC BY-NC-SA 4.0 </a> | </span>
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+
+    
+
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
