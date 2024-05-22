@@ -2,11 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/</loc>
+    <lastmod>2024-05-10T22:34:35-08:00</lastmod>
+  </url><url>
     <loc>https://jiajiexiao.github.io/</loc>
-    <lastmod>2024-04-29T08:36:29-07:00</lastmod>
+    <lastmod>2024-05-10T22:34:35-08:00</lastmod>
   </url><url>
     <loc>https://jiajiexiao.github.io/posts/</loc>
-    <lastmod>2024-04-29T08:36:29-07:00</lastmod>
+    <lastmod>2024-05-10T22:34:35-08:00</lastmod>
   </url><url>
     <loc>https://jiajiexiao.github.io/tags/robustness/</loc>
     <lastmod>2024-04-29T08:36:29-07:00</lastmod>
