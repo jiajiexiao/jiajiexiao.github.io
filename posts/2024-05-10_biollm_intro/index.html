@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>Biomedical LLMs: Intro | JX&#39;s log</title>
-<meta name="keywords" content="">
+<meta name="keywords" content="AI/ML, LLMs, Biomedical">
 <meta name="description" content="The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical">
 <meta name="author" content="Jiajie Xiao">
 <link rel="canonical" href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">
@@ -138,10 +138,10 @@ if (!doNotTrack) {
   "name": "Biomedical LLMs: Intro",
   "description": "The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical",
   "keywords": [
-    
+    "AI/ML", "LLMs", "Biomedical"
   ],
   "articleBody": "The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising results, highlighting their potential to address complex problems where data scarcity is a significant barrier. Starting from this post, I am planning to write a series on Biomedical Large Language Models (LLMs).\n1. General Introduction to LLMs LLMs are sophisticated deep learning models designed to understand and generate human language. They leverage vast datasets to learn the statistical properties of language, allowing them to generate coherent and contextually appropriate text. The development of LLMs has been significantly influenced by the introduction of the Transformer architecture (Fig. 1) by Vaswani et al. (2017), which enabled models to efficiently (relatively speaking) capture long-range dependencies in text through self-attention mechanisms. Subsequent models such as BERT (Bidirectional Encoder Representations from Transformers) by Devlin et al. (2019) and GPT (Generative Pre-trained Transformer) by Radford et al. (2018) have set new benchmarks in NLP, demonstrating state-of-the-art performance across various tasks.\nFig 1. Transformer Architecture.. The nice illustration is from D2l.ai.\n2. Training Large Language Models The training of LLMs involves multiple methodologies designed to enhance their language understanding and generation capabilities. The primary training schemes include:\n2.1 Autoregressive Language Modeling (ALM) Autoregressive language modeling involves training the model to predict the next word in a sequence based on the preceding words:\n\\begin{equation} \\begin{aligned} \\pi_\\theta (\\mathbf{y} \\mid \\mathbf{x}) = \\prod_{t} \\pi_\\theta (y_t \\mid \\mathbf{x}, \\mathbf{y}_{",
-  "wordCount" : "3851",
+  "wordCount" : "3916",
   "inLanguage": "en",
   "datePublished": "2024-05-10T22:34:35-08:00",
   "dateModified": "2024-05-10T22:34:35-08:00",
@@ -318,7 +318,9 @@ if (!doNotTrack) {
                     </li></ul>
                     </li>
                     <li>
-                        <a href="#plans-for-this-series" aria-label="Plans for this Series">Plans for this Series</a><ul>
+                        <a href="#plans-for-this-series" aria-label="Plans for this Series">Plans for this Series</a></li>
+                    <li>
+                        <a href="#citation" aria-label="Citation">Citation</a><ul>
                             
                     <li>
                         <a href="#references" aria-label="References">References</a>
@@ -761,7 +763,22 @@ biomedical field.</li>
 </ol>
 <p>While this intro post focuses on some general intro to LLMs, I look forward to more exploration of
 how LLMs are transforming biomedical research and applications in the coming posts of this series.</p>
-<h3 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h3>
+<h2 id="citation">Citation<a hidden class="anchor" aria-hidden="true" href="#citation">#</a></h2>
+<p>If you find this post helpful and are interested in referencing it in your write-up, you can cite it as</p>
+<blockquote>
+<p>Xiao, Jiajie. (May 2023). <em>Biomedical LLMs: Intro</em>. JX&rsquo;s log. Available
+at: <a href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/</a>.</p>
+</blockquote>
+<p>or add the following to your BibTeX file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bib" data-lang="bib"><span style="display:flex;"><span><span style="color:#a6e22e">@article</span>{xiao2024_biollm_intro,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">title</span>   = <span style="color:#e6db74">&#34;Biomedical LLMs: Intro&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">author</span>  = <span style="color:#e6db74">&#34;Xiao, Jiajie&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">journal</span> = <span style="color:#e6db74">&#34;JX&#39;s log&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">year</span>    = <span style="color:#e6db74">&#34;2024&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">month</span>   = <span style="color:#e6db74">&#34;May&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span>     = <span style="color:#e6db74">&#34;https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h3>
 <ul>
 <li>
 <p><a id="Vaswani2017"></a> Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., &hellip; &amp; Polosukhin, I. (2017). Attention is all you need. Advances in neural information processing systems, 30.</p>
@@ -830,6 +847,9 @@ them as two different approaches given the popularity of LoRA.&#160;<a href="#fn
 
   <footer class="post-footer">
     <ul class="post-tags">
+      <li><a href="https://jiajiexiao.github.io/tags/ai/ml/">AI/ML</a></li>
+      <li><a href="https://jiajiexiao.github.io/tags/llms/">LLMs</a></li>
+      <li><a href="https://jiajiexiao.github.io/tags/biomedical/">Biomedical</a></li>
     </ul>
 <nav class="paginav">
   <a class="next" href="https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/">
@@ -843,7 +863,7 @@ them as two different approaches given the popularity of LoRA.&#160;<a href="#fn
 <ul class="share-buttons">
     <li>
         <a target="_blank" rel="noopener noreferrer" aria-label="share Biomedical LLMs: Intro on x"
-            href="https://x.com/intent/tweet/?text=Biomedical%20LLMs%3a%20Intro&amp;url=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-05-10_biollm_intro%2f&amp;hashtags=">
+            href="https://x.com/intent/tweet/?text=Biomedical%20LLMs%3a%20Intro&amp;url=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-05-10_biollm_intro%2f&amp;hashtags=AI%2fML%2cLLMs%2cBiomedical">
             <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
                 <path
                     d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />

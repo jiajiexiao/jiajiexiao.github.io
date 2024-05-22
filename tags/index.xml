@@ -6,8 +6,22 @@
     <description>Recent content in Tags on JX&#39;s log</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 29 Apr 2024 08:36:29 -0700</lastBuildDate>
+    <lastBuildDate>Fri, 10 May 2024 22:34:35 -0800</lastBuildDate>
     <atom:link href="https://jiajiexiao.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Biomedical</title>
+      <link>https://jiajiexiao.github.io/tags/biomedical/</link>
+      <pubDate>Fri, 10 May 2024 22:34:35 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/tags/biomedical/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>LLMs</title>
+      <link>https://jiajiexiao.github.io/tags/llms/</link>
+      <pubDate>Fri, 10 May 2024 22:34:35 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/tags/llms/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Robustness</title>
       <link>https://jiajiexiao.github.io/tags/robustness/</link>
