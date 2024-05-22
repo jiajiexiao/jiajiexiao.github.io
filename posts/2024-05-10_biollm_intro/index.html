@@ -141,7 +141,7 @@ if (!doNotTrack) {
     "AI/ML", "LLMs", "Biomedical"
   ],
   "articleBody": "The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising results, highlighting their potential to address complex problems where data scarcity is a significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.\n1. General Introduction to LLMs LLMs are deep learning models designed to understand and generate human language. They leverage vast datasets to learn the statistical properties of language, allowing them to generate coherent and contextually appropriate text. The development of LLMs has been significantly influenced by the introduction of the Transformer architecture (Fig. 1) by Vaswani et al. (2017), which enabled models to efficiently (relatively speaking) capture long-range dependencies in text through self-attention mechanisms. Subsequent models such as BERT (Bidirectional Encoder Representations from Transformers) by Devlin et al. (2019) and GPT (Generative Pre-trained Transformer) by Radford et al. (2018) have set new benchmarks in NLP, demonstrating state-of-the-art performance across various tasks.\nFig 1. Transformer Architecture.. The nice illustration is from D2l.ai.\n2. Training Large Language Models The training of LLMs involves multiple methodologies designed to enhance their language understanding and generation capabilities. The primary training schemes include:\n2.1 Autoregressive Language Modeling (ALM) Autoregressive language modeling involves training the model to predict the next word in a sequence based on the preceding words:\n\\begin{equation} \\begin{aligned} \\pi_\\theta (\\mathbf{y} \\mid \\mathbf{x}) = \\prod_{t} \\pi_\\theta (y_t \\mid \\mathbf{x}, \\mathbf{y}_{",
-  "wordCount" : "4357",
+  "wordCount" : "5090",
   "inLanguage": "en",
   "datePublished": "2024-05-10T22:34:35-08:00",
   "dateModified": "2024-05-10T22:34:35-08:00",
@@ -246,7 +246,7 @@ if (!doNotTrack) {
     <h1 class="post-title entry-hint-parent">
       Biomedical LLMs (1): Intro
     </h1>
-    <div class="post-meta"><span title='2024-05-10 22:34:35 -0800 -0800'>2024-05-10</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;Jiajie Xiao
+    <div class="post-meta"><span title='2024-05-10 22:34:35 -0800 -0800'>2024-05-10</span>&nbsp;·&nbsp;11 min&nbsp;·&nbsp;Jiajie Xiao
 
 </div>
   </header> <aside id="toc-container" class="toc-container wide">
@@ -289,34 +289,48 @@ if (!doNotTrack) {
                     <li>
                         <a href="#41-prompting" aria-label="4.1 Prompting">4.1 Prompting</a></li>
                     <li>
-                        <a href="#42-instruction-learning" aria-label="4.2 Instruction Learning">4.2 Instruction Learning</a></li>
+                        <a href="#42-in-context-learning" aria-label="4.2 In-Context Learning">4.2 In-Context Learning</a></li>
                     <li>
-                        <a href="#43-in-context-learning" aria-label="4.3 In-Context Learning">4.3 In-Context Learning</a></li>
+                        <a href="#43-instruction-learning" aria-label="4.3 Instruction Learning">4.3 Instruction Learning</a></li>
                     <li>
-                        <a href="#44-vocabulary-extension" aria-label="4.4 Vocabulary Extension">4.4 Vocabulary Extension</a></li>
-                    <li>
-                        <a href="#45-supervised-fine-tuning" aria-label="4.5 Supervised Fine-Tuning">4.5 Supervised Fine-Tuning</a></li>
-                    <li>
-                        <a href="#46-alignment-via-rfhf" aria-label="4.6 Alignment via RFHF">4.6 Alignment via RFHF</a><ul>
+                        <a href="#44-chain-of-thought-cot" aria-label="4.4 Chain of Thought (CoT)">4.4 Chain of Thought (CoT)</a><ul>
                             
                     <li>
-                        <a href="#461-ppo" aria-label="4.6.1 PPO">4.6.1 PPO</a></li>
+                        <a href="#441-few-shot-cot-prompting" aria-label="4.4.1 Few-Shot CoT Prompting">4.4.1 Few-Shot CoT Prompting</a></li>
                     <li>
-                        <a href="#462-dpo" aria-label="4.6.2 DPO">4.6.2 DPO</a></li>
+                        <a href="#442-zero-shot-cot-prompting" aria-label="4.4.2 Zero-Shot CoT Prompting">4.4.2 Zero-Shot CoT Prompting</a></li>
                     <li>
-                        <a href="#463-sppo" aria-label="4.6.3 SPPO">4.6.3 SPPO</a></li></ul>
+                        <a href="#443-self-consistency" aria-label="4.4.3 Self-Consistency">4.4.3 Self-Consistency</a></li>
+                    <li>
+                        <a href="#444-least-to-most-prompting" aria-label="4.4.4 Least-to-Most Prompting">4.4.4 Least-to-Most Prompting</a></li></ul>
                     </li>
                     <li>
-                        <a href="#47-efficient-fine-tuning" aria-label="4.7 Efficient Fine-Tuning">4.7 Efficient Fine-Tuning</a><ul>
+                        <a href="#45-retrieval-augmented-generation-rag" aria-label="4.5 Retrieval-Augmented Generation (RAG)">4.5 Retrieval-Augmented Generation (RAG)</a></li>
+                    <li>
+                        <a href="#46-vocabulary-extension" aria-label="4.6 Vocabulary Extension">4.6 Vocabulary Extension</a></li>
+                    <li>
+                        <a href="#47-supervised-fine-tuning" aria-label="4.7 Supervised Fine-Tuning">4.7 Supervised Fine-Tuning</a></li>
+                    <li>
+                        <a href="#48-alignment-via-rfhf" aria-label="4.8 Alignment via RFHF">4.8 Alignment via RFHF</a><ul>
                             
                     <li>
-                        <a href="#471-low-rank-adaptation-lora" aria-label="4.7.1 Low-Rank Adaptation (LoRA)">4.7.1 Low-Rank Adaptation (LoRA)</a></li>
+                        <a href="#481-ppo" aria-label="4.8.1 PPO">4.8.1 PPO</a></li>
                     <li>
-                        <a href="#472-adapter-modules" aria-label="4.7.2 Adapter Modules">4.7.2 Adapter Modules</a></li>
+                        <a href="#482-dpo" aria-label="4.8.2 DPO">4.8.2 DPO</a></li>
                     <li>
-                        <a href="#473-prefix-tuning" aria-label="4.7.3 Prefix-Tuning">4.7.3 Prefix-Tuning</a></li>
+                        <a href="#483-sppo" aria-label="4.8.3 SPPO">4.8.3 SPPO</a></li></ul>
+                    </li>
                     <li>
-                        <a href="#474-other-parameter-efficient-fine-tuning-techniques" aria-label="4.7.4 Other Parameter-Efficient Fine-Tuning Techniques">4.7.4 Other Parameter-Efficient Fine-Tuning Techniques</a></li></ul>
+                        <a href="#49-efficient-fine-tuning" aria-label="4.9 Efficient Fine-Tuning">4.9 Efficient Fine-Tuning</a><ul>
+                            
+                    <li>
+                        <a href="#491-low-rank-adaptation-lora" aria-label="4.9.1 Low-Rank Adaptation (LoRA)">4.9.1 Low-Rank Adaptation (LoRA)</a></li>
+                    <li>
+                        <a href="#492-adapter-modules" aria-label="4.9.2 Adapter Modules">4.9.2 Adapter Modules</a></li>
+                    <li>
+                        <a href="#493-prefix-tuning" aria-label="4.9.3 Prefix-Tuning">4.9.3 Prefix-Tuning</a></li>
+                    <li>
+                        <a href="#494-other-parameter-efficient-fine-tuning-techniques" aria-label="4.9.4 Other Parameter-Efficient Fine-Tuning Techniques">4.9.4 Other Parameter-Efficient Fine-Tuning Techniques</a></li></ul>
                     </li></ul>
                     </li>
                     <li>
@@ -566,30 +580,7 @@ architecture, such as GPT.</p>
     Here, the model utilizes its extensive training data to create coherent and contextually appropriate text without additional fine-tuning.
   </p>
 </div>
-<h3 id="42-instruction-learning">4.2 Instruction Learning<a hidden class="anchor" aria-hidden="true" href="#42-instruction-learning">#</a></h3>
-<p>Instruction learning involves providing the model with explicit instructions within the input text
-to perform a specific task. This method allows the model to understand and execute complex tasks by
-interpreting the given instructions. Instruction learning is particularly useful for tasks requiring
-precise control over the model&rsquo;s behavior and is suitable for models with decoder components.</p>
-<div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
-  <strong>Example:</strong>
-  <p>
-    Consider a pre-trained language model being adapted through instruction learning. The instruction is:
-  </p>
-  <p>
-    "Here is a Chinese sentence that is often used to say Hi. Translate it to English: '你吃了吗?'"
-  </p>
-  <p>
-    With instruction learning, the model uses this directive to perform a specific task, generating the output:
-  </p>
-  <p>
-    "Hello, how are you?"
-  </p>
-  <p>
-    In this case, the model is fine-tuned on a dataset of translation pairs to follow explicit instructions for translating text between languages.
-  </p>
-</div>
-<h3 id="43-in-context-learning">4.3 In-Context Learning<a hidden class="anchor" aria-hidden="true" href="#43-in-context-learning">#</a></h3>
+<h3 id="42-in-context-learning">4.2 In-Context Learning<a hidden class="anchor" aria-hidden="true" href="#42-in-context-learning">#</a></h3>
 <p>In-context learning allows the model to learn tasks by providing examples within the input context,
 without additional training. This method leverages the model&rsquo;s ability to infer patterns and
 relationships from the provided examples, enabling it to perform new tasks based on the contextual
@@ -612,7 +603,158 @@ information alone. This approach works well with models that have a decoder comp
     Here, the model leverages the provided examples to predict the answer to the new question based on the pattern observed in the context.
   </p>
 </div>
-<h3 id="44-vocabulary-extension">4.4 Vocabulary Extension<a hidden class="anchor" aria-hidden="true" href="#44-vocabulary-extension">#</a></h3>
+<h3 id="43-instruction-learning">4.3 Instruction Learning<a hidden class="anchor" aria-hidden="true" href="#43-instruction-learning">#</a></h3>
+<p>Instruction learning/tuning involves providing the model with explicit instructions within the input
+text to perform a specific task. This method allows the model to understand and execute complex
+tasks by interpreting the given instructions. Instruction learning is particularly useful for tasks
+requiring precise control over the model&rsquo;s behavior and is suitable for models with decoder
+components. The model is fine-tuned on a dataset with examples showing how to follow explicit
+instructions. This process trains the LLMs to learn how to do in context learning, granting the
+models&rsquo; capability of zero-shot generalization from multitask training.</p>
+<div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
+  <strong>Example:</strong>
+  <p>
+    Consider a pre-trained language model being adapted through instruction learning. The instruction is:
+  </p>
+  <p>
+    "Here is a Chinese sentence that is often used to say Hi. Translate it to English: '你吃了吗?'"
+  </p>
+  <p>
+    With instruction learning, the model uses this directive to perform a specific task, generating the output:
+  </p>
+  <p>
+    "Hello, how are you?"
+  </p>
+  <p>
+    In this case, the model is fine-tuned on a dataset of translation pairs to follow explicit instructions for translating text between languages.
+  </p>
+</div>
+<h3 id="44-chain-of-thought-cot">4.4 Chain of Thought (CoT)<a hidden class="anchor" aria-hidden="true" href="#44-chain-of-thought-cot">#</a></h3>
+<p>Extended from in-context learning, CoT prompting enhances the model&rsquo;s reasoning capabilities by
+guiding it through a step-by-step problem-solving process. This technique can be applied in few-shot
+or zero-shot scenarios and includes methods like &ldquo;let&rsquo;s think step by step&rdquo; and self-consistency.</p>
+<h4 id="441-few-shot-cot-prompting">4.4.1 Few-Shot CoT Prompting<a hidden class="anchor" aria-hidden="true" href="#441-few-shot-cot-prompting">#</a></h4>
+<p>Few-shot CoT prompting involves providing the model with several examples of the reasoning process
+needed to solve a task. By showing the model how to work through a problem step-by-step, it learns
+to apply a similar approach to new problems.</p>
+<div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
+  <strong>Example:</strong>
+  <p>
+    Consider a pre-trained language model being used with few-shot CoT prompting. The input is:
+  </p>
+  <p>
+    "Example 1: 
+  </p>
+  <p>  
+    Q: If you have 5 apples and you give 2 away, how many do you have left? A: You start with 5 apples. You give away 2 apples. So, you have 3 apple left. 
+  </p>
+  <p> 
+    Example 2: 
+  </p>
+  <p> 
+    Q: If you have 6 books and you buy 3 more, how many do you have in total? A: You start with 6 books. You buy 3 more books. So, you have 9 books in total."
+  </p>
+  <p>
+    New Problem: Q: If you have 10 candies and you eat 8, how many do you have left?"
+  </p>
+  <p>
+    Using few-shot CoT prompting, the model generates:
+  </p>
+  <p>
+    "You start with 10 candies. You eat 8 candies. So, you have 2 candies left."
+  </p>
+</div>
+<h4 id="442-zero-shot-cot-prompting">4.4.2 Zero-Shot CoT Prompting<a hidden class="anchor" aria-hidden="true" href="#442-zero-shot-cot-prompting">#</a></h4>
+<p>Zero-shot CoT prompting involves instructing the model to think through the problem step-by-step
+without providing examples. This approach relies on the model&rsquo;s ability to generalize from its
+training data.</p>
+<div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
+  <strong>Example:</strong>
+  <p>
+    Consider a pre-trained language model being used with zero-shot CoT prompting. The input is:
+  </p>
+  <p>
+    "Q: If you have 9 oranges and you give 3 to your friend, how many do you have left? **Let's think step by step.**"
+  </p>
+  <p>
+    Using zero-shot CoT prompting, the model generates:
+  </p>
+  <p>
+    "Let's think step by step. You start with 9 oranges. You give 3 oranges to your friend. So, you have 6 oranges left."
+  </p>
+</div>
+<h4 id="443-self-consistency">4.4.3 Self-Consistency<a hidden class="anchor" aria-hidden="true" href="#443-self-consistency">#</a></h4>
+<p>Self-consistency is a technique used to improve the reliability of CoT prompting. It involves
+generating multiple reasoning paths and then selecting the most consistent answer among them. This
+method helps mitigate the variability in the model&rsquo;s outputs.</p>
+<div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
+  <strong>Example:</strong>
+  <p>
+    Consider a pre-trained language model using self-consistency in CoT prompting. The input is:
+  </p>
+  <p>
+    "Q: If you have 12 balloons and you give 6 to your friend, how many do you have left? Let's think step by step."
+  </p>
+  <p>
+    The model generates multiple reasoning paths:
+  </p>
+  <p>
+    "Path 1: You start with 12 balloons. You give 6 balloons to your friend. So, you have 7 balloons left."
+  </p>
+  <p>
+    "Path 2: You start with 12 balloons. You give 6 balloons to your friend. So, you have 6 balloons left."
+  </p>
+  <p>
+    "Path 2: You start with 12 balloons. You give 6 balloons to your friend. So, you have 6 balloons left."
+  </p>
+  <p>
+    The final answer is determined by the consistency across paths:
+  </p>
+  <p>
+    "6 balloons."
+  </p>
+</div>
+<h4 id="444-least-to-most-prompting">4.4.4 Least-to-Most Prompting<a hidden class="anchor" aria-hidden="true" href="#444-least-to-most-prompting">#</a></h4>
+<p>Least-to-most prompting is a teaching strategy that helps students learn new skills by using a
+sequence of prompts that start with the least intrusive and progress to the most intrusive. It
+breaks down a complex task into simpler sub-tasks and solves each one step-by-step. This method
+helps the model handle more complex problems by simplifying the process.</p>
+<div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
+  <strong>Example:</strong>
+  <p>
+    Consider a pre-trained language model using least-to-most prompting. The input is:
+  </p>
+  <p>
+    "Q: Solve the equation 2x + 3 = 11 step-by-step."
+  </p>
+  <p>
+    The model breaks down the problem:
+  </p>
+  <p>
+    "Step 1: Subtract 3 from both sides. 2x = 8. 
+  </p>
+  <p>
+    Step 2: Divide both sides by 2. x = 4."
+  </p>
+  <p>
+    The final answer is:
+  </p>
+  <p>
+    "x = 4."
+  </p>
+</div>
+<p>To learn more prompting engineering, check out the <a href="https://learnprompting.org/docs/intro">Learn Prompting
+website</a>. Of course, except for hard prompting, there are
+other ongoing research and applications that aim to generate optimal prompts or soft prompts (a
+numerical vector like the adapter, see more in <a href="#493-prefix-tuning">prefix-tuning</a>) via another LLM
+model.</p>
+<h3 id="45-retrieval-augmented-generation-rag">4.5 Retrieval-Augmented Generation (RAG)<a hidden class="anchor" aria-hidden="true" href="#45-retrieval-augmented-generation-rag">#</a></h3>
+<p>RAG combines retrieval-based methods with generation capabilities to improve the accuracy and
+relevance of the model&rsquo;s outputs. In RAG, the model first retrieves relevant documents or
+information from a large corpus and then generates a response based on this retrieved information.
+This approach enhances the model&rsquo;s performance on tasks requiring up-to-date or domain-specific
+knowledge.</p>
+<h3 id="46-vocabulary-extension">4.6 Vocabulary Extension<a hidden class="anchor" aria-hidden="true" href="#46-vocabulary-extension">#</a></h3>
 <p>Vocabulary extension involves adding new tokens to the model&rsquo;s existing vocabulary to better handle
 domain-specific terminology. This is crucial in fields like biomedicine, where specialized terms
 frequently appear that were not part of the original corpus (i.e., out-of-vocabulary). The process
@@ -635,14 +777,14 @@ various sources or incorporating domain-specific information. For example, when 
 trained on DNA sequences, methylation status may be available in the target domain corpus but not in
 the original training corpus. By combining these different types of features, the model&rsquo;s
 performance is enhanced, especially in handling domain-specific terminology.</p>
-<h3 id="45-supervised-fine-tuning">4.5 Supervised Fine-Tuning<a hidden class="anchor" aria-hidden="true" href="#45-supervised-fine-tuning">#</a></h3>
+<h3 id="47-supervised-fine-tuning">4.7 Supervised Fine-Tuning<a hidden class="anchor" aria-hidden="true" href="#47-supervised-fine-tuning">#</a></h3>
 <p>Supervised fine-tuning (SFT) involves continuing the training of a pre-trained model using
 domain-specific or task-specific data. This process adjusts the model parameters to better suit the
 nuances of the new domain or new task. For example, a pre-trained LLM might be fine-tuned on a
 dataset of clinical notes to improve its ability to understand and generate medical text,
 significantly enhancing its performance on specialized tasks. SFT can be employed for both GPT-style
 and BERT-style LLMs.</p>
-<h3 id="46-alignment-via-rfhf">4.6 Alignment via RFHF<a hidden class="anchor" aria-hidden="true" href="#46-alignment-via-rfhf">#</a></h3>
+<h3 id="48-alignment-via-rfhf">4.8 Alignment via RFHF<a hidden class="anchor" aria-hidden="true" href="#48-alignment-via-rfhf">#</a></h3>
 <p>Alignment through reinforcement learning from human feedback (RFHF) aims to fine-tune the
 unsupervised LMs to align the model&rsquo;s outputs with human values and preferences, ensuring that the
 generated responses are accurate, ethical, and contextually appropriate (<a href="Ziegler2019">Ziegler, et al.
@@ -668,13 +810,13 @@ get large reward without deviating from the original reference LLM too much.</p>
 categorized into reward-based methods like Proximal Policy Optimization (PPO) (<a href="#Ouyang2022">Ouyang, et al.
 2022</a>) and reward-free methods like Direct Preference Optimization (DPO) (<a href="#Rafailov2024">Rafailov, et
 al. 2024</a>) and Self-Play Preference Optimization (SPPO) (<a href="#Wu2024">Wu, et al. 2024</a>).</p>
-<h4 id="461-ppo">4.6.1 PPO<a hidden class="anchor" aria-hidden="true" href="#461-ppo">#</a></h4>
+<h4 id="481-ppo">4.8.1 PPO<a hidden class="anchor" aria-hidden="true" href="#481-ppo">#</a></h4>
 <p>After a reward model $r_\phi$ is constructed using the human-labeled comparison data, <a href="#eq3">eq 3</a>
 can be explicitly optimized with online RL algorithms. PPO is a policy gradient method in RL
 algorithm designed to stabilize training by using a clipped objective function (<a href="#Schulman2017">Schulman, et al.
 2017</a>). Compared to other RL algorithms, the key idea for PPO is to update the policy
 in small steps to prevent large deviations from the previous policy, which can lead to instability.</p>
-<h4 id="462-dpo">4.6.2 DPO<a hidden class="anchor" aria-hidden="true" href="#462-dpo">#</a></h4>
+<h4 id="482-dpo">4.8.2 DPO<a hidden class="anchor" aria-hidden="true" href="#482-dpo">#</a></h4>
 <p>Direct Preference Optimization (DPO) simplifies RFHF by directly optimizing preference probabilities
 without training a separate reward model (<a href="#Rafailov2024">Rafailov, et al. 2024</a>). It leverages the log-likelihood ratio of preferred
 responses to non-preferred ones. The DPO loss function is:</p>
@@ -692,7 +834,7 @@ efficient training compared to methods requiring a reward model.</p>
 model. It aligns the language model with human preferences through a straightforward
 optimization process. However, DPO might struggle with data sparsity and non-transitive
 preferences, which can limit its effectiveness in some scenarios.</p>
-<h4 id="463-sppo">4.6.3 SPPO<a hidden class="anchor" aria-hidden="true" href="#463-sppo">#</a></h4>
+<h4 id="483-sppo">4.8.3 SPPO<a hidden class="anchor" aria-hidden="true" href="#483-sppo">#</a></h4>
 <p>Self-Play Preference Optimization (SPPO) formulates the alignment problem as a two-player
 constant-sum game, aiming to find the Nash equilibrium policy that consistently aligns with human
 preferences (<a href="#Wu2024">Wu, et al. 2024</a>). SPPO uses a self-play mechanism to iteratively refine the
@@ -713,7 +855,7 @@ working with preference probabilities, which cannot be trivially achieved by sym
 pairwise loss functions like DPO. SPPO was shown significant improvements
 in alignment tasks, outperforming iterative DPO and other methods (e.g. Identity Preference
 Optimization IPO) in various benchmarks without the need for external supervision.</p>
-<h3 id="47-efficient-fine-tuning">4.7 Efficient Fine-Tuning<a hidden class="anchor" aria-hidden="true" href="#47-efficient-fine-tuning">#</a></h3>
+<h3 id="49-efficient-fine-tuning">4.9 Efficient Fine-Tuning<a hidden class="anchor" aria-hidden="true" href="#49-efficient-fine-tuning">#</a></h3>
 <p>As the size of foundational LLMs (Large Language Models) today is typically quite large, fine-tuning
 these models can be computationally challenging. Efficient fine-tuning techniques aim to reduce the
 computational resources required for fine-tuning large models. This enables large language models to
@@ -728,7 +870,7 @@ accessible and practical for a broader range of applications.</p>
         </figcaption>
 </figure>
 
-<h4 id="471-low-rank-adaptation-lora">4.7.1 Low-Rank Adaptation (LoRA)<a hidden class="anchor" aria-hidden="true" href="#471-low-rank-adaptation-lora">#</a></h4>
+<h4 id="491-low-rank-adaptation-lora">4.9.1 Low-Rank Adaptation (LoRA)<a hidden class="anchor" aria-hidden="true" href="#491-low-rank-adaptation-lora">#</a></h4>
 <p>Low-Rank Adaptation (LoRA) reduces the number of trainable parameters by learning low-rank updates
 to the pre-trained weights. This method adapts only a small subset of the model&rsquo;s parameters,
 allowing for quick and resource-efficient updates. LoRA is particularly useful in scenarios with
@@ -753,7 +895,7 @@ parameters from $d \times k$ to $d \times r + r \times k$.</p>
         </figcaption>
 </figure>
 
-<h4 id="472-adapter-modules">4.7.2 Adapter Modules<a hidden class="anchor" aria-hidden="true" href="#472-adapter-modules">#</a></h4>
+<h4 id="492-adapter-modules">4.9.2 Adapter Modules<a hidden class="anchor" aria-hidden="true" href="#492-adapter-modules">#</a></h4>
 <p>Adapter modules involve adding small, trainable layers between the layers of a pre-trained model
 <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>. These adapters can be fine-tuned for specific tasks without altering the original model
 parameters. This approach significantly reduces the amount of training data and computational power
@@ -768,7 +910,7 @@ h&rsquo; = h + f_{\text{adapter}}(h),
 <p>where $f_{\text{adapter}}$ is a lightweight feed-forward network with a bottleneck architecture,
 typically much smaller than the original layer. Please read <a href="#fig3">Fig 3 (c &amp; d)</a> for checking
 series abd parallel adapters, two common ways to place the adapters:</p>
-<h4 id="473-prefix-tuning">4.7.3 Prefix-Tuning<a hidden class="anchor" aria-hidden="true" href="#473-prefix-tuning">#</a></h4>
+<h4 id="493-prefix-tuning">4.9.3 Prefix-Tuning<a hidden class="anchor" aria-hidden="true" href="#493-prefix-tuning">#</a></h4>
 <p>Prefix-tuning involves learning a small continuous vector, or &ldquo;prefix,&rdquo; that is prepended to the
 input sequence (<a href="#fig3">Fig 3(a)</a>). This prefix is fine-tuned while the rest of the model&rsquo;s
 parameters remain fixed. Prefix-tuning allows the model to adapt to new tasks efficiently,
@@ -798,7 +940,7 @@ learned prefix vectors.</p>
     sentiment analysis task using minimal additional computation.
   </p>
 </div>
-<h4 id="474-other-parameter-efficient-fine-tuning-techniques">4.7.4 Other Parameter-Efficient Fine-Tuning Techniques<a hidden class="anchor" aria-hidden="true" href="#474-other-parameter-efficient-fine-tuning-techniques">#</a></h4>
+<h4 id="494-other-parameter-efficient-fine-tuning-techniques">4.9.4 Other Parameter-Efficient Fine-Tuning Techniques<a hidden class="anchor" aria-hidden="true" href="#494-other-parameter-efficient-fine-tuning-techniques">#</a></h4>
 <p>Other PEFT techniques focus on modifying only a subset of the model&rsquo;s parameters or applying
 quantization techniques to reduce computational overhead. These methods maintain model performance
 while minimizing the resources needed for fine-tuning. Some examples are:</p>
