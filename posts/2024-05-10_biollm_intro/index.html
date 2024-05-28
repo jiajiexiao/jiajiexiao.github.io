@@ -141,7 +141,7 @@ if (!doNotTrack) {
     "AI/ML", "LLMs", "Biomedical"
   ],
   "articleBody": "The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising results, highlighting their potential to address complex problems where data scarcity is a significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.\n1. General Introduction to LLMs LLMs are deep learning models designed to understand and generate human language. They leverage vast datasets to learn the statistical properties of language, allowing them to generate coherent and contextually appropriate text. The development of LLMs has been significantly influenced by the introduction of the Transformer architecture (Fig. 1) by Vaswani et al. (2017), which enabled models to efficiently (relatively speaking) capture long-range dependencies in text through self-attention mechanisms. Subsequent models such as BERT (Bidirectional Encoder Representations from Transformers) by Devlin et al. (2019) and GPT (Generative Pre-trained Transformer) by Radford et al. (2018) have set new benchmarks in NLP, demonstrating state-of-the-art performance across various tasks.\nFig 1. Transformer Architecture.. The nice illustration is from D2l.ai.\n2. Training Large Language Models The training of LLMs involves multiple methodologies designed to enhance their language understanding and generation capabilities. The primary training schemes include:\n2.1 Autoregressive Language Modeling (ALM) Autoregressive language modeling involves training the model to predict the next word in a sequence based on the preceding words:\n\\begin{equation} \\begin{aligned} \\pi_\\theta (\\mathbf{y} \\mid \\mathbf{x}) = \\prod_{t} \\pi_\\theta (y_t \\mid \\mathbf{x}, \\mathbf{y}_{",
-  "wordCount" : "5090",
+  "wordCount" : "5204",
   "inLanguage": "en",
   "datePublished": "2024-05-10T22:34:35-08:00",
   "dateModified": "2024-05-10T22:34:35-08:00",
@@ -328,7 +328,7 @@ if (!doNotTrack) {
                     <li>
                         <a href="#492-adapter-modules" aria-label="4.9.2 Adapter Modules">4.9.2 Adapter Modules</a></li>
                     <li>
-                        <a href="#493-prefix-tuning" aria-label="4.9.3 Prefix-Tuning">4.9.3 Prefix-Tuning</a></li>
+                        <a href="#493-soft-prompting-and-prefix-tuning" aria-label="4.9.3 Soft Prompting and Prefix-Tuning">4.9.3 Soft Prompting and Prefix-Tuning</a></li>
                     <li>
                         <a href="#494-other-parameter-efficient-fine-tuning-techniques" aria-label="4.9.4 Other Parameter-Efficient Fine-Tuning Techniques">4.9.4 Other Parameter-Efficient Fine-Tuning Techniques</a></li></ul>
                     </li></ul>
@@ -336,13 +336,10 @@ if (!doNotTrack) {
                     <li>
                         <a href="#5-plans-for-this-series" aria-label="5. Plans for this Series">5. Plans for this Series</a></li>
                     <li>
-                        <a href="#citation" aria-label="Citation">Citation</a><ul>
-                            
+                        <a href="#citation" aria-label="Citation">Citation</a></li>
                     <li>
                         <a href="#references" aria-label="References">References</a>
                     </li>
-                </ul>
-                </li>
                 </ul>
             </div>
         </details>
@@ -541,8 +538,8 @@ each layer and each token generation step involve separate KV caching.</p>
 <figure id="fig2" 
      class="align-center ">
     <img loading="lazy" src="../../images/decoder-only_vs_decoder-decoder.png#center"
-         alt="Fig 2. Decoder-only vs Decoder-Decoder. (a) Decoder-only. (b) &amp;amp; (c) Decoder-decoder architecture. (d) YOCO inference process. (a) is from Radford et al. 2018 and (b-d) are from Sun et al. 2024." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
-            <p style="text-align: left;"> <strong>Fig 2. Decoder-only vs Decoder-Decoder.</strong> (a) Decoder-only. (b) &amp; (c) Decoder-decoder architecture. (d) YOCO inference process. (a) is from <a href="#Radford2018">Radford et al. 2018</a> and (b-d) are from <a href="#Sun2024">Sun et al. 2024</a>.</p>
+         alt="Fig 2. Decoder-only vs Decoder-Decoder. (a) GPT&amp;rsquo;s decoder-only architecture. (b) &amp;amp; (c) Decoder-decoder architecture. (d) YOCO inference process. (a) is from Radford et al. 2018 and (b-d) are from Sun et al. 2024." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 2. Decoder-only vs Decoder-Decoder.</strong> (a) GPT&rsquo;s decoder-only architecture. (b) &amp; (c) Decoder-decoder architecture. (d) YOCO inference process. (a) is from <a href="#Radford2018">Radford et al. 2018</a> and (b-d) are from <a href="#Sun2024">Sun et al. 2024</a>.</p>
         </figcaption>
 </figure>
 
@@ -910,12 +907,14 @@ h&rsquo; = h + f_{\text{adapter}}(h),
 <p>where $f_{\text{adapter}}$ is a lightweight feed-forward network with a bottleneck architecture,
 typically much smaller than the original layer. Please read <a href="#fig3">Fig 3 (c &amp; d)</a> for checking
 series abd parallel adapters, two common ways to place the adapters:</p>
-<h4 id="493-prefix-tuning">4.9.3 Prefix-Tuning<a hidden class="anchor" aria-hidden="true" href="#493-prefix-tuning">#</a></h4>
-<p>Prefix-tuning involves learning a small continuous vector, or &ldquo;prefix,&rdquo; that is prepended to the
-input sequence (<a href="#fig3">Fig 3(a)</a>). This prefix is fine-tuned while the rest of the model&rsquo;s
-parameters remain fixed. Prefix-tuning allows the model to adapt to new tasks efficiently,
-leveraging the pre-trained model&rsquo;s capabilities with minimal additional computation.</p>
-<p>Given an input sequence $x = [x_1, x_2, \ldots, x_n]$, prefix-tuning modifies it to:</p>
+<h4 id="493-soft-prompting-and-prefix-tuning">4.9.3 Soft Prompting and Prefix-Tuning<a hidden class="anchor" aria-hidden="true" href="#493-soft-prompting-and-prefix-tuning">#</a></h4>
+<p>Unlike providing exact instruction as hard prompts, <strong>soft prompting</strong> involves adding a series of
+trainable tokens (soft prompts) to the input of a pre-trained model. These soft prompts compose a
+small continuous vector, that is prepended to the input sequence (<a href="#fig3">Fig 3(a)</a>). This soft
+prompt vector is fine-tuned while the rest of the model&rsquo;s parameters remain fixed.  This method is
+especially useful when adapting the model for tasks like classification, generation, or answering
+questions, without needing extensive retraining or fine-tuning of the model itself.</p>
+<p>Given an input sequence $x = [x_1, x_2, \ldots, x_n]$, soft prompting modifies it to:</p>
 <p>$x&rsquo; = [p_1, p_2, \ldots, p_m, x_1, x_2, \ldots, x_n]$, where $[p_1, p_2, \ldots, p_m]$ are the
 learned prefix vectors.</p>
 <div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
@@ -928,18 +927,27 @@ learned prefix vectors.</p>
     "I had a great day at the park."
   </p>
   <p>
-    With prefix-tuning, a learned prefix is prepended to this input: 
+    With soft-prompting, a learned soft prompt is prepended to this input: 
     <p>
     $[p_1, p_2, p_3, p_4, p_5]$ + "I had a great day at the park."
     </p>
   </p>
   <p>
-    Here, $[p_1, p_2, p_3, p_4, p_5]$ are the learned prefix vectors. 
-    During fine-tuning, only these prefix vectors are updated while the rest of the 
+    Here, $[p_1, p_2, p_3, p_4, p_5]$ are the soft prompting vectors. 
+    During fine-tuning, only these soft prompting vectors are updated while the rest of the 
     model's parameters remain fixed. This allows the model to adapt to the
     sentiment analysis task using minimal additional computation.
   </p>
 </div>
+<p><strong>Prefix-tuning</strong> extends the idea of soft prompts by not only prepending trainable vectors to the
+input sequence but also integrating these vectors into intermediate stages of the model. This
+technique involves learning a series of continuous vectors, or &ldquo;prefixes,&rdquo; that are inserted not
+just at the input but potentially at multiple points within the transformer layers (see the
+Illustration of prefix tuning in <a href="https://magazine.sebastianraschka.com/p/understanding-parameter-efficient">Sebastian Raschka&rsquo;s
+blog</a>). This operation
+effectively modifies both the input and the intermediate representations throughout the model.
+Compared to soft prompting, prefix-tuning likely offers enhanced control over the model&rsquo;s behavior,
+potentially leading to improved performance on complex tasks.</p>
 <h4 id="494-other-parameter-efficient-fine-tuning-techniques">4.9.4 Other Parameter-Efficient Fine-Tuning Techniques<a hidden class="anchor" aria-hidden="true" href="#494-other-parameter-efficient-fine-tuning-techniques">#</a></h4>
 <p>Other PEFT techniques focus on modifying only a subset of the model&rsquo;s parameters or applying
 quantization techniques to reduce computational overhead. These methods maintain model performance
@@ -962,12 +970,10 @@ to lower computational requirements.</p>
 (LLMs). Subsequent posts in this series will delve into specific applications of LLMs in the
 biomedical domain. The planned topics include</p>
 <ol>
-<li><strong>Genomic/DNA Language Models</strong>: Covering general genomic applications, including DNA sequence
-analysis, and introducing specialized models like Geneformer.</li>
+<li><strong>Genomic Language Models</strong>: Covering general genomic applications, including DNA/RNA LLMs and
+gene LLMs.</li>
 <li><strong>Protein Language Models</strong>: Exploring the use of LLMs in understanding protein structures and
 functions.</li>
-<li><strong>RNA and Single-cell Language Models</strong>: Combining RNA language models with single-cell analysis
-models like sc-GPT to explore their roles in gene expression and cellular heterogeneity.</li>
 <li><strong>Chemistry Language Models</strong>: Highlighting the role of LLMs in chemical research, including drug
 discovery and molecular analysis.</li>
 <li><strong>Other Biomedical LLMs</strong>: Discussing models for medical imaging, generalized biological
@@ -991,7 +997,7 @@ at: <a href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">https:
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">month</span>   = <span style="color:#e6db74">&#34;May&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span>     = <span style="color:#e6db74">&#34;https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/&#34;</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h3>
+</span></span></code></pre></div><h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
 <ul>
 <li>
 <p><a id="Vaswani2017"></a> Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., &hellip; &amp; Polosukhin, I. (2017). Attention is all you need. Advances in neural information processing systems, 30.</p>
