@@ -6,8 +6,34 @@
     <description>Recent content in LLMs on JX&#39;s log</description>
     <generator>Hugo -- 0.142.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 10 May 2024 22:34:35 -0800</lastBuildDate>
+    <lastBuildDate>Sun, 12 May 2024 12:30:32 -0800</lastBuildDate>
     <atom:link href="https://jiajiexiao.github.io/tags/llms/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Biomedical LLMs (2): Genomics</title>
+      <link>https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/</link>
+      <pubDate>Sun, 12 May 2024 12:30:32 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/</guid>
+      <description>&lt;ul&gt;
+&lt;li&gt;&lt;span style=&#34;color: lightblue&#34;&gt;[Updated in Jan 2025]: Added &lt;a href=&#34;#helm&#34;&gt;HELM&lt;/a&gt;.&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;color: lightblue&#34;&gt;[Updated in Dec 2024]: Added &lt;a href=&#34;#methylgpt&#34;&gt;MethylGPT&lt;/a&gt;.&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In &lt;a href=&#34;https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/&#34;&gt;previous post&lt;/a&gt;,
+we discussed some of the introduction to Large Language Models (LLMs) and how
+they are constructed, trained, and utilized. Beginning with this post in the
+Biomedical LLMs series, we will explore their applications in biomedical
+domains. This post will concentrate on a few LLMs for genomics (e.g. DNA and
+RNA).&lt;/p&gt;
+&lt;h2 id=&#34;dna-language-models&#34;&gt;DNA Language Models&lt;/h2&gt;
+&lt;h3 id=&#34;dnabert&#34;&gt;DNABERT&lt;/h3&gt;
+&lt;p&gt;DNABERT (&lt;a href=&#34;#Ji2021&#34;&gt;Ji et al., 2021&lt;/a&gt;) is designed to encoder genomic DNA
+sequences by adapting the Bidirectional Encoder Representations from
+Transformers (BERT) model. DNABERT utilizes a Transformer&amp;rsquo;s encoder architecture
+characterized by attention mechanisms, which effectively capture both local and
+long-range dependencies in DNA sequences and offer contextual representation of
+the input DNA sequences. The encoder-only architecture is identical to the BERT
+base model, comprising 12 transformer layers, each with 768 hidden units and 12
+attention heads.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Biomedical LLMs (1): Intro</title>
       <link>https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/</link>
