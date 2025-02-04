@@ -1,40 +1,66 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>AI/ML on JX&#39;s log</title>
     <link>https://jiajiexiao.github.io/tags/ai/ml/</link>
     <description>Recent content in AI/ML on JX&#39;s log</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo -- 0.142.0</generator>
     <language>en-us</language>
+    <lastBuildDate>Fri, 10 May 2024 22:34:35 -0800</lastBuildDate>
     <atom:link href="https://jiajiexiao.github.io/tags/ai/ml/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Biomedical LLMs (1): Intro</title>
       <link>https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/</link>
       <pubDate>Fri, 10 May 2024 22:34:35 -0800</pubDate>
       <guid>https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/</guid>
-      <description>The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical</description>
+      <description>&lt;p&gt;The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and
+efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in
+compressing vast amounts of information through unsupervised or self-supervised training, enabling
+impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly
+attractive for domains where generating extensive task-specific datasets is challenging, such as in
+biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising
+results, highlighting their potential to address complex problems where data scarcity is a
+significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.&lt;/p&gt;</description>
     </item>
     <item>
       <title>What a large p for small n</title>
       <link>https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/</link>
       <pubDate>Mon, 29 Apr 2024 08:36:29 -0700</pubDate>
       <guid>https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/</guid>
-      <description>&amp;ldquo;Large p small n&amp;rdquo; describes a scenario where the number of features ($p$) is much greater than the number of observations ($n$) for model training. While it is not a new problem, it continues to pose significant challenges in real-world applications of machine learning, especially for domains lacking rich data or fast and cheap data generation processes. In this blog post, I&amp;rsquo;ll document my recent thoughts on the &amp;ldquo;large p small n&amp;rdquo; problem.</description>
+      <description>&lt;p&gt;&amp;ldquo;Large p small n&amp;rdquo; describes a scenario where the number of features ($p$) is much greater than the
+number of observations ($n$) for model training. While it is not a new problem, it continues to pose
+significant challenges in real-world applications of machine learning, especially for domains
+lacking rich data or fast and cheap data generation processes. In this blog post, I&amp;rsquo;ll document my
+recent thoughts on the &amp;ldquo;large p small n&amp;rdquo; problem.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Toward Robust AI (2): How To Achieve Robust AI</title>
       <link>https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/</link>
       <pubDate>Sat, 06 Jan 2024 20:44:25 -0800</pubDate>
       <guid>https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/</guid>
-      <description>In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence (AI) and machine learning (ML) systems, discussing how they attain &amp;ldquo;intelligence&amp;rdquo; through a careful &amp;ldquo;data diet.&amp;rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers to robust performance and reliable deployment. In particular, covariate shift (eq 1) and concept drift (eq 2) are two major types of OOD frequently encountered in practice, demanding mitigation for robust model deployment.</description>
+      <description>&lt;p&gt;In my previous &lt;a href=&#34;https://jiajiexiao.github.io/posts/2023-12-17_why_robust_ai/&#34;&gt;post&lt;/a&gt;, I highlighted the growing influence and adoption of Artificial Intelligence
+(AI) and machine learning (ML) systems, discussing how they attain &amp;ldquo;intelligence&amp;rdquo; through a careful
+&amp;ldquo;data diet.&amp;rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers
+to robust performance and reliable deployment. In particular, covariate shift (&lt;a href=&#34;#eq1&#34;&gt;eq 1&lt;/a&gt;) and
+concept drift (&lt;a href=&#34;#eq2&#34;&gt;eq 2&lt;/a&gt;) are two major types of OOD frequently encountered in practice,
+demanding mitigation for robust model deployment.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Toward Robust AI (1): Why Robustness Matters</title>
       <link>https://jiajiexiao.github.io/posts/2023-12-17_why_robust_ai/</link>
       <pubDate>Sun, 17 Dec 2023 14:06:46 -0800</pubDate>
       <guid>https://jiajiexiao.github.io/posts/2023-12-17_why_robust_ai/</guid>
-      <description>Brilliant AI/ML Models Remain Brittle Artificial intelligence (AI) and machine learning (ML) have garnered significant attention for their potential to emulate, and sometimes surpass, human capabilities across diverse domains such as vision, translation, and planning. The popularity of groundbreaking models like ChatGPT and Stable Diffusion has fueled optimism, with many speculating not if, but when, Artificial General Intelligence (AGI) will emerge.
-Yet, beneath the in silico surface, AI/ML systems remain at their core parametrized mathematical models.</description>
+      <description>&lt;h2 id=&#34;brilliant-aiml-models-remain-brittle&#34;&gt;Brilliant AI/ML Models Remain Brittle&lt;/h2&gt;
+&lt;p&gt;Artificial intelligence (AI) and machine learning (ML) have garnered significant attention for their
+potential to emulate, and sometimes surpass, human capabilities across diverse domains such as
+vision, translation, and planning. The popularity of groundbreaking models like ChatGPT and Stable
+Diffusion has fueled optimism, with many speculating not &lt;em&gt;if&lt;/em&gt;, but &lt;em&gt;when&lt;/em&gt;, Artificial General
+Intelligence (AGI) will emerge.&lt;/p&gt;
+&lt;p&gt;Yet, beneath the in silico surface, AI/ML systems remain at their core parametrized mathematical
+models. They are trained to transform inputs into predictive outputs, which includes tasks like
+classification, regression, media generation, data clustering, and action planning. Despite the
+awe-inspiring results, the deployment of even the most sophisticated models reveals a
+fundamental fragility.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

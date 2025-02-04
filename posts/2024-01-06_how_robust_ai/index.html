@@ -7,10 +7,15 @@
 <meta name="robots" content="index, follow">
 <title>Toward Robust AI (2): How To Achieve Robust AI | JX&#39;s log</title>
 <meta name="keywords" content="AI/ML, Robustness">
-<meta name="description" content="In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence (AI) and machine learning (ML) systems, discussing how they attain &ldquo;intelligence&rdquo; through a careful &ldquo;data diet.&rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers to robust performance and reliable deployment. In particular, covariate shift (eq 1) and concept drift (eq 2) are two major types of OOD frequently encountered in practice, demanding mitigation for robust model deployment.">
+<meta name="description" content="In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence
+(AI) and machine learning (ML) systems, discussing how they attain &ldquo;intelligence&rdquo; through a careful
+&ldquo;data diet.&rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers
+to robust performance and reliable deployment. In particular, covariate shift (eq 1) and
+concept drift (eq 2) are two major types of OOD frequently encountered in practice,
+demanding mitigation for robust model deployment.">
 <meta name="author" content="Jiajie Xiao">
 <link rel="canonical" href="https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/">
-<link crossorigin="anonymous" href="../../assets/css/stylesheet.afe408fbde9e6232e4bb41db6dc1a6f427226bd3dcc8f7bd3765525b7678f46b.css" integrity="sha256-r&#43;QI&#43;96eYjLku0HbbcGm9Ccia9PcyPe9N2VSW3Z49Gs=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.c292a07dea08ffa7274e381a70305fb0723ab31bafbf10e470c03a04b23c11b6.css" integrity="sha256-wpKgfeoI/6cnTjgacDBfsHI6sxuvvxDkcMA6BLI8EbY=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://jiajiexiao.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://jiajiexiao.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://jiajiexiao.github.io/favicon-32x32.png">
@@ -18,6 +23,7 @@
 <link rel="mask-icon" href="https://jiajiexiao.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/">
 <noscript>
     <style>
         #theme-toggle,
@@ -88,26 +94,38 @@
 
 
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VT65G42LLD"></script>
-<script>
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-VT65G42LLD', { 'anonymize_ip': false });
-}
-</script>
-<meta property="og:title" content="Toward Robust AI (2): How To Achieve Robust AI" />
-<meta property="og:description" content="In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence (AI) and machine learning (ML) systems, discussing how they attain &ldquo;intelligence&rdquo; through a careful &ldquo;data diet.&rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers to robust performance and reliable deployment. In particular, covariate shift (eq 1) and concept drift (eq 2) are two major types of OOD frequently encountered in practice, demanding mitigation for robust model deployment." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-01-06T20:44:25-08:00" />
-<meta property="article:modified_time" content="2024-01-06T20:44:25-08:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Toward Robust AI (2): How To Achieve Robust AI"/>
-<meta name="twitter:description" content="In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence (AI) and machine learning (ML) systems, discussing how they attain &ldquo;intelligence&rdquo; through a careful &ldquo;data diet.&rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers to robust performance and reliable deployment. In particular, covariate shift (eq 1) and concept drift (eq 2) are two major types of OOD frequently encountered in practice, demanding mitigation for robust model deployment."/>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT65G42LLD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-VT65G42LLD');
+        }
+      </script><meta property="og:url" content="https://jiajiexiao.github.io/posts/2024-01-06_how_robust_ai/">
+  <meta property="og:site_name" content="JX&#39;s log">
+  <meta property="og:title" content="Toward Robust AI (2): How To Achieve Robust AI">
+  <meta property="og:description" content="In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence (AI) and machine learning (ML) systems, discussing how they attain “intelligence” through a careful “data diet.” However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers to robust performance and reliable deployment. In particular, covariate shift (eq 1) and concept drift (eq 2) are two major types of OOD frequently encountered in practice, demanding mitigation for robust model deployment.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-01-06T20:44:25-08:00">
+    <meta property="article:modified_time" content="2024-01-06T20:44:25-08:00">
+    <meta property="article:tag" content="AI/ML">
+    <meta property="article:tag" content="Robustness">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Toward Robust AI (2): How To Achieve Robust AI">
+<meta name="twitter:description" content="In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence
+(AI) and machine learning (ML) systems, discussing how they attain &ldquo;intelligence&rdquo; through a careful
+&ldquo;data diet.&rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers
+to robust performance and reliable deployment. In particular, covariate shift (eq 1) and
+concept drift (eq 2) are two major types of OOD frequently encountered in practice,
+demanding mitigation for robust model deployment.">
 
 
 <script type="application/ld+json">
@@ -136,7 +154,7 @@ if (!doNotTrack) {
   "@type": "BlogPosting",
   "headline": "Toward Robust AI (2): How To Achieve Robust AI",
   "name": "Toward Robust AI (2): How To Achieve Robust AI",
-  "description": "In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence (AI) and machine learning (ML) systems, discussing how they attain \u0026ldquo;intelligence\u0026rdquo; through a careful \u0026ldquo;data diet.\u0026rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers to robust performance and reliable deployment. In particular, covariate shift (eq 1) and concept drift (eq 2) are two major types of OOD frequently encountered in practice, demanding mitigation for robust model deployment.",
+  "description": "In my previous post, I highlighted the growing influence and adoption of Artificial Intelligence (AI) and machine learning (ML) systems, discussing how they attain \u0026ldquo;intelligence\u0026rdquo; through a careful \u0026ldquo;data diet.\u0026rdquo; However, a fundamental challenge arises from out-of-distribution (OOD), posing barriers to robust performance and reliable deployment. In particular, covariate shift (eq 1) and concept drift (eq 2) are two major types of OOD frequently encountered in practice, demanding mitigation for robust model deployment.\n",
   "keywords": [
     "AI/ML", "Robustness"
   ],
@@ -479,7 +497,7 @@ training.</p>
 <figure id="fig4" 
      class="align-center ">
     <img loading="lazy" src="https://yueatsprograms.github.io/ttt/method.png#center"
-         alt="Fig 4. Test-Time Training. Source image is from the authors&amp;rsquo; page (link) of TTT (Sun, et al (2020))." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+         alt="Fig 4. Test-Time Training. Source image is from the authors&rsquo; page (link) of TTT (Sun, et al (2020))." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
             <p style="text-align: left;"> <strong>Fig 4. Test-Time Training.</strong> Source image is from the authors&rsquo; page (<a href="https://yueatsprograms.github.io/ttt/home.html">link</a>) of TTT (<a href="#Sun2020">Sun, et al (2020)</a>).</p>
         </figcaption>
 </figure>
@@ -930,25 +948,12 @@ range of the training data.&#160;<a href="#fnref:6" class="footnote-backref" rol
 </ul>
 
   </footer>
-<div id="disqus_thread"></div>
-    <script type="text/javascript">
-    (function() {
-      
-      
-      if (window.location.hostname === 'localhost') return;
 
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      var disqus_shortname = 'jjxiao';
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </article>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2023-2024 <a href="https://jiajiexiao.github.io/">JX&#39;s log</a> | <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" 
+    <span>&copy; 2023-2025 <a href="https://jiajiexiao.github.io/">JX&#39;s log</a> | <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" 
         target="_blank" rel="license noopener noreferrer">CC BY-NC-SA 4.0 </a> | </span>
 
     <span>

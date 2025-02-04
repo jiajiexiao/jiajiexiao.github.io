@@ -7,10 +7,17 @@
 <meta name="robots" content="index, follow">
 <title>Biomedical LLMs (1): Intro | JX&#39;s log</title>
 <meta name="keywords" content="AI/ML, LLMs, Biomedical">
-<meta name="description" content="The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical">
+<meta name="description" content="The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and
+efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in
+compressing vast amounts of information through unsupervised or self-supervised training, enabling
+impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly
+attractive for domains where generating extensive task-specific datasets is challenging, such as in
+biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising
+results, highlighting their potential to address complex problems where data scarcity is a
+significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.">
 <meta name="author" content="Jiajie Xiao">
 <link rel="canonical" href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">
-<link crossorigin="anonymous" href="../../assets/css/stylesheet.afe408fbde9e6232e4bb41db6dc1a6f427226bd3dcc8f7bd3765525b7678f46b.css" integrity="sha256-r&#43;QI&#43;96eYjLku0HbbcGm9Ccia9PcyPe9N2VSW3Z49Gs=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.c292a07dea08ffa7274e381a70305fb0723ab31bafbf10e470c03a04b23c11b6.css" integrity="sha256-wpKgfeoI/6cnTjgacDBfsHI6sxuvvxDkcMA6BLI8EbY=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://jiajiexiao.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://jiajiexiao.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://jiajiexiao.github.io/favicon-32x32.png">
@@ -18,6 +25,7 @@
 <link rel="mask-icon" href="https://jiajiexiao.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">
 <noscript>
     <style>
         #theme-toggle,
@@ -88,26 +96,41 @@
 
 
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VT65G42LLD"></script>
-<script>
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-VT65G42LLD', { 'anonymize_ip': false });
-}
-</script>
-<meta property="og:title" content="Biomedical LLMs (1): Intro" />
-<meta property="og:description" content="The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-05-10T22:34:35-08:00" />
-<meta property="article:modified_time" content="2024-05-10T22:34:35-08:00" />
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Biomedical LLMs (1): Intro"/>
-<meta name="twitter:description" content="The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical"/>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT65G42LLD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-VT65G42LLD');
+        }
+      </script><meta property="og:url" content="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">
+  <meta property="og:site_name" content="JX&#39;s log">
+  <meta property="og:title" content="Biomedical LLMs (1): Intro">
+  <meta property="og:description" content="The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising results, highlighting their potential to address complex problems where data scarcity is a significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-05-10T22:34:35-08:00">
+    <meta property="article:modified_time" content="2024-05-10T22:34:35-08:00">
+    <meta property="article:tag" content="AI/ML">
+    <meta property="article:tag" content="LLMs">
+    <meta property="article:tag" content="Biomedical">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Biomedical LLMs (1): Intro">
+<meta name="twitter:description" content="The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and
+efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in
+compressing vast amounts of information through unsupervised or self-supervised training, enabling
+impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly
+attractive for domains where generating extensive task-specific datasets is challenging, such as in
+biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising
+results, highlighting their potential to address complex problems where data scarcity is a
+significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.">
 
 
 <script type="application/ld+json">
@@ -136,12 +159,12 @@ if (!doNotTrack) {
   "@type": "BlogPosting",
   "headline": "Biomedical LLMs (1): Intro",
   "name": "Biomedical LLMs (1): Intro",
-  "description": "The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical",
+  "description": "The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising results, highlighting their potential to address complex problems where data scarcity is a significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.\n",
   "keywords": [
     "AI/ML", "LLMs", "Biomedical"
   ],
   "articleBody": "The rapid advancements in Natural Language Processing (NLP) have showcased the versatility and efficacy of Large Language Models (LLMs). These models have demonstrated significant capabilities in compressing vast amounts of information through unsupervised or self-supervised training, enabling impressive few-shot and zero-shot learning performance. These attributes make LLMs particularly attractive for domains where generating extensive task-specific datasets is challenging, such as in biomedical applications. Recent attempts to apply LLMs in biomedical contexts have yielded promising results, highlighting their potential to address complex problems where data scarcity is a significant barrier. Starting from this post, I am planning to write a series on Biomedical LLMs.\n1. General Introduction to LLMs LLMs are deep learning models designed to understand and generate human language. They leverage vast datasets to learn the statistical properties of language, allowing them to generate coherent and contextually appropriate text. The development of LLMs has been significantly influenced by the introduction of the Transformer architecture (Fig. 1) by Vaswani et al. (2017), which enabled models to efficiently (relatively speaking) capture long-range dependencies in text through self-attention mechanisms. Subsequent models such as BERT (Bidirectional Encoder Representations from Transformers) by Devlin et al. (2019) and GPT (Generative Pre-trained Transformer) by Radford et al. (2018) have set new benchmarks in NLP, demonstrating state-of-the-art performance across various tasks.\nFig 1. Transformer Architecture.. The nice illustration is from D2l.ai.\n2. Training Large Language Models The training of LLMs involves multiple methodologies designed to enhance their language understanding and generation capabilities. The primary training schemes include:\n2.1 Autoregressive Language Modeling (ALM) Autoregressive language modeling involves training the model to predict the next word in a sequence based on the preceding words:\n\\begin{equation} \\begin{aligned} \\pi_\\theta (\\mathbf{y} \\mid \\mathbf{x}) = \\prod_{t} \\pi_\\theta (y_t \\mid \\mathbf{x}, \\mathbf{y}_{",
-  "wordCount" : "5550",
+  "wordCount" : "5664",
   "inLanguage": "en",
   "datePublished": "2024-05-10T22:34:35-08:00",
   "dateModified": "2024-05-10T22:34:35-08:00",
@@ -539,7 +562,7 @@ each layer and each token generation step involve separate KV caching.</p>
 <figure id="fig2" 
      class="align-center ">
     <img loading="lazy" src="../../images/decoder-only_vs_decoder-decoder.png#center"
-         alt="Fig 2. Decoder-only vs Decoder-Decoder. (a) GPT&amp;rsquo;s decoder-only architecture. (b) &amp;amp; (c) Decoder-decoder architecture. (d) YOCO inference process. (a) is from Radford et al. 2018 and (b-d) are from Sun et al. 2024." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+         alt="Fig 2. Decoder-only vs Decoder-Decoder. (a) GPT&rsquo;s decoder-only architecture. (b) &amp; (c) Decoder-decoder architecture. (d) YOCO inference process. (a) is from Radford et al. 2018 and (b-d) are from Sun et al. 2024." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
             <p style="text-align: left;"> <strong>Fig 2. Decoder-only vs Decoder-Decoder.</strong> (a) GPT&rsquo;s decoder-only architecture. (b) &amp; (c) Decoder-decoder architecture. (d) YOCO inference process. (a) is from <a href="#Radford2018">Radford et al. 2018</a> and (b-d) are from <a href="#Sun2024">Sun et al. 2024</a>.</p>
         </figcaption>
 </figure>
@@ -549,6 +572,8 @@ each layer and each token generation step involve separate KV caching.</p>
 methodologies to enhance LLM capabilities. Hybrid models and multimodal models, which integrate text
 with other data types (e.g., images, audio) (<a href="#Radford2021">Radford et al. 2021</a>), represent
 cutting-edge advancements in the field.</p>
+<p>Another notable innovation is the prefix decoder architecture. This type of hybrid model modifies the masking mechanism of causal decoders (i.e., decoder-only architecture) to enable bidirectional attention over prefix tokens while maintaining unidirectional attention on generated tokens. Consequently, prefix decoders can bidirectionally encode the prefix sequence and autoregressively predict output tokens using shared parameters. For a more detailed illustration of such prefix language models, I recommend Cameron Wolfe&rsquo;s blog &ldquo;T5: Text-to-Text Transformers&rdquo;
+(<a href="https://cameronrwolfe.substack.com/p/t5-text-to-text-transformers-part">link1</a>, <a href="https://cameronrwolfe.substack.com/p/t5-text-to-text-transformers-part-354">link2</a>).</p>
 <h2 id="4-employing-pre-trained-llms">4. Employing Pre-Trained LLMs<a hidden class="anchor" aria-hidden="true" href="#4-employing-pre-trained-llms">#</a></h2>
 <p>Pre-trained LLMs serve as foundation models that can be employed for specific tasks using several
 techniques, starting with zero-shot approaches and moving towards more customized fine-tuning
@@ -786,11 +811,13 @@ the original training corpus. By combining these different types of features, th
 performance is enhanced, especially in handling domain-specific terminology.</p>
 <h3 id="47-supervised-fine-tuning">4.7 Supervised Fine-Tuning<a hidden class="anchor" aria-hidden="true" href="#47-supervised-fine-tuning">#</a></h3>
 <p>Supervised fine-tuning (SFT) involves continuing the training of a pre-trained model using
-domain-specific or task-specific data. This process adjusts the model parameters to better suit the
-nuances of the new domain or new task. For example, a pre-trained LLM might be fine-tuned on a
-dataset of clinical notes to improve its ability to understand and generate medical text,
-significantly enhancing its performance on specialized tasks. SFT can be employed for both GPT-style
-and BERT-style LLMs.</p>
+domain-specific or task-specific data. SFT is a specific type of fine-tuning where the task-specific
+dataset used for fine-tuning includes labeled data. This labeled data is used to provide explicit
+guidance to the model on how to adjust its parameters. This process adjusts the model parameters to
+better suit the nuances of the new domain or new task. For example, a pre-trained LLM might be
+fine-tuned on a dataset of clinical notes to improve its ability to understand and generate medical
+text, significantly enhancing its performance on specialized tasks. SFT can be employed for both
+GPT-style and BERT-style LLMs.</p>
 <h3 id="48-alignment-via-rfhf">4.8 Alignment via RFHF<a hidden class="anchor" aria-hidden="true" href="#48-alignment-via-rfhf">#</a></h3>
 <p>Alignment through reinforcement learning from human feedback (RFHF) aims to fine-tune the
 unsupervised LMs to align the model&rsquo;s outputs with human values and preferences, ensuring that the
@@ -809,7 +836,7 @@ which is used to adjust the model&rsquo;s parameters as fine-tuning via minimize
 \mathcal{L_r(\pi_t)} = -\mathbb{E}_{x \sim p_d, y \sim \pi_t} \left[ r(x, y) - \beta \log \frac{\pi_t(y \mid x)}{\pi_r(y \mid x)} \right],
 \end{aligned}
 \end{equation}</p>
-<p>where $r$ is the reward function reflecting human preferences in the comparison data$p_d$. $\pi_r$
+<p>where $r$ is the reward function reflecting human preferences in the comparison data $p_d$. $\pi_r$
 is the original reference model used for regularizing $\pi_t$ with Kullback–Leibler divergence.
 $\beta$ is the hyperparameter for controlling the regularization strength. The objective here is to
 get large reward without deviating from the original reference LLM too much.</p>
@@ -986,9 +1013,9 @@ gene LLMs.</li>
 functions.</li>
 <li><strong>Chemistry Language Models</strong>: Highlighting the role of LLMs in chemical research, including drug
 discovery and molecular analysis.</li>
-<li><strong>Other Biomedical LLMs</strong>: Discussing models for medical imaging, generalized biological
-understanding through multimodal data integration, and other emerging applications in the
-biomedical field.</li>
+<li><strong>Other Biomedical LLMs</strong>: Discussing models for universal biological sequence LLMs, medical
+imaging, generalized biological understanding through multimodal data integration, and other
+emerging applications in the biomedical field.</li>
 </ol>
 <p>While this intro post focuses on some general intro to LLMs, I look forward to more exploration of
 how LLMs are transforming biomedical research and applications in the coming posts of this series.</p>
@@ -1090,6 +1117,11 @@ them as two different approaches given the popularity of LoRA.&#160;<a href="#fn
       <li><a href="https://jiajiexiao.github.io/tags/biomedical/">Biomedical</a></li>
     </ul>
 <nav class="paginav">
+  <a class="prev" href="https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Biomedical LLMs (2): Genomics</span>
+  </a>
   <a class="next" href="https://jiajiexiao.github.io/posts/2024-04-29_large_p_small_n/">
     <span class="title">Next »</span>
     <br>
@@ -1120,25 +1152,12 @@ them as two different approaches given the popularity of LoRA.&#160;<a href="#fn
 </ul>
 
   </footer>
-<div id="disqus_thread"></div>
-    <script type="text/javascript">
-    (function() {
-      
-      
-      if (window.location.hostname === 'localhost') return;
 
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      var disqus_shortname = 'jjxiao';
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </article>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2023-2024 <a href="https://jiajiexiao.github.io/">JX&#39;s log</a> | <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" 
+    <span>&copy; 2023-2025 <a href="https://jiajiexiao.github.io/">JX&#39;s log</a> | <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" 
         target="_blank" rel="license noopener noreferrer">CC BY-NC-SA 4.0 </a> | </span>
 
     <span>

@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Biomedical LLMs (2): Genomics | JX&#39;s log</title>
+<meta name="keywords" content="">
+<meta name="description" content="
+[Updated in Jan 2025]: Added HELM.
+[Updated in Dec 2024]: Added MethylGPT.
+
+In previous post,
+we discussed some of the introduction to Large Language Models (LLMs) and how
+they are constructed, trained, and utilized. Beginning with this post in the
+Biomedical LLMs series, we will explore their applications in biomedical
+domains. This post will concentrate on a few LLMs for genomics (e.g. DNA and
+RNA).
+DNA Language Models
+DNABERT
+DNABERT (Ji et al., 2021) is designed to encoder genomic DNA
+sequences by adapting the Bidirectional Encoder Representations from
+Transformers (BERT) model. DNABERT utilizes a Transformer&rsquo;s encoder architecture
+characterized by attention mechanisms, which effectively capture both local and
+long-range dependencies in DNA sequences and offer contextual representation of
+the input DNA sequences. The encoder-only architecture is identical to the BERT
+base model, comprising 12 transformer layers, each with 768 hidden units and 12
+attention heads.">
+<meta name="author" content="Jiajie Xiao">
+<link rel="canonical" href="https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.c292a07dea08ffa7274e381a70305fb0723ab31bafbf10e470c03a04b23c11b6.css" integrity="sha256-wpKgfeoI/6cnTjgacDBfsHI6sxuvvxDkcMA6BLI8EbY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jiajiexiao.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jiajiexiao.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jiajiexiao.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jiajiexiao.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jiajiexiao.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload='renderMathInElement(
+          document.body, 
+          {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\(", right: "\\)", display: false},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "\\begin{equation}", right: "\\end{equation}", display: true},
+                {left: "\\begin{align}", right: "\\end{align}", display: true},
+                {left: "\\begin{alignat}", right: "\\end{alignat}", display: true},
+                {left: "\\begin{gather}", right: "\\end{gather}", display: true},
+                {left: "\\begin{CD}", right: "\\end{CD}", display: true},
+            ]
+          }
+        );'></script>
+  </head>
+</html>
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT65G42LLD"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-VT65G42LLD');
+        }
+      </script><meta property="og:url" content="https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/">
+  <meta property="og:site_name" content="JX&#39;s log">
+  <meta property="og:title" content="Biomedical LLMs (2): Genomics">
+  <meta property="og:description" content=" [Updated in Jan 2025]: Added HELM. [Updated in Dec 2024]: Added MethylGPT. In previous post, we discussed some of the introduction to Large Language Models (LLMs) and how they are constructed, trained, and utilized. Beginning with this post in the Biomedical LLMs series, we will explore their applications in biomedical domains. This post will concentrate on a few LLMs for genomics (e.g. DNA and RNA).
+DNA Language Models DNABERT DNABERT (Ji et al., 2021) is designed to encoder genomic DNA sequences by adapting the Bidirectional Encoder Representations from Transformers (BERT) model. DNABERT utilizes a Transformer’s encoder architecture characterized by attention mechanisms, which effectively capture both local and long-range dependencies in DNA sequences and offer contextual representation of the input DNA sequences. The encoder-only architecture is identical to the BERT base model, comprising 12 transformer layers, each with 768 hidden units and 12 attention heads.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-05-12T12:30:32-08:00">
+    <meta property="article:modified_time" content="2024-05-12T12:30:32-08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Biomedical LLMs (2): Genomics">
+<meta name="twitter:description" content="
+[Updated in Jan 2025]: Added HELM.
+[Updated in Dec 2024]: Added MethylGPT.
+
+In previous post,
+we discussed some of the introduction to Large Language Models (LLMs) and how
+they are constructed, trained, and utilized. Beginning with this post in the
+Biomedical LLMs series, we will explore their applications in biomedical
+domains. This post will concentrate on a few LLMs for genomics (e.g. DNA and
+RNA).
+DNA Language Models
+DNABERT
+DNABERT (Ji et al., 2021) is designed to encoder genomic DNA
+sequences by adapting the Bidirectional Encoder Representations from
+Transformers (BERT) model. DNABERT utilizes a Transformer&rsquo;s encoder architecture
+characterized by attention mechanisms, which effectively capture both local and
+long-range dependencies in DNA sequences and offer contextual representation of
+the input DNA sequences. The encoder-only architecture is identical to the BERT
+base model, comprising 12 transformer layers, each with 768 hidden units and 12
+attention heads.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://jiajiexiao.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Biomedical LLMs (2): Genomics",
+      "item": "https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Biomedical LLMs (2): Genomics",
+  "name": "Biomedical LLMs (2): Genomics",
+  "description": " [Updated in Jan 2025]: Added HELM. [Updated in Dec 2024]: Added MethylGPT. In previous post, we discussed some of the introduction to Large Language Models (LLMs) and how they are constructed, trained, and utilized. Beginning with this post in the Biomedical LLMs series, we will explore their applications in biomedical domains. This post will concentrate on a few LLMs for genomics (e.g. DNA and RNA).\nDNA Language Models DNABERT DNABERT (Ji et al., 2021) is designed to encoder genomic DNA sequences by adapting the Bidirectional Encoder Representations from Transformers (BERT) model. DNABERT utilizes a Transformer\u0026rsquo;s encoder architecture characterized by attention mechanisms, which effectively capture both local and long-range dependencies in DNA sequences and offer contextual representation of the input DNA sequences. The encoder-only architecture is identical to the BERT base model, comprising 12 transformer layers, each with 768 hidden units and 12 attention heads.\n",
+  "keywords": [
+    
+  ],
+  "articleBody": " [Updated in Jan 2025]: Added HELM. [Updated in Dec 2024]: Added MethylGPT. In previous post, we discussed some of the introduction to Large Language Models (LLMs) and how they are constructed, trained, and utilized. Beginning with this post in the Biomedical LLMs series, we will explore their applications in biomedical domains. This post will concentrate on a few LLMs for genomics (e.g. DNA and RNA).\nDNA Language Models DNABERT DNABERT (Ji et al., 2021) is designed to encoder genomic DNA sequences by adapting the Bidirectional Encoder Representations from Transformers (BERT) model. DNABERT utilizes a Transformer’s encoder architecture characterized by attention mechanisms, which effectively capture both local and long-range dependencies in DNA sequences and offer contextual representation of the input DNA sequences. The encoder-only architecture is identical to the BERT base model, comprising 12 transformer layers, each with 768 hidden units and 12 attention heads.\nDNABERT employs a k-mer tokenization strategy to segment DNA sequences into overlapping k-mers, which provides a more coarse-grained and computationally cheaper way to capture the contextual information than base-by-base tokenization. The authors experimented with four k-mer sizes: 3, 4, 5, and 6. Each k-mer model (DNABERT-3, DNABERT-4, DNABERT-5, DNABERT-6) has a vocabulary size of 4^k+5 tokens, including special tokens such as [CLS] (classification), [PAD] (padding), [UNK] (unknown), [SEP] (separator), and [MASK] (masking). Each version captures different levels of contextual information, with DNABERT-6 generally performing the best due to its richer context representation. Moreover, learned positional embeddings (likely learns a simple lookup table via a linear layer) were used to add to the token embeddings.\nFig 1. Architecture and Key Features of the DNABERT Model. (a) Contextual understanding in RNN, CNN, and Transformer models: Comparison of how each model processes input tokens (T1-T5) to generate hidden states. RNNs use sequential information flow, CNNs focus on local context, while Transformers employ global self-attention mechanisms. (b) DNABERT’s structure: The model inputs tokenized k-mer sequences, including special tokens (CLS, SEP, MASK). This data passes through an embedding layer and 12 Transformer blocks. The model produces sentence-level classifications from the first output and token-level classifications from individual masked token outputs. (c) DNABERT’s versatility: The model uses general pre-training, allowing fine-tuning for various specific tasks with appropriate data. (d) DNABERT’s attention visualization: An example showing global attention patterns across 12 attention heads, demonstrating the model’s ability to focus on significant regions, such as known binding sites within a sequence.. The figure is Fig.1 from Ji et al., 2021.\nThe pretraining dataset for DNABERT was derived from the human genome, which has 3 billion bases. Sequences were generated through direct non-overlapping splitting and random sampling, with lengths varying between 5 and 510 bases. The pretraining process involved masking 15% of k-mers in the sequences for the first 100,000 steps and increasing this to 20% for the final 20,000 steps. The model was pretrained for 120,000 steps with a batch size of 2,000. The training process for DNABERT took approximately 25 days on 8 NVIDIA 2080Ti GPUs.\nDNABERT exhibits versatility across various genomic sequence-related tasks. It demonstrated state-of-the-art (SOTA) performance in 2021 for predicting promoters, splice sites, and transcription factor binding sites. By comparing the fine-tuned DNABERT pre-trained on the human genome with 78 mouse ENCODE ChIP-seq datasets against CNN, CNN+LSTM, CNN+GRU, and randomly initialized DNABERT models on cross-genome sequence prediction tasks, the authors show that the pre-trained DNABERT significantly outperforms all baselines. This suggests that pre-training not only enhances model performance by providing a better starting point for training but also enables robust transfer across species, even with considerable dissimilarities in non-coding regions, highlighting the model’s ability to capture shared deep semantic features across genomes. Furthermore, by visualizing the attention maps, DNABERT provides insights into the relative importance of different nucleotides and their semantic relationships within sequences. This interpretability demonstrates that deep learning models need not be “black boxes” - the model’s attention patterns can help identify conserved sequence motifs and predict functional genetic variants by highlighting biologically meaningful patterns in the data.\nDNABERT-2 DNABERT-2 (Zhou et al., 2023) is a refined genome foundation model designed to improve upon the limitations of its predecessor, DNABERT. DNABERT-2 is built upon the Transformer’s encoder architecture, similar to BERT and DNABERT, but incorporates a few key changes:\nDNABERT-2 adapts SentencePiece 1 (Kudo, 2018) with Byte Pair Encoding (BPE) 2 (Sennrich et al., 2015) to tokenize DNA sequences instead of using k-mer tokenization. BPE iteratively merges the most frequent co-occurring genome segments. This method overcomes the limitations of k-mer tokenization, such as information leakage 3 and poor computational efficiency, by providing a more streamlined and effective approach to sequence representation. This switch addresses computational inefficiencies and sample inefficiencies associated with k-mer tokenization. 8 vocabularies with target sizes ranging from 2^8 to 2^15 were tested for the BPE tokenization strategy. The best performing model was trained with a vocabulary size of 2^15, where larger vocabulary size means longer sequences but more sparse updates to the embedding layer. Evaluating different vocabulary sizes on a multi-species genome dataset on the Genome Understanding Evaluation (GUE) benchmark led the authors to use a vocabulary size of 2^12 = 4096 for training the final DNABERT-2 model. Except for replacing k-mer tokenization with BPE for better tokenization efficiency and sequence representation, DNABERT-2 abandons learned positional embeddings by integrating Attention with Linear Biases (ALiBi) (Press, et al, 2021) to overcome input length limitations. Unlike approaches that add positional embeddings to word embeddings, ALiBi biases query-key attention scores with a penalty proportional to the distance between tokens, enabling the model to extrapolate efficiently to sequences longer than those encountered during training. Additionally, DNABERT-2 also employs Flash Attention (Dao, et al., 2022) and Low Precision Layer Normalization to boost computational efficiency. This model comprises 117M parameters, making it substantially smaller yet more efficient than other models in its class. The pre-training of DNABERT-2 involved two main datasets: a human genome dataset consisting of 2.75 billion nucleotide bases, and a multi-species genome dataset comprising genomes from 135 species, totaling 32.49 billion nucleotide bases. This multi-species dataset ensures a broader representation and diversity of genetic sequences. Maximum sequence length was set to 510bps4 for DNABERT.\nThe pre-training of DNABERT-2 took approximately 14 days using eight Nvidia RTX 2080Ti GPUs. The training process employed a batch size of 4096 and a maximum sequence length of 128, optimized using the AdamW optimizer with specific hyperparameters.\nAs briefly mentioned earlier, DNABERT-2 introduces the Genome Understanding Evaluation (GUE) benchmark to evaluate DNEBERT-2. GUE includes 36 datasets across nine genome analysis tasks from four species. This benchmark enables a standardized assessment of model performance across various tasks such as promoter detection, transcription factor prediction, and species classification. While the input size of datasets in GUE ranges from 5000 to 10000, the authors splitted the input into 512bps segments and use the averaged embedding of each segment as the input to the model during their benchmarking. Also, the DNABERT-2 model is pre-trained purely on 700-bps sequences. Thanks to the extrapolation capability offered by ALiBi, the authors showed that such a setting still performs well even on 10000-bps sequences with a few epochs of fine-tuning.\nCompared to its predecessor DNABERT, DNABERT-2 achieves superior performance with significantly reduced computational cost and model size. In the authors evaluation, it performs on par with “SOTA” Nucleotide Transformers in 2023 while being 21 times smaller and requiring 92 times less GPU time for pre-training. This efficiency makes DNABERT-2 particularly suitable for fine-tuning on consumer GPUs.\nNucleotide Transformer The Nucleotide Transformer (NT) is a foundation model developed by InstaDeep in collaboration with Nvidia, designed for encoding genomic sequences (Dalla-Torre, et al., 2023). This model series, ranging from 50M to 2.5B parameters, has been developed over recent years with continuous improvements in training techniques and architectural enhancements.\nFig 2. Overview of the Nucleotide Transformer: pre-training, fine-tuning, analysis, and comparison of foundational models for genomics. (a,b) Illustration of the Nucleotide Transformer’s training process (a) and its application to downstream genomic prediction tasks via fine-tuning (b). Probing for downstream tasks follows a similar approach but excludes rescaling weights. (c) Comparative analysis of the Nucleotide Transformer models against other foundational genomics models, focusing on receptive field size, number of parameters, and performance across a benchmark comprising 18 curated downstream tasks. (d) Visualization of genomic features considered in downstream tasks. The figure is Fig.1 from Dalla-Torre, et al., 2023.\nNTs employ an encoder-only transformer architecture similar to BERT. They use non-overlapping 6-mer DNA tokens as a trade-off between sequence length (up to 6kb) and embedding size, achieving the highest performance compared to other token lengths. NT-v1 models use a learnable positional encoding layer that accepts a maximum of 1000 tokens 5. Each model includes transformer layers with layer normalization, multi-head self-attention, and a two-layer perceptron with GELU activations. The parameter sizes for NT-v1 models range from 500M to 2.5B.\nThe updated NT-v2 models feature architectural advancements such as rotary embeddings (Su, et al., 2024)6 and swiGLU activation (Shazeer, 2020). They eliminate MLP biases and dropout mechanisms to improve efficiency. NT-v2 models extend the context length to 12kb by accepting up to 2048 tokens and include variants with parameter sizes from 50M to 500M.\nNT models are pre-trained on diverse datasets to ensure comprehensive genomic representation:\nHuman Reference Genome: Based on the GRCh38/hg38 assembly, encompassing 3.2 billion nucleotides. 1000 Genomes Project (1000G): Comprising 3,202 high-coverage human genomes, representing 20.5 trillion nucleotides from 27 geographically diverse populations. Multispecies Dataset: Includes 850 genomes from various species, totaling 174 billion nucleotides, selected to maximize diversity and functional relevance across different phyla​​. The tokenization process converts nucleotide sequences into 6-mer tokens, with a vocabulary of 4104 tokens, including special tokens for padding [pad], masking [mask], and sequence start [CLS]. All nucleotides other than A, T, C, G were replaced by N before tokenization. The models are trained using a masked language modeling (MLM) approach similar to BERT, where 15% of the tokens in each sequence are masked, and the model learns to predict these masked tokens. Training utilizes the Adam optimizer with a learning rate schedule and gradient accumulation to handle large batch sizes effectively, with an effective batch size of 1M tokens per batch. Training is conducted on the Cambridge-1 Nvidia supercomputer, using 128 A100 GPUs across 16 nodes. NT-v1 models require up to 28 days for training, while NT-v2 models are trained for extended durations, with the largest models processing up to 1 trillion tokens to better understand the scaling laws (Kaplan, et al., 2020).\nNT models are evaluated based on their performance across various genomic tasks:\nScaling Laws: NT models, ranging from 50M to 2.5B parameters, were trained on extensive datasets. Larger models captured more complex genomic patterns, resulting in better generalization and accuracy. Architectural advancements in NT-v2 allowed smaller models to achieve results comparable to larger ones. These findings emphasize the importance of optimizing training techniques and extending context lengths to enhance model performance.\nBenchmarking: NT models were tested on 18 diverse genomic tasks, such as predicting epigenetic marks, chromatin profiles, and splice sites. Larger models consistently outperformed smaller ones, with the 2.5B parameter NT-v2 model showing superior accuracy in most tasks. The NT-v2 500M parameter model achieved similar performance to the 2.5B parameter model due to architectural improvements and longer training durations. Smaller models, like the 50M and 100M parameter versions, also performed well in less complex tasks or resource-limited environments. This benchmarking highlighted the trade-off between model size, computational efficiency, and task complexity.\nModel Selection: Selecting NT models depends on the specific downstream tasks. For tasks like predicting epigenetic marks and chromatin profiles, larger models (500M-2.5B parameters) are recommended due to their higher accuracy and ability to capture intricate dependencies. For splice site prediction, the NT-v2 500M model offers excellent performance comparable to SOTA models. For simpler tasks or when computational resources are limited, smaller models (50M-100M parameters) provide sufficient performance and efficiency. Understanding the specific requirements and constraints of the application is crucial in selecting the most appropriate NT model.\nThe NT models have shown significant improvements over existing benchmarks like DNABERT and Enformer (see below), particularly in tasks involving human genomic data.\nEnformer Enformer (Avsec, et al., 2021), developed by a team at DeepMind in collaboration with Calico Life Sciences and Google, leverages transformer architecture to predict gene expression and chromatin states from DNA sequences in humans and mice. While Enformer does not involve pre-training tasks like other large language models (LLMs), its adoption of a BERT-like architecture makes it highly relevant to this post.\nFig 3. Overview of the Enformer architecture. The model is trained to predict human and mouse genomic tracks at a 128-bp resolution using 200 kb of input DNA sequence. It replaces dilated convolutions with transformer modules, expanding its receptive field fivefold to detect elements up to 100 kb away, compared to 20 kb in Basenji2. Detailed architecture settings can be found in Extended Data Fig. 1 of the original paper (Avsec, et al., 2021), with a comparison to Basenji2. The figure was originally Fig. 1a but is linked through DeepMind’s corresponding blog post.\nEnformer combines deep convolutional neural networks with transformer blocks, significantly extending its receptive field. The model processes 196,608 bps of DNA sequence input and predicts 5,313 genomic tracks for humans and 1,643 for mice. It consists of seven convolutional layers followed by eleven transformer layers, using attention mechanisms to integrate information from distal genomic elements up to 100 kb away. This setup contrasts with previous SOTA models like Basenji2, which can only integrate information from up to 20 kb away.\nRegarding tokenization, input DNA sequences are one-hot encoded, with each nucleotide represented by a unique vector (A = [1,0,0,0], C = [0,1,0,0], G = [0,0,1,0], T = [0,0,0,1]). This encoding feeds into the convolutional layers, which reduce the spatial dimension, allowing the transformer layers to capture long-range interactions effectively. Moreover, the model employs custom relative positional encodings like Transformer-XL paper does (in short that is to add relative positional encodings $R_{ij}$ to the $q_i k_j^T$ ) to enhance its ability to distinguish between proximal and distal regulatory elements and to differentiate positions upstream and downstream of the transcription start site (TSS). This approach ensures effective integration of long-range genomic interactions, crucial for accurate gene expression prediction.\nEnformer was trained using a multitask learning framework on a vast dataset encompassing most of the human and mouse genomes. The training involved 34,021 human and 29,295 mouse sequences, with additional validation and test sets. The dataset included various genomic assays such as transcription factor (TF) chromatin immunoprecipitation and sequencing (ChIP-seq), histone modification ChIP-seq, DNase-seq, and ATAC-seq, providing a comprehensive set of genomic tracks.\nTraining was conducted on 64 TPU v3 cores over approximately three days, with optimization handled by the Adam optimizer. The model’s training and validation employed Poisson negative log-likelihood loss (same as Basenji2 did) 7, and data augmentation techniques like random shifting and reverse-complementing the input sequences were used to enhance robustness.\nEnformer demonstrated superior performance in gene expression prediction compared to Basenji2, with mean correlation improvements from 0.81 to 0.85 in predicting RNA expression at TSSs of human protein-coding genes. The model also showed enhanced ability to predict tissue-specific gene expression and the effects of genetic mutations on gene expression, validated by CRISPR interference assays and population eQTL studies.\nAlthough Enformer is not an LLM, its generic architecture and trained model make it versatile for various applications, including fine-mapping of human disease associations, understanding cis-regulatory evolution, and potentially designing synthetic enhancers for specific cell types. Its ability to predict regulatory activity from DNA sequence alone presents a significant advantage in genomic research.\nDespite its advancements, the authors acknowledged in their paper that Enformer is limited by its reliance on the cell types and assays present in its training data. It cannot generalize to new cell types or assays not included in its training set. Future improvements could involve integrating 3D genome organization data to better model genomic interactions and expanding training datasets to include more cell types and organisms. Additionally, advancements in computational efficiency and hardware could further enhance the model’s scalability and performance. Moreover, other studies suggest that Enformer may not present SOTA results in benchmarking. Methods like nucleotide transformers we mentioned previously can outperform Enformer although Enformer has a much larger receptive field.\nGPN The Genomic Pre-trained Network (GPN) is a language model designed for genome-wide variant effect prediction, leveraging unsupervised pretraining on genomic DNA sequences (Benegas, et al., 2023). It is particularly notable for its application to predicting the functional impact of genetic variants in Arabidopsis thaliana, a model organism for plant biology.\nGPN is based on a customized transformer-encoder where the traditional multi-head attention layers are replaced by convolutions. This design leverages the efficiency of convolutional networks in capturing local dependencies, which are prevalent in genomic sequences. The core of GPN consists of 25 convolutional blocks, each incorporating a dilated convolutional layer followed by a feed-forward layer, with intermediate residual connections and layer normalization. The model maintains a fixed embedding dimension of 512 across all layers. This architecture allows GPN to effectively model both local and long-range dependencies within genomic sequences. GPN was trained for 150,000 steps over four days using four NVIDIA A100 80 GB GPUs.\nFig 4. Overview of the Genomic Pre-trained Network. GPN predicts nucleotides at masked positions in a 512-bp DNA sequence. During training, 15% of positions are masked, while only the variant position is masked during variant effect prediction. The model uses a convolutional neural network to generate embeddings for each position and outputs nucleotide probabilities for masked positions. Training is performed with cross-entropy loss on the reference sequence, and the variant effect prediction score is the log-likelihood ratio between the alternate and reference alleles. Here, L represents the window length in base pairs, D denotes the embedding dimension, REF is the reference allele, and ALT is the alternate allele. The figure was Fig. 1 from Benegas, et al.,2023.\nUnlike models that utilize k-mers or byte-pair encoding for tokenization, GPN uses single-nucleotide tokens. This approach simplifies the interpretation of model outputs, which is crucial for variant effect prediction. The model does not incorporate explicit positional embeddings; instead, it leverages the convolutional layers’ structure to capture positional information within the sequence. This design introduces translational equivariance as an inductive bias through the convolutional operations. While this assumption can be advantageous, it may also limit generalization when this bias does not align with the data.\nGPN was pretrained on unaligned reference genomes from Arabidopsis thaliana and seven related species within the Brassicales order. The training dataset included various genomic regions such as exons, promoters, and random genomic windows, ensuring a comprehensive representation of the genome. The model processes input DNA sequences of 512 base pairs, where 15% of the positions are masked during training. The goal is to predict the nucleotides at these masked positions, facilitating the learning of complex genomic features and structures. To address the overrepresentation of repetitive elements, the training loss was adjusted to down-weight these regions, improving the model’s performance on non-repetitive, functionally significant regions.\nGPN is designed to predict the effects of genetic variants across the genome, making it a powerful tool for genome-wide association studies (GWAS) and fine-mapping of causal variants. It outperforms traditional conservation scores like phyloP and phastCons in predicting variant effects in Arabidopsis thaliana.\nThe authors highlight that GPN’s ability to learn and predict gene structures and DNA motifs without any supervision. This capability is crucial for identifying transcription factor binding sites and other regulatory elements in the genome. Additionally, GPN’s predictions show a strong correlation with functional genomic regions, as evidenced by its high accuracy in distinguishing coding sequences, untranslated regions, and introns. This work should remind us that conventional CNN-based models can also work well sometimes.\nHyenaDNA Fig 5. Overview of HyenaDNA. The figure was from the GitHub profile page of the author’s repo for this work (link).\nHyenaDNA is a genomic foundation model designed to handle long-range dependencies in DNA sequences at single nucleotide resolution (Nguyen, et al., 2024). HyenaDNA addresses the limitations of previous Transformer-based genomic models that were constrained by the quadratic scaling of attention mechanisms. These earlier models could only handle contexts of up to 4k tokens, significantly limiting their ability to model long-range interactions in genomic sequences.\nHyenaDNA is based on the Hyena operator (Fig. 6), a convolutional model that can process long contexts with sub-quadratic time complexity. This architecture allows HyenaDNA to scale linearly with sequence length, enabling the modeling of up to 1 million tokens in a single context. The key components of the HyenaDNA architecture include:\nImplicit Convolutions: The Hyena operator uses long convolutions parameterized by a neural network, which are evaluated using Fast Fourier Transform (FFT) for efficient computation.\nElement-wise Gating: These gates modulate the input based on learned parameters, allowing the model to apply context-specific operations at each token position.\nSingle Nucleotide Tokenization: Unlike previous models that relied on k-mers or other aggregation techniques, HyenaDNA tokenizes DNA sequences at the single nucleotide level, preserving fine-grained information crucial for understanding genetic variations.\nFig 6. HyenaDNA Block. (left) The HyenaDNA block resembles a Transformer-decoder block, but with the attention mechanism replaced by a Hyena Operator. (middle) The Hyena Operator integrates long convolutions with element-wise gates, where the gates are derived from projections of the input using dense and short convolutional layers. (right) The long convolutions are parameterized implicitly through an MLP, which generates the weights for the long Hyena filters. The figure was from (https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna).\nHyenaDNA is a decoder-only model that was pretrained on the human reference genome using next-nucleotide prediction. This autoregressive training employed a sequence length warm-up technique, gradually increasing the context length to stabilize training and improve efficiency. The model demonstrated significant improvements in perplexity with longer contexts, indicating better prediction accuracy. The pretraining used a minimal DNA vocabulary consisting of ‘A’, ‘C’, ‘G’, ‘T’, and special tokens.\nHyenaDNA was pretrained using Nvidia A100 GPUs (exact number was not disclosed by authors), with training times varying based on sequence length and model size. For example, training a model with a context length of 1 million tokens took approximately 4 weeks. The model sizes used in training ranged from 400k to 6.6M parameters, and it employed gradient checkpointing to manage memory usage efficiently during training.\nDespite being as an auto-regressive, decoder-only model for predicting the next nucleotide, HyenaDNA can be used in discriminative tasks such as classification. This adaptability is achieved through techniques like sequence-level pooling and soft prompting.\nIn sequence-level pooling, the outputs of HyenaDNA are aggregated across the genomic sequence to form a cohesive representation, which can then be funneled through a classification head to predict labels for the entire sequence. This method leverages the contextual information encoded by the model to classify sequences based on their entire compositional makeup.\nFor discriminative tasks, HyenaDNA can also leverage soft prompting (check relevant information in the first post of this series), which involves integrating trainable tokens directly into the input sequence. These tokens are optimized during training to adapt the model’s focus towards relevant features for the classification task, enabling effective in-context learning without extensive retraining of the model. This method seems elegant as it allows for flexible adaptation to new tasks by modifying only a small part of the model’s input, making HyenaDNA a powerful tool for genomic classifications and other discriminative tasks, while preserving computational efficiency and model integrity.\nIn authors’ evaluation, HyenaDNA excels in various genomic tasks, including species classification and regulatory element identification. HyenaDNA achieved SOTA performance on 12 out of 18 benchmarks from the Nucleotide Transformer dataset, despite using significantly fewer parameters and pretraining data. On the GenomicBenchmarks dataset, HyenaDNA surpassed the SOTA on 7 out of 8 datasets, with notable improvements in enhancer identification.\nFig 7. Why single nuceotide resolution and long context are important. (a) DNA motifs play a crucial role in gene regulation. Variants in regulatory regions such as promoters, silencers, and enhancers influence the binding of transcription factors and RNA polymerases to DNA, ultimately affecting gene expression. (b) Single-nucleotide resolution is essential for precise variant analysis, but not all DNA sequences are relevant to gene expression. Relevant sequences may be located far apart within the genome, necessitating a long contextual span to capture their interactions effectively. The figure was adapted from (https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna).\nHyenaDNA offers significant advancements in genomic sequence modeling due to its ability to handle long-range contexts of up to 1 million tokens, which allows it to capture intricate dependencies across vast genomic sequences. This capability is particularly beneficial for tasks that require understanding long-range interactions, such as regulatory element identification and species classification. Additionally, the model’s use of single nucleotide tokenization ensures that every subtle genetic variation is preserved, enabling precise detection of single nucleotide polymorphisms (SNPs) and mutations. Check Fig.7 to better understand such biological significance further. Moreoever, the architecture, based on implicit convolutions, provides efficient computation with sub-quadratic scaling, making it more effective and faster than traditional Transformer-based models. This efficiency is further enhanced by techniques like gradient checkpointing and sequence length warm-up during training.\nDespite its innovations, the pretraining of HyenaDNA was conducted on a single human reference genome, which may limit the model’s generalizability to broader genomic datasets or to genomes from different species. Incorporating multiple genomes in the training process could enhance its robustness and applicability. Expanding the model’s application beyond DNA sequences to other biological sequences, such as proteins and RNA, also presents an area for future research and potential enhancement.\nEvo Evo is a cutting-edge DNA foundation model that generalizes to prediction tasks and generative design at scales ranging from molecular to whole genomes (Nguyen, et al., 2024). Developed by key contributors of HyenaDNA in collaboration with Stanford University, Arc Institute, and TogetherAI, Evo represents a significant advancement in leveraging machine learning for genomic data.\nFig 8. The Evo model architecture, based on StripedHyena. The figure was adapted from https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna.\nEvo is built on the StripedHyena architecture, a hybrid model combining 29 layers of data-controlled convolutional operators with 3 layers of multi-head attention equipped with rotary position embeddings (RoPE). (Check Fig. 8 and reference about StripedHyena for detailed information about the archtecture.) This design enables efficient processing of long DNA sequences while maintaining single-nucleotide resolution. Evo scales up to 7B parameters and utilizes a context length of 131 kilobases (kb) at single-nucleotide resolution. Evo employs byte-level, single-nucleotide tokenization for input DNA sequences, allowing it to model sequences with fine granularity. During pretraining, Evo uses an effective vocabulary of four tokens (A, T, C, G) from a total vocabulary of 512 characters. The additional 508 characters beyond ATCG enable prompting with special tokens during generation with finetuned models. Meanwhile, RoPE aids in maintaining positional information over long contexts, crucial for genomic sequences where the relative position of nucleotides can impact biological function.\nEvo was pretrained on a vast dataset of 300 billion nucleotide tokens, encompassing 2.7 million prokaryotic and phage genomes from databases such as the Genome Taxonomy Database (GTDB), Integrated Microbial Genomes/Virus (IMG/VR), and Integrated Microbial Genomes/Plasmid (IMG/PR). The authors introduced OpenGenome in this work, compiling over 80,000 bacterial and archaeal genomes, and millions of predicted prokaryotic phage and plasmid sequences. The training followed a two-stage process: an initial phase with an 8k token context length, followed by a context extension phase to 131k tokens. Evo was trained using an autoregressive modeling approach, predicting the likelihood of the next token given a sequence of tokens. This next-token prediction task was purely on raw genome sequences with no explicit supervision or annotations, which is fundamental for learning how to capture complex patterns in DNA sequences. Evo employs a decoder-only framework, enabling it to efficiently handle long context lengths and maintain single-nucleotide resolution.\nFig 9. Evo models the fundamental modalities of biology as seen in the centra dogma of molecular biology. The figure was from https://arcinstitute.org/news/blog/evo, which is also Fig. 1a from Evo’s paper.\nEvo supports RNA and protein sequence modeling through its DNA outputs by leveraging the central dogma of molecular biology (Fig. 9). By modeling genome sequences at single-nucleotide resolution, Evo captures the information encoded in regulatory DNA, protein-coding DNA, coding RNA, and non-coding RNA, etc. It can learn covariation involving multiple genes and regulatory elements, making DNA a productive modality for developing a biological foundation model. However, it is important to note that Evo’s tokenization approach focuses on DNA sequences, and while it can model RNA-related functionality through their DNA counterparts, it does not directly accept RNA sequences as inputs. The training data primarily consists of DNA sequences, and any RNA-related functionality is derived from the model’s understanding of DNA sequences. This approach is also applied to protein sequences.\nTo support structure-related predictions, Evo’s generated DNA sequences can be processed using tools like ESMFold, AlphaFold2, and RNAMultiFold. These tools help predict the 3D structures of proteins and RNA sequences that Evo generates through its DNA-based learning.\nEvo excels in various applications:\nZero-shot Function Prediction: Evo outperforms domain-specific models (e.g. ESMs, NTs, RNA-FM) in predicting the effects of mutations on protein and ncRNA functions without task-specific finetuning. This capability is derived from its understanding of the DNA sequences encoding these molecules. Generative Design: Evo can generate synthetic CRISPR-Cas systems, including coherent protein and non-coding RNA sequences. This is achieved by generating DNA sequences that code for these molecules, which can then be transcribed and translated into functional RNA and proteins. Gene Essentiality Prediction: Using long genomic contexts, Evo accurately predicts essential genes in bacteria and phages. By analyzing the DNA sequences, Evo can determine which genes are crucial for an organism’s survival, providing insights into organismal fitness and potential targets for drug discovery. Whole-genome Sequence Generation: Evo generates sequences up to 650 kb, demonstrating high coding density and plausible genomic organization. These sequences can include coding regions for proteins and RNAs, enabling further studies on their structure and function using tools like ESMFold, AlphaFold2, and RNAMultiFold. The authors conducted a comprehensive scaling laws analysis, comparing over 300 models across four architectures: Transformer++, Mamba, Hyena, and StripedHyena. They found that StripedHyena demonstrates favorable scaling laws on DNA sequence data, outperforming other architectures, including state-of-the-art Transformers and modern data-controlled state-space models like Mamba. However, training Evo required substantial computational resources, including 64 Nvidia H100 GPUs and 128 Nvidia A100 GPUs. It was trained on ~340B tokens using ~$2 \\times 10^{22}$ FLOPS.\nEvo’s primary advantage lies in its ability to handle long genomic sequences at single-nucleotide resolution, enabling comprehensive modeling of biological systems. Its hybrid architecture ensures efficient processing and scalability, outperforming traditional Transformer models on genomic data. Currently trained exclusively on prokaryotic data, Evo’s predictions for eukaryotic sequences, including human genomes, remain limited. Expanding Evo to include eukaryotic genomes will require addressing the much higher complexity of these genomes, along with significant investments in engineering, computational resources, and safety-related model alignment. While Evo is capable of generating broad genomic organization, further improvements are needed in the detail and completeness of generated sequences. Additionally, the model’s substantial computational demands during both training and inference could limit accessibility for smaller research groups.\nMethylation-awared Language Models MethylBert MethylBERT (Jeong, et al. 2023) is a deep learning model designed for read-level DNA methylation pattern classification and tumour purity estimation. Built on the DNABert architecture, it processes overlapping 3-mer DNA sequences (comprising 69 unique tokens, including DNA bases A, T, C, G and special tokens like [MASK], [UNK]) combined with methylation states to encode read-level methylomes. Unlike traditional methods that rely on microarray-based beta-values, MethylBERT directly analyzes sequencing-based methylation data, preserving single-molecule signals and improving sensitivity for detecting rare cell types. The model’s primary goal is to classify sequencing reads as either tumor or normal cells, facilitating tumor fraction estimation in bulk DNA methylation samples.\nFig 10. Overview of MethylBERT. The figure is Fig. 1 from its paper.\nMethylBERT’s training process consists of two major stages (Fig. 10). During the pre-training stage, the model employs an unsupervised Masked Language Model (MLM) objective on the hg19 genome (or mouse mm10 for cross-species applications). It learns to predict missing 3-mer DNA sequences using contextual embeddings, processing DNA sequences in 510 bp segments. Through this process, the model develops a deep understanding of sequence dependencies, CpG distributions, and genome-wide structures.\nIn the fine-tuning stage, MethylBERT focuses on specialized read-level methylation classification using supervised learning with tissue-derived data, such as Diffuse Large B-cell Lymphoma and Non-neoplastic B-cells. The model classifies reads based on CpG methylation patterns and genomic context, processing methylation states in a categorical format where 0 represents unmethylated CpG (unmodified cytosine), 1 indicates methylated CpG (cytosine with methyl group), and 2 denotes non-CpG sites (other nucleotides, not used in classification). The model converts these methylation states into embedding vectors and combines them with DNA sequence embeddings for comprehensive representation.\nFor final predictions, MethylBERT follows a three-step process (Fig. 10): first, it classifies each read as tumor-derived or normal using model embeddings; second, it incorporates additional genomic region information such as DMR labels; and finally, it estimates tumor purity in bulk samples using Bayesian probability inversion and maximum likelihood estimation.\nThe model’s architecture mirrors DNABert, featuring 12 Transformer encoder layers with 768 hidden units and 12 attention heads. Additionally, the authors developed a smaller variant with 6 encoder layers optimized for longer read sequences (500 bp), which achieved comparable performance to the larger model.\nThe computational requirements for MethylBERT varied significantly between training stages. The pre-training phase required several days using 4 NVIDIA V100 GPUs, while the subsequent fine-tuning phase completed much more quickly.\nMethylBERT exhibited remarkable capabilities in analyzing complex methylation patterns, significantly outperforming traditional statistical approaches like CancerDetector and Hidden Markov Models (HMM). Its particular strength lies in read-level DNA methylation analysis, demonstrating high accuracy and sensitivity. These results highlight MethylBERT’s potential as a powerful tool for liquid biopsy applications, where precise methylation pattern detection is crucial for early disease detection and monitoring.\nMethylGPT Unlike MethylBert, which is a BERT-like encoder model that embeds full sequences with methylation status, MethylGPT is a decoder-only generative model designed to analyze DNA methylation patterns across large numbers of CpG sites (Ying, et al. 2024). The model was trained on a large-scale dataset of 154,063 human methylation profiles, capturing 49,156 physiologically relevant CpG sites and processing a total of 7.6 billion training tokens. Unlike conventional linear models, MethylGPT leverages deep learning to recognize both local and higher-order genomic features, enabling robust predictions in various epigenetic applications.\nFig 11. Overview of MethylGPT. The figure is Fig. 1a from its paper.\nMethylGPT employs a transformer architecture consisting of six transformer blocks, with each block containing four multi-head self-attention layers followed by a feed-forward network. The model’s tokenization strategy involves two key components: CpG site positions and methylation states. Each CpG site is assigned a unique integer identifier for position encoding, while methylation states are embedded separately. These two types of embeddings are combined through an element-wise operation before being processed by the transformer layers. This dual embedding approach enables the model to simultaneously capture both the genomic context of CpG sites and their methylation states through the attention mechanism. The model uses a 64-dimensional embedding space for representation learning, and includes a special [CLS] token at the beginning of each sequence to generate sample-level representations for downstream tasks.\nDuring pretraining, the model was optimized using two complementary loss functions:\nMasked Language Modeling (MLM): Predicts methylation levels for 30% randomly masked CpG sites. Profile Reconstruction Loss: Uses the [CLS] token to reconstruct full DNA methylation profiles. The training dataset was curated from the EWAS Data Hub and Clockbase, covering over 20 tissue types. The selection of 49,156 CpG sites was based on their association with Epigenome-Wide Association Study (EWAS) traits and their prevalence across datasets. Methylation values were normalized, and missing values were handled through masking during training.\nThe training process proceeded for 10 epochs using the AdamW optimizer, starting with a 0.001 learning rate and implementing a 10% per-epoch decay. The implementation utilized NVIDIA A100 GPUs with a batch size of 16 and incorporated FlashAttention for efficient memory usage.\nMethylGPT was shown to generalizes well across epigenetic tasks, including methylation imputation, age prediction, missing data handling, and intervention analysis. It excels in biological interpretability, scalability, and resilience to missing data, outperforming traditional models in accuracy. However, its high computational cost and training on bulk methylation data may limit generalization to single-cell methylation data. Furthermore, the model only considers CpG sites rather than incorporating the full sequence context, which may limit its ability to efficiently capture sequence-dependent patterns during both training and inference.\nRNA Language Models RiNALMo RiNALMo (RiboNucleic Acid Language Model) (Penić, et al. 2024) is a RNA language model designed to understand and predict RNA structures and functions. It employs a BERT-style Transformer encoder architecture, which consists of 33 Transformer blocks with an embedding dimension of 1280. Each block includes multi-head attention (20 heads) and feed-forward networks, utilizing advanced techniques such as rotary positional embeddings (RoPE) and the SwiGLU activation function. RiNALMo has a total of 650M parameters.\nThe model tokenizes RNA sequences by treating each nucleotide as a single token. During preprocessing, all instances of uracil (U) in the sequences are replaced with thymine (T). The resulting vocabulary includes primary nucleotides (A, C, G, T) and various ambiguous nucleotide combinations and special tokens. These ambiguous combinations cover multiple nucleotide possibilities and are used to handle sequences where the exact nucleotide is not known or where multiple nucleotides are possible due to sequencing uncertainties or biological variability:\nSymbol Nucleotides Represented R A or G Y C or U K G or U M A or C S G or C W A or U B C, G, or U D A, G, or U H A, C, or U V A, C, or G N Any nucleotide (A, C, G, U) Additional special tokens used in the model include [CLS], [EOS], [PAD], and [MASK]. The positional information of tokens is encoded using RoPE, which captures both relative and absolute positional data, enhancing the model’s ability to learn sequence relationships effectively.\nRiNALMo was pre-trained on a dataset of 36 million non-coding RNA (ncRNA) sequences curated from multiple sources including RNAcentral, Rfam, and Ensembl. The model’s pre-training involved a masked language modeling (MLM) task, where 15% of the tokens in the input sequences were masked and the model was trained to predict these masked tokens. This approach helps the model learn the underlying structure and function of RNA sequences from vast amounts of unannotated data.\nThe pre-training of RiNALMo was conducted over six epochs on a cluster of seven A100 GPUs, each with 80 GB of memory. The training utilized a batch size of 192 per GPU and employed a cosine annealing learning rate schedule with a linear warm-up. The training process involved intensive computational resources to handle the large-scale data and model parameters efficiently.\nRiNALMo has demonstrated good performance across various RNA-related tasks. Key applications include:\nSecondary Structure Prediction: RiNALMo’s embeddings were fine-tuned for predicting RNA secondary structures, exhibiting superior generalization capabilities compared to existing deep learning methods. It was able to generalize well on unseen RNA families, a significant advancement over traditional models.\nSplice-Site Prediction: The model was fine-tuned to predict splice sites in RNA sequences, outperforming other RNA language models (e.g. RNA-FM) and established methods. RiNALMo’s ability to generalize across different species’ RNA sequences underscores its robustness and versatility.\nMean Ribosome Loading (MRL) Prediction: RiNALMo was also fine-tuned to predict MRL values for mRNA sequences, showing superior performance and generalization on human UTRs despite being trained on random sequences.\nRiNALMo’s primary advantage lies in its large-scale pre-training on diverse RNA sequences, which equips it with powerful representations that can be effectively utilized across various downstream tasks.\nWhile RiNALMo excels in secondary structure prediction, it struggles with specific RNA families, such as telomerase RNAs. Overall, RiNALMo is a RNA embedding modeling, providing a powerful tool for RNA structure and function prediction tasks. Its ability to generalize across different RNA families and its superior performance on a range of downstream tasks highlight its potential to drive forward our understanding of RNA biology and its applications in biomedical research.\nRNAErnie RNAErnie (Wang, et al. 2024) is a RNA language model that integrates biological knowledge through RNA motifs (Fig. 11). The model employs a transformer-based architecture consisting of 12 layers of multihead transformer blocks, with each layer maintaining a hidden state dimension of 768. At its core, RNAErnie builds upon the Enhanced Representation through Knowledge Integration (ERNIE) framework, which systematically incorporates external domain knowledge during the pretraining process. This knowledge integration enables the model to capture and represent intricate biological relationships within RNA sequences more effectively. Specifically, RNAErnie leverages RNA motifs and RNA type information as biological priors, significantly enhancing its capabilities across various RNA analysis tasks.\nFig 11.Illustration of RNAErnie. The model uses 12 transformer encoder layers and employs motif-aware pretraining on 23M RNAcentral sequences. It then performs type-guided fine-tuning by predicting RNA types and using them as auxiliary information for downstream tasks. Fig. 1 from original paper.\nDuring pretraining, RNAErnie employs a sophisticated motif-aware multilevel masking strategy that incorporates biological knowledge (Fig. 12a). This hierarchical masking approach consists of:\nBase-level Masking: Randomly masks 15% of nucleobases within an RNA sequence, aiding in learning fundamental token representations. Subsequence-level Masking: Masks contiguous segments of nucleobases, ranging from 4 to 8 bases, to capture deeper biological information. Motif-level Masking: Incorporates biologically significant motifs from databases like ATtRACT and SpliceAid, masking these motifs to embed complex structural and functional elements within the model. Fig 12. RNAErnie’s training strategies. a, Motif-aware masking with three levels (base, subsequence, motif) during pretraining. b, Type-guided fine-tuning predicts RNA types first, then uses ensemble learning with shared parameters for downstream tasks.\nRNAErnie utilizes a type-guided fine-tuning approach, leveraging predicted RNA types as auxiliary information (Fig. 12b). This strategy employs three neural architectures:\nFBTH (Frozen Backbone with Trainable Head): Extracts embeddings from the pretrained RNAErnie block and uses them to train a separate task-specific head. TBTH (Trainable Backbone with Trainable Head): Combines the RNAErnie block with task-specific heads into an end-to-end neural network for supervised learning tasks. STACK: Uses the RNAErnie block to predict the top-K possible RNA types, followed by ensemble learning through multiple downstream modules. RNAErnie has approximately 105M trainable parameters and processes RNA sequences by tokenizing the bases ‘A’, ‘U’, ‘C’, and ‘G’. Each sequence is appended with an initial classification embedding ([CLS]) and an indication embedding ([IND]), which helps cluster similar RNA sequences in a latent space for more effective retrieval-based learning. The model accepts input sequences up to 512 nucleotides in length, though this limitation may pose challenges when analyzing complex three-dimensional RNA structural motifs.\nThe model was pretrained on approximately 23 million RNA sequences from RNAcentral. Training was conducted on four Nvidia Tesla V100 32GB GPUs over approximately 250 hours, using the AdamW optimizer with a learning rate scheduler that incorporates anneal warm-up and decay techniques. The initial learning rate was set to 1×10^-4.\nRNAErnie demonstrates robust performance across various RNA analytical tasks in both supervised and unsupervised learning scenarios. The model has been successfully evaluated on RNA sequence classification, RNA-RNA interaction prediction, and RNA secondary structure prediction tasks. Its effectiveness is particularly evident in RNA sequence classification on the nRC dataset, where RNAErnie+ achieved an impressive 96.88% accuracy, significantly outperforming baseline models (e.g. RNABERT, RNA-MSM and RNA-FM).\nHELM HELM (Hierarchical Encoding for mRNA Language Modeling) (Yazdani-Jahromi, et al. 2024) is a new LLM pretraining method specifically designed for analyzing messenger RNA (mRNA) sequences. HELM introduces a pretraining strategy that explicitly incorporates the biological hierarchy of mRNA sequences, particularly at the codon level. This approach better reflects the inherent structure of genetic information, where three nucleotides form a codon that codes for a specific amino acid. By aligning the model architecture and training process with these fundamental biological principles, HELM aims to achieve more accurate and biologically meaningful sequence analysis.\nFig 13.Hierarchical codon-aware tokenization and loss function in HELM. Left: The hierarchical structure of codons used in HELM for tokenization and modeling. Codons are categorized into Start, Coding (grouped by amino acids), and Stop codons. This biologically informed hierarchy influences the training loss function by prioritizing synonymous relationships between codons. Right: Codon prediction probabilities visualized on an amino acid codon wheel. Orange bars represent HELM’s Hierarchical Cross-Entropy (HXE) loss, while blue bars correspond to the standard Cross-Entropy (XE) loss. HELM assigns higher probabilities to synonymous codons when making predictions, better capturing biological redundancy, whereas XE tends to misassign probability to non-synonymous codons.\nHELM proposes to adopt Hierarchical Cross-Entropy Loss (HXE, see eq1) to better capture synonymous codon relationships.\n\\begin{equation} \\begin{aligned} L_{HXE} = -\\sum_{i} w_i \\cdot y_i \\log \\hat{y}_i \\end{aligned} \\end{equation}\nwhere:\n$y_i$ is the true one-hot label, $\\hat{y}_i$ is the predicted probability for codon $i$, $w_i$ is a weight assigned based on codon similarity based on $\\lambda (C) = exp(-\\alpha h(C))$, and $h(C)$ is the height of the node C in the hierarchy and ($\\alpha \u003e 0$). Unlike standard cross-entropy loss which treats all prediction errors equally, HXE implements a structured hierarchy where prediction errors are penalized differently based on their biological significance within the codon structure. In another words, This encourages the model to prefer synonymous codons over random codon assignments, improving biological plausibility in sequence predictions.\nThe pretraining dataset consists of 15.3 million curated mRNA sequences from the Observed Antibody Space (OAS) database, which includes sequences from over 80 studies. The model was trained using 8 NVIDIA A100 GPUs over 40 epochs. HELM is implemented using multiple architectures, including Transformer, Mamba, and Hyena models, each with 50M parameters.\nKey technical features include:\nCodon-level tokenization strategy (64 codons plus special tokens) Hierarchical Cross-Entropy Loss (HXE) for biologically-informed error weighting Support for both Masked Language Modeling (MLM) and Causal Language Modeling (CLM) training objectives HELM has demonstrated superior performance than a few baseline methods (e.g. RNA-FM, SpliceBERT, and CodonBERT) in several critical areas:\nAccurate prediction of mRNA properties including protein expression and thermostability Precise annotation of antibody regions High-quality mRNA sequence generation In comparative evaluations, HELM achieved significant improvements:\n8% performance gain over standard bio-language models 2x parameter efficiency compared to state-of-the-art models like RNA-FM and CodonBERT Enhanced biological plausibility in generated sequences Improved accuracy in property prediction tasks through better capture of codon hierarchies The model shows particular promise for therapeutic applications, especially in vaccine development and gene therapy. However, authors also acknowledged the following limitations:\nTraining in Euclidean space may not optimally capture hierarchical relationships compared to hyperbolic space The specialized tokenization and pretraining approaches may present integration challenges with existing bioinformatics pipelines Overall, HELM demonstrates how incorporating domain-specific biological knowledge into both data preprocessing and model training can significantly enhance LLM performance. By explicitly modeling the hierarchical nature of codons and using biologically-informed loss functions, HELM achieves better results with fewer parameters compared to conventional approaches. This suggests a promising direction for developing more efficient and biologically meaningful language models in genomics.\nGene Language Models scGPT scGPT (Cui, et al. 2024) is a generative pre-trained transformer model specifically designed for analyzing single-cell RNA sequencing (scRNA-seq) and multi-omics data (Fig. 14). Built on a decoder-only transformer architecture, scGPT processes gene expression data by treating individual genes as tokens and converting each cell’s expression profile into a sequence. This approach allows the model to capture complex relationships between genes, cells, and tissues, learning intricate biological patterns in a manner analogous to how traditional GPT models learn linguistic structures.\nFig 14. Overview of scGPT.\nscGPT employs a sophisticated tokenization strategy:\nGene names serve as the primary vocabulary tokens Expression values undergo pre-defined binning transformations to standardize data across different sequencing modalities Condition tokens capture important metadata such as batch identity for technical variation tracking, modality type (e.g., RNA, ATAC-seq, proteomics) and perturbation conditions (e.g., drug treatments, CRISPR knockouts). These condition tokens are crucial for integrating data across different experiments, enabling scGPT to generalize beyond individual datasets and infer biological relationships across diverse conditions. As a fundatational model, scGPT was pre-trained on an extensive dataset of 33 million single-cell RNA sequencing profiles from the CELLxGENE repository. This dataset encompasses 51 organs and 441 studies, providing broad tissue diversity across healthy human cells. The comprehensive training data enables zero-shot generalization to disease-related tasks, as demonstrated in studies involving multiple sclerosis (MS) and cancer datasets.\nThe pre-training process utilizes a comprehensive self-supervised learning approach with four main tasks:\nMasked Gene Prediction: Similar to BERT’s masked language modeling, the model predicts expression values for randomly masked gene tokens based on surrounding context.\nGene Expression Imputation: The model learns to reconstruct missing gene expression values, addressing the common challenge of sparse data in single-cell datasets.\nModality-Aware Pre-training: Integration of RNA, ATAC-seq, and proteomics data to develop unified multi-omic representations.\nBatch Effect Reduction: Implementation of contrastive learning techniques to minimize technical variations while preserving biological signals.\nThe pre-training process leverages high-performance A100 GPU clusters and employs FlashAttention for optimized self-attention computations.\nAfter pre-training, scGPT demonstrates remarkable versatility through fine-tuning for various downstream tasks:\nCell-type annotation Batch effect correction Multi-omic data integration Perturbation response prediction Gene Regulatory Network (GRN) inference This adaptability makes scGPT a powerful tool for diverse applications in single-cell genomics research. However, like most LLMs, scGPT faces certain limitations like biases in the training data. Since it is pretrained primarily on publicly available single-cell datasets, rare or underrepresented cell types may not be adequately captured in the model’s learned representations. This can potentially impact the model’s performance when analyzing low-abundance cell populations or rare cell states, highlighting the importance of considering dataset bias in model applications.\nCitation If you find this post helpful and are interested in referencing it in your write-up, you can cite it as\nXiao, Jiajie. (May 2023). Biomedical LLMs (2): Genomics. JX’s log. Available at: https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/.\nor add the following to your BibTeX file.\n@article{xiao2024_biollm_genomics, title = \"Biomedical LLMs (2): Genomics\", author = \"Xiao, Jiajie\", journal = \"JX's log\", year = \"2024\", month = \"May\", url = \"https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/\" } References Ji, Y., Zhou, Z., Liu, H., \u0026 Davuluri, R. V. (2021). DNABERT: pre-trained Bidirectional Encoder Representations from Transformers model for DNA-language in genome. Bioinformatics, 37(15), 2112-2120.\nZhou, Z., Ji, Y., Li, W., Dutta, P., Davuluri, R., \u0026 Liu, H. (2023). Dnabert-2: Efficient foundation model and benchmark for multi-species genome. arXiv preprint arXiv:2306.15006.\nKudo, T., \u0026 Richardson, J. (2018). Sentencepiece: A simple and language independent subword tokenizer and detokenizer for neural text processing. arXiv preprint arXiv:1808.06226.\nSennrich, R., Haddow, B., \u0026 Birch, A. (2015). Neural machine translation of rare words with subword units. arXiv preprint arXiv:1508.07909.\nPress, O., Smith, N. A., \u0026 Lewis, M. (2021). Train short, test long: Attention with linear biases enables input length extrapolation. arXiv preprint arXiv:2108.12409.\nDao, T., Fu, D. Y., Ermon, S., Rudra, A., \u0026 Ré, C. F. fast and memory-efficient exact attention with IO-awareness. arXiv; 2022. arXiv preprint arXiv:2205.14135.\nDalla-Torre, H., Gonzalez, L., Mendoza-Revilla, J., Carranza, N. L., Grzywaczewski, A. H., Oteri, F., … \u0026 Pierrot, T. (2023). The nucleotide transformer: Building and evaluating robust foundation models for human genomics. BioRxiv, 2023-01.\nSu, J., Ahmed, M., Lu, Y., Pan, S., Bo, W., \u0026 Liu, Y. (2024). Roformer: Enhanced transformer with rotary position embedding. Neurocomputing, 568, 127063.\nShazeer, N. (2020). Glu variants improve transformer. arXiv preprint arXiv:2002.05202.\nKaplan, J., McCandlish, S., Henighan, T., Brown, T. B., Chess, B., Child, R., … \u0026 Amodei, D. (2020). Scaling laws for neural language models. arXiv preprint arXiv:2001.08361.\nAvsec, Ž., Agarwal, V., Visentin, D., Ledsam, J. R., Grabska-Barwinska, A., Taylor, K. R., … \u0026 Kelley, D. R. (2021). Effective gene expression prediction from sequence by integrating long-range interactions. Nature methods, 18(10), 1196-1203.\nBenegas, G., Batra, S. S., \u0026 Song, Y. S. (2023). DNA language models are powerful predictors of genome-wide variant effects. Proceedings of the National Academy of Sciences, 120(44), e2311219120.\nNguyen, E., Poli, M., Faizi, M., Thomas, A., Wornow, M., Birch-Sykes, C., … \u0026 Baccus, S. (2024). Hyenadna: Long-range genomic sequence modeling at single nucleotide resolution. Advances in neural information processing systems, 36.\nJeong, Y., Gerhäuser, C., Sauter, G., Schlomm, T., Rohr, K., \u0026 Lutsik, P. (2023). MethylBERT: A Transformer-based model for read-level DNA methylation pattern identification and tumour deconvolution. bioRxiv, 2023-10.\nYing, K., Song, J., Cui, H., Zhang, Y., Li, S., Chen, X., … \u0026 Gladyshev, V. N. (2024). MethylGPT: a foundation model for the DNA methylome. bioRxiv, 2024-10.\nZvyagin, M., Brace, A., Hippe, K., Deng, Y., Zhang, B., Bohorquez, C. O., … \u0026 Ramanathan, A. (2023). GenSLMs: Genome-scale language models reveal SARS-CoV-2 evolutionary dynamics. The International Journal of High Performance Computing Applications, 37(6), 683-705.\nPenić, R. J., Vlašić, T., Huber, R. G., Wan, Y., \u0026 Šikić, M. (2024). Rinalmo: General-purpose rna language models can generalize well on structure prediction tasks. arXiv preprint arXiv:2403.00043.\nWang, N., Bian, J., Li, Y., Li, X., Mumtaz, S., Kong, L., \u0026 Xiong, H. (2024). Multi-purpose RNA language modelling with motif-aware pretraining and type-guided fine-tuning. Nature Machine Intelligence, 1-10.\nYazdani-Jahromi, M., Prakash, M., Mansi, T., Moskalev, A., \u0026 Liao, R. (2024). HELM: Hierarchical Encoding for mRNA Language Modeling. arXiv preprint arXiv:2410.12459.\nCui, H., Wang, C., Maan, H., Pang, K., Luo, F., Duan, N., \u0026 Wang, B. (2024). scGPT: toward building a foundation model for single-cell multi-omics using generative AI. Nature Methods, 1-11.\nSentencePiece is a tokenization method that segments text into smaller units such as subwords or characters, allowing for efficient handling of various languages and scripts. It employs techniques like Byte-Pair Encoding (BPE) or unigram language model to create a unified vocabulary, facilitating better representation of rare or out-of-vocabulary words. ↩︎\nByte-Pair Encoding (BPE) tokenization is a data compression algorithm that constructs tokens by iteratively merging the most frequent (statistics from the training corpus) pair of consecutive bytes or characters in a corpus to create new tokens, effectively reducing the vocabulary size while preserving meaningful units. This process continues until a predefined vocabulary size or iteration limit is reached, resulting in a compact representation of the original text data. More reading materials and examples can be found from Huggingface. ↩︎\nInformation leakage could happen if one generates k-mer vocabulary by checking all corpus including test data. ↩︎\nThe DNABERT-2 paper says the input limit for DNABERT is 512bps. ↩︎\nEach token has 6bps. Therefore, 1k tokens lead to 6kb sequence length. ↩︎\nRoPE encodes absolute positions using a rotation matrix while incorporating relative position dependencies directly into the self-attention mechanism. This approach allows models to handle sequences of different lengths and gradually reduces the influence of distant tokens. RoPE is especially beneficial for extrapolating to longer sequences than those seen during training and has been widely adopted in modern transformer models. Additionally, It also integrates seamlessly with linear self-attention architectures, enabling efficient positional encoding even in models optimized for large-scale processing of long sequences. ↩︎\nThe Poisson negative log-likelihood loss is a loss function often used when modeling count data, such as predicting the number of occurrences of an event. This loss is particularly suitable for data that follows a Poisson distribution: $P(k|\\lambda) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$, where the rate parameter $\\lambda$ equals both mean and variance of the distribution. Corresponding loss is $\\text{PoissonNLLLoss} = -\\log(P(k|\\lambda)) = \\lambda\nk\\log(\\lambda) + \\log(k!)$, where $k$ is the target and $\\lambda$ is the expected count that the model would like to predict. Pytorch has provided a built-in loss for this here. ↩︎ ",
+  "wordCount" : "9183",
+  "inLanguage": "en",
+  "datePublished": "2024-05-12T12:30:32-08:00",
+  "dateModified": "2024-05-12T12:30:32-08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Jiajie Xiao"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "JX's log",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jiajiexiao.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jiajiexiao.github.io/" accesskey="h" title="JX&#39;s log (Alt + H)">JX&#39;s log</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jiajiexiao.github.io/" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/posts/" title="Blog">
+                    <span>Blog</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/tags/" title="Tag">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jiajiexiao.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jiajiexiao.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://jiajiexiao.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Biomedical LLMs (2): Genomics
+    </h1>
+    <div class="post-meta"><span title='2024-05-12 12:30:32 -0800 -0800'>2024-05-12</span>&nbsp;·&nbsp;44 min&nbsp;·&nbsp;Jiajie Xiao
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">Table of Contents</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#dna-language-models" aria-label="DNA Language Models">DNA Language Models</a><ul>
+                            
+                    <li>
+                        <a href="#dnabert" aria-label="DNABERT">DNABERT</a></li>
+                    <li>
+                        <a href="#dnabert-2" aria-label="DNABERT-2">DNABERT-2</a></li>
+                    <li>
+                        <a href="#nucleotide-transformer" aria-label="Nucleotide Transformer">Nucleotide Transformer</a></li>
+                    <li>
+                        <a href="#enformer" aria-label="Enformer">Enformer</a></li>
+                    <li>
+                        <a href="#gpn" aria-label="GPN">GPN</a></li>
+                    <li>
+                        <a href="#hyenadna" aria-label="HyenaDNA">HyenaDNA</a></li>
+                    <li>
+                        <a href="#evo" aria-label="Evo">Evo</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#methylation-awared-language-models" aria-label="Methylation-awared Language Models">Methylation-awared Language Models</a><ul>
+                            
+                    <li>
+                        <a href="#methylbert" aria-label="MethylBert">MethylBert</a></li>
+                    <li>
+                        <a href="#methylgpt" aria-label="MethylGPT">MethylGPT</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#rna-language-models" aria-label="RNA Language Models">RNA Language Models</a><ul>
+                            
+                    <li>
+                        <a href="#rinalmo" aria-label="RiNALMo">RiNALMo</a></li>
+                    <li>
+                        <a href="#rnaernie" aria-label="RNAErnie">RNAErnie</a></li>
+                    <li>
+                        <a href="#helm" aria-label="HELM">HELM</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#gene-language-models" aria-label="Gene Language Models">Gene Language Models</a><ul>
+                            
+                    <li>
+                        <a href="#scgpt" aria-label="scGPT">scGPT</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#citation" aria-label="Citation">Citation</a></li>
+                    <li>
+                        <a href="#references" aria-label="References">References</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+
+  <div class="post-content"><ul>
+<li><span style="color: lightblue">[Updated in Jan 2025]: Added <a href="#helm">HELM</a>.</span></li>
+<li><span style="color: lightblue">[Updated in Dec 2024]: Added <a href="#methylgpt">MethylGPT</a>.</span></li>
+</ul>
+<p>In <a href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">previous post</a>,
+we discussed some of the introduction to Large Language Models (LLMs) and how
+they are constructed, trained, and utilized. Beginning with this post in the
+Biomedical LLMs series, we will explore their applications in biomedical
+domains. This post will concentrate on a few LLMs for genomics (e.g. DNA and
+RNA).</p>
+<h2 id="dna-language-models">DNA Language Models<a hidden class="anchor" aria-hidden="true" href="#dna-language-models">#</a></h2>
+<h3 id="dnabert">DNABERT<a hidden class="anchor" aria-hidden="true" href="#dnabert">#</a></h3>
+<p>DNABERT (<a href="#Ji2021">Ji et al., 2021</a>) is designed to encoder genomic DNA
+sequences by adapting the Bidirectional Encoder Representations from
+Transformers (BERT) model. DNABERT utilizes a Transformer&rsquo;s encoder architecture
+characterized by attention mechanisms, which effectively capture both local and
+long-range dependencies in DNA sequences and offer contextual representation of
+the input DNA sequences. The encoder-only architecture is identical to the BERT
+base model, comprising 12 transformer layers, each with 768 hidden units and 12
+attention heads.</p>
+<p>DNABERT employs a k-mer tokenization strategy to segment DNA sequences into
+<ins><strong>overlapping</strong></ins> k-mers, which provides a more coarse-grained and
+computationally cheaper way to capture the contextual information than
+base-by-base tokenization. The authors experimented with four k-mer sizes: 3, 4,
+5, and 6. Each k-mer model (DNABERT-3, DNABERT-4, DNABERT-5, DNABERT-6) has a
+vocabulary size of 4^k+5 tokens, including special tokens such as [CLS]
+(classification), [PAD] (padding), [UNK] (unknown), [SEP] (separator), and
+[MASK] (masking). Each version captures different levels of contextual
+information, with DNABERT-6 generally performing the best due to its richer
+context representation. Moreover, learned positional embeddings (likely learns a
+simple lookup table via a linear layer) were used to add to the token
+embeddings.</p>
+<figure id="fig1" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/dnabert.jpeg#center"
+         alt="Fig 1. Architecture and Key Features of the DNABERT Model. (a) Contextual understanding in RNN, CNN, and Transformer models: Comparison of how each model processes input tokens (T1-T5) to generate hidden states. RNNs use sequential information flow, CNNs focus on local context, while Transformers employ global self-attention mechanisms. (b) DNABERT&rsquo;s structure: The model inputs tokenized k-mer sequences, including special tokens (CLS, SEP, MASK). This data passes through an embedding layer and 12 Transformer blocks. The model produces sentence-level classifications from the first output and token-level classifications from individual masked token outputs. (c) DNABERT&rsquo;s versatility: The model uses general pre-training, allowing fine-tuning for various specific tasks with appropriate data. (d) DNABERT&rsquo;s attention visualization: An example showing global attention patterns across 12 attention heads, demonstrating the model&rsquo;s ability to focus on significant regions, such as known binding sites within a sequence.. The figure is Fig.1 from Ji et al., 2021." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 1. Architecture and Key Features of the DNABERT Model.</strong> (a) Contextual understanding in RNN, CNN, and Transformer models: Comparison of how each model processes input tokens (T1-T5) to generate hidden states. RNNs use sequential information flow, CNNs focus on local context, while Transformers employ global self-attention mechanisms. (b) DNABERT&rsquo;s structure: The model inputs tokenized k-mer sequences, including special tokens (CLS, SEP, MASK). This data passes through an embedding layer and 12 Transformer blocks. The model produces sentence-level classifications from the first output and token-level classifications from individual masked token outputs. (c) DNABERT&rsquo;s versatility: The model uses general pre-training, allowing fine-tuning for various specific tasks with appropriate data. (d) DNABERT&rsquo;s attention visualization: An example showing global attention patterns across 12 attention heads, demonstrating the model&rsquo;s ability to focus on significant regions, such as known binding sites within a sequence.. The figure is Fig.1 from <a href="#Ji2021">Ji et al., 2021</a>.</p>
+        </figcaption>
+</figure>
+
+<p>The pretraining dataset for DNABERT was derived from the human genome, which has
+3 billion bases. Sequences were generated through direct non-overlapping
+splitting and random sampling, with lengths varying between 5 and 510 bases. The
+pretraining process involved masking 15% of k-mers in the sequences for the
+first 100,000 steps and increasing this to 20% for the final 20,000 steps. The
+model was pretrained for 120,000 steps with a batch size of 2,000. The training
+process for DNABERT took approximately 25 days on 8 NVIDIA 2080Ti GPUs.</p>
+<p>DNABERT exhibits versatility across various genomic sequence-related tasks. It
+demonstrated state-of-the-art (SOTA) performance in 2021 for predicting
+promoters, splice sites, and transcription factor binding sites. By comparing
+the fine-tuned DNABERT pre-trained on the human genome with 78 mouse ENCODE
+ChIP-seq datasets against CNN, CNN+LSTM, CNN+GRU, and randomly initialized
+DNABERT models on cross-genome sequence prediction tasks, the authors show that
+the pre-trained DNABERT significantly outperforms all baselines. This suggests
+that pre-training not only enhances model performance by providing a better
+starting point for training but also enables robust transfer across species,
+even with considerable dissimilarities in non-coding regions, highlighting the
+model&rsquo;s ability to capture shared deep semantic features across genomes.
+Furthermore, by visualizing the attention maps, DNABERT provides insights into
+the relative importance of different nucleotides and their semantic
+relationships within sequences. This interpretability demonstrates that deep
+learning models need not be &ldquo;black boxes&rdquo; - the model&rsquo;s attention patterns can
+help identify conserved sequence motifs and predict functional genetic variants
+by highlighting biologically meaningful patterns in the data.</p>
+<h3 id="dnabert-2">DNABERT-2<a hidden class="anchor" aria-hidden="true" href="#dnabert-2">#</a></h3>
+<p>DNABERT-2 (<a href="#Zhou2023">Zhou et al., 2023</a>) is a refined genome foundation model
+designed to improve upon the limitations of its predecessor, DNABERT. DNABERT-2
+is built upon the Transformer&rsquo;s encoder architecture, similar to BERT and
+DNABERT, but incorporates a few key changes:</p>
+<ul>
+<li>DNABERT-2 adapts SentencePiece <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> (<a href="#Kudo2018">Kudo, 2018</a>) with Byte Pair
+Encoding (BPE) <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> (<a href="Sennrich2015">Sennrich et al., 2015</a>) to tokenize DNA
+sequences instead of using k-mer tokenization. BPE iteratively merges the most
+frequent co-occurring genome segments. This method overcomes the limitations of
+k-mer tokenization, such as information leakage <sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> and poor computational
+efficiency, by providing a more streamlined and effective approach to sequence
+representation. This switch addresses computational inefficiencies and sample
+inefficiencies associated with k-mer tokenization. 8 vocabularies with target
+sizes ranging from 2^8 to 2^15 were tested for the BPE tokenization strategy.
+The best performing model was trained with a vocabulary size of 2^15, where
+larger vocabulary size means longer sequences but more sparse updates to the
+embedding layer. Evaluating different vocabulary sizes on a multi-species genome
+dataset on the Genome Understanding Evaluation (GUE) benchmark led the authors
+to use a vocabulary size of 2^12 = 4096 for training the final DNABERT-2 model.</li>
+</ul>
+<ul>
+<li>Except for replacing k-mer tokenization with BPE for better tokenization
+efficiency and sequence representation, DNABERT-2 abandons learned positional
+embeddings by integrating Attention with Linear Biases (ALiBi) (<a href="#Press2021">Press, et al,
+2021</a>) to overcome input length limitations. Unlike approaches that
+add positional embeddings to word embeddings, ALiBi biases query-key attention
+scores with a penalty proportional to the distance between tokens, enabling the
+model to extrapolate efficiently to sequences longer than those encountered
+during training. Additionally, DNABERT-2 also employs Flash Attention (<a href="Dao2022">Dao, et
+al., 2022</a>) and Low Precision Layer Normalization to boost
+computational efficiency. This model comprises 117M parameters, making it
+substantially smaller yet more efficient than other models in its class.</li>
+</ul>
+<p>The pre-training of DNABERT-2 involved two main datasets: a human genome dataset
+consisting of 2.75 billion nucleotide bases, and a multi-species genome dataset
+comprising genomes from 135 species, totaling 32.49 billion nucleotide bases.
+This multi-species dataset ensures a broader representation and diversity of
+genetic sequences. Maximum sequence length was set to 510bps<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> for DNABERT.</p>
+<p>The pre-training of DNABERT-2 took approximately 14 days using eight Nvidia RTX
+2080Ti GPUs. The training process employed a batch size of 4096 and a maximum
+sequence length of 128, optimized using the AdamW optimizer with specific
+hyperparameters.</p>
+<p>As briefly mentioned earlier, DNABERT-2 introduces the Genome Understanding
+Evaluation (GUE) benchmark to evaluate DNEBERT-2. GUE includes 36 datasets
+across nine genome analysis tasks from four species. This benchmark enables a
+standardized assessment of model performance across various tasks such as
+promoter detection, transcription factor prediction, and species classification.
+While the input size of datasets in GUE ranges from 5000 to 10000, the authors
+splitted the input into 512bps segments and use the averaged embedding of each
+segment as the input to the model during their benchmarking. Also, the DNABERT-2
+model is pre-trained purely on 700-bps sequences. Thanks to the extrapolation
+capability offered by ALiBi, the authors showed that such a setting still
+performs well even on 10000-bps sequences with a few epochs of fine-tuning.</p>
+<p>Compared to its predecessor DNABERT, DNABERT-2 achieves superior performance
+with significantly reduced computational cost and model size. In the authors
+evaluation, it performs on par with &ldquo;SOTA&rdquo; Nucleotide Transformers in 2023 while
+being 21 times smaller and requiring 92 times less GPU time for pre-training.
+This efficiency makes DNABERT-2 particularly suitable for fine-tuning on
+consumer GPUs.</p>
+<h3 id="nucleotide-transformer">Nucleotide Transformer<a hidden class="anchor" aria-hidden="true" href="#nucleotide-transformer">#</a></h3>
+<p>The Nucleotide Transformer (NT) is a foundation model developed by InstaDeep in
+collaboration with Nvidia, designed for encoding genomic sequences
+(<a href="#Dalla-Torre2023">Dalla-Torre, et al., 2023</a>). This model series, ranging from
+50M to 2.5B parameters, has been developed over recent years with continuous
+improvements in training techniques and architectural enhancements.</p>
+<figure id="fig2" 
+     class="align-center ">
+    <img loading="lazy" src="https://www.biorxiv.org/content/biorxiv/early/2023/09/19/2023.01.11.523679/F1.large.jpg#center"
+         alt="Fig 2. Overview of the Nucleotide Transformer: pre-training, fine-tuning, analysis, and comparison of foundational models for genomics. (a,b) Illustration of the Nucleotide Transformer’s training process (a) and its application to downstream genomic prediction tasks via fine-tuning (b). Probing for downstream tasks follows a similar approach but excludes rescaling weights. (c) Comparative analysis of the Nucleotide Transformer models against other foundational genomics models, focusing on receptive field size, number of parameters, and performance across a benchmark comprising 18 curated downstream tasks. (d) Visualization of genomic features considered in downstream tasks. The figure is Fig.1 from Dalla-Torre, et al., 2023." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 2. Overview of the Nucleotide Transformer: pre-training, fine-tuning, analysis, and comparison of foundational models for genomics.</strong> (a,b) Illustration of the Nucleotide Transformer’s training process (a) and its application to downstream genomic prediction tasks via fine-tuning (b). Probing for downstream tasks follows a similar approach but excludes rescaling weights. (c) Comparative analysis of the Nucleotide Transformer models against other foundational genomics models, focusing on receptive field size, number of parameters, and performance across a benchmark comprising 18 curated downstream tasks. (d) Visualization of genomic features considered in downstream tasks. The figure is Fig.1 from <a href="#Dalla-Torre2023">Dalla-Torre, et al., 2023</a>.</p>
+        </figcaption>
+</figure>
+
+<p>NTs employ an encoder-only transformer architecture similar to BERT. They use
+<ins><strong>non-overlapping</strong></ins> 6-mer DNA tokens as a trade-off between sequence
+length (up to 6kb) and embedding size, achieving the highest performance
+compared to other token lengths. NT-v1 models use a learnable positional
+encoding layer that accepts a maximum of 1000 tokens <sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>. Each model includes
+transformer layers with layer normalization, multi-head self-attention, and a
+two-layer perceptron with GELU activations. The parameter sizes for NT-v1 models
+range from 500M to 2.5B.</p>
+<p>The updated NT-v2 models feature architectural advancements such as rotary
+embeddings (<a href="#Su2024">Su, et al., 2024</a>)<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup> and <a href="https://azizbelaweid.substack.com/p/what-is-swiglu-how-to-implement-it">swiGLU
+activation</a>
+(<a href="#Shazeer2020">Shazeer, 2020</a>). They eliminate MLP biases and dropout
+mechanisms to improve efficiency. NT-v2 models extend the context length to 12kb
+by accepting up to 2048 tokens and include variants with parameter sizes from
+50M to 500M.</p>
+<p>NT models are pre-trained on diverse datasets to ensure comprehensive genomic
+representation:</p>
+<ul>
+<li>Human Reference Genome: Based on the GRCh38/hg38 assembly, encompassing 3.2
+billion nucleotides.</li>
+<li>1000 Genomes Project (1000G): Comprising 3,202 high-coverage human genomes,
+representing 20.5 trillion nucleotides from 27 geographically diverse
+populations.</li>
+<li>Multispecies Dataset: Includes 850 genomes from various species, totaling 174
+billion nucleotides, selected to maximize diversity and functional relevance
+across different phyla​​.</li>
+</ul>
+<p>The tokenization process converts nucleotide sequences into 6-mer tokens, with a
+vocabulary of 4104 tokens, including special tokens for padding [pad], masking
+[mask], and sequence start [CLS]. All nucleotides other than A, T, C, G were
+replaced by N before tokenization. The models are trained using a masked
+language modeling (MLM) approach similar to BERT, where 15% of the tokens in
+each sequence are masked, and the model learns to predict these masked tokens.
+Training utilizes the Adam optimizer with a learning rate schedule and gradient
+accumulation to handle large batch sizes effectively, with an effective batch
+size of 1M tokens per batch. Training is conducted on the Cambridge-1 Nvidia
+supercomputer, using 128 A100 GPUs across 16 nodes. NT-v1 models require up to
+28 days for training, while NT-v2 models are trained for extended durations,
+with the largest models processing up to 1 trillion tokens to better understand
+the scaling laws (<a href="#Kaplan2020">Kaplan, et al., 2020</a>).</p>
+<p>NT models are evaluated based on their performance across various genomic tasks:</p>
+<ul>
+<li>
+<p><strong>Scaling Laws</strong>: NT models, ranging from 50M to 2.5B parameters, were trained
+on extensive datasets. Larger models captured more complex genomic patterns,
+resulting in better generalization and accuracy. Architectural advancements in
+NT-v2 allowed smaller models to achieve results comparable to larger ones.
+These findings emphasize the importance of optimizing training techniques and
+extending context lengths to enhance model performance.</p>
+</li>
+<li>
+<p><strong>Benchmarking</strong>: NT models were tested on 18 diverse genomic tasks, such as
+predicting epigenetic marks, chromatin profiles, and splice sites. Larger
+models consistently outperformed smaller ones, with the 2.5B parameter NT-v2
+model showing superior accuracy in most tasks. The NT-v2 500M parameter model
+achieved similar performance to the 2.5B parameter model due to architectural
+improvements and longer training durations. Smaller models, like the 50M and
+100M parameter versions, also performed well in less complex tasks or
+resource-limited environments. This benchmarking highlighted the trade-off
+between model size, computational efficiency, and task complexity.</p>
+</li>
+<li>
+<p><strong>Model Selection</strong>: Selecting NT models depends on the specific downstream
+tasks. For tasks like predicting epigenetic marks and chromatin profiles,
+larger models (500M-2.5B parameters) are recommended due to their higher
+accuracy and ability to capture intricate dependencies. For splice site
+prediction, the NT-v2 500M model offers excellent performance comparable to
+SOTA models. For simpler tasks or when computational resources are limited,
+smaller models (50M-100M parameters) provide sufficient performance and
+efficiency. Understanding the specific requirements and constraints of the
+application is crucial in selecting the most appropriate NT model.</p>
+</li>
+</ul>
+<p>The NT models have shown significant improvements over existing benchmarks like
+DNABERT and Enformer (see below), particularly in tasks involving human genomic
+data.</p>
+<h3 id="enformer">Enformer<a hidden class="anchor" aria-hidden="true" href="#enformer">#</a></h3>
+<p>Enformer (<a href="#Avsec2021">Avsec, et al., 2021</a>), developed by a team at DeepMind in
+collaboration with Calico Life Sciences and Google, leverages transformer
+architecture to predict gene expression and chromatin states from DNA sequences
+in humans and mice. While Enformer does not involve pre-training tasks like
+other large language models (LLMs), its adoption of a BERT-like architecture
+makes it highly relevant to this post.</p>
+<figure id="fig3" 
+     class="align-center ">
+    <img loading="lazy" src="https://deepmind.google/api/blob/website/images/6227e3d36e3ad3540e4966f8_Fig_01.original_chOCT6H.svg#center"
+         alt="Fig 3. Overview of the Enformer architecture. The model is trained to predict human and mouse genomic tracks at a 128-bp resolution using 200 kb of input DNA sequence. It replaces dilated convolutions with transformer modules, expanding its receptive field fivefold to detect elements up to 100 kb away, compared to 20 kb in Basenji2. Detailed architecture settings can be found in Extended Data Fig. 1 of the original paper (Avsec, et al., 2021), with a comparison to Basenji2. The figure was originally Fig. 1a but is linked through DeepMind’s corresponding blog post." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 3. Overview of the Enformer architecture.</strong> The model is trained to predict human and mouse genomic tracks at a 128-bp resolution using 200 kb of input DNA sequence.  It replaces dilated convolutions with transformer modules, expanding its receptive field fivefold to detect elements up to 100 kb away, compared to 20 kb in Basenji2. Detailed architecture settings can be found in <a href="https://www.nature.com/articles/s41592-021-01252-x/figures/5">Extended Data Fig. 1</a> of the original paper (<a href="#Avsec2021">Avsec, et al., 2021</a>), with a comparison to Basenji2.  The figure was originally Fig. 1a but is linked through DeepMind’s corresponding <a href="https://deepmind.google/discover/blog/predicting-gene-expression-with-ai/">blog post</a>.</p>
+        </figcaption>
+</figure>
+
+<p>Enformer combines deep convolutional neural networks with transformer blocks,
+significantly extending its receptive field. The model processes 196,608 bps of
+DNA sequence input and predicts 5,313 genomic tracks for humans and 1,643 for
+mice. It consists of seven convolutional layers followed by eleven transformer
+layers, using attention mechanisms to integrate information from distal genomic
+elements up to 100 kb away. This setup contrasts with previous SOTA models like
+<a href="https://genome.cshlp.org/content/28/5/739">Basenji2</a>, which can only integrate
+information from up to 20 kb away.</p>
+<p>Regarding tokenization, input DNA sequences are one-hot encoded, with each
+nucleotide represented by a unique vector (A = [1,0,0,0], C = [0,1,0,0], G =
+[0,0,1,0], T = [0,0,0,1]). This encoding feeds into the convolutional layers,
+which reduce the spatial dimension, allowing the transformer layers to capture
+long-range interactions effectively. Moreover, the model employs custom relative
+positional encodings like <a href="https://arxiv.org/abs/1901.02860">Transformer-XL
+paper</a> does (in short that is to add relative
+positional encodings $R_{ij}$ to the $q_i k_j^T$ ) to enhance its ability to
+distinguish between proximal and distal regulatory elements and to differentiate
+positions upstream and downstream of the transcription start site (TSS). This
+approach ensures effective integration of long-range genomic interactions,
+crucial for accurate gene expression prediction.</p>
+<p>Enformer was trained using a multitask learning framework on a vast dataset
+encompassing most of the human and mouse genomes. The training involved 34,021
+human and 29,295 mouse sequences, with additional validation and test sets. The
+dataset included various genomic assays such as transcription factor (TF)
+chromatin immunoprecipitation and sequencing (ChIP-seq), histone modification
+ChIP-seq, DNase-seq, and ATAC-seq, providing a comprehensive set of genomic
+tracks.</p>
+<p>Training was conducted on 64 TPU v3 cores over approximately three days, with
+optimization handled by the Adam optimizer. The model&rsquo;s training and validation
+employed Poisson negative log-likelihood loss (same as Basenji2 did) <sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>, and
+data augmentation techniques like random shifting and reverse-complementing the
+input sequences were used to enhance robustness.</p>
+<p>Enformer demonstrated superior performance in gene expression prediction
+compared to Basenji2, with mean correlation improvements from 0.81 to 0.85 in
+predicting RNA expression at TSSs of human protein-coding genes. The model also
+showed enhanced ability to predict tissue-specific gene expression and the
+effects of genetic mutations on gene expression, validated by CRISPR
+interference assays and population eQTL studies.</p>
+<p>Although Enformer is not an LLM, its generic architecture and trained model make
+it versatile for various applications, including fine-mapping of human disease
+associations, understanding cis-regulatory evolution, and potentially designing
+synthetic enhancers for specific cell types. Its ability to predict regulatory
+activity from DNA sequence alone presents a significant advantage in genomic
+research.</p>
+<p>Despite its advancements, the authors acknowledged in their paper that Enformer
+is limited by its reliance on the cell types and assays present in its training
+data. It cannot generalize to new cell types or assays not included in its
+training set. Future improvements could involve integrating 3D genome
+organization data to better model genomic interactions and expanding training
+datasets to include more cell types and organisms. Additionally, advancements in
+computational efficiency and hardware could further enhance the model&rsquo;s
+scalability and performance. Moreover, other studies suggest that Enformer may
+not present SOTA results in benchmarking. Methods like nucleotide transformers
+we mentioned previously can outperform Enformer although Enformer has a much
+larger receptive field.</p>
+<h3 id="gpn">GPN<a hidden class="anchor" aria-hidden="true" href="#gpn">#</a></h3>
+<p>The Genomic Pre-trained Network (GPN) is a language model designed for
+genome-wide variant effect prediction, leveraging unsupervised pretraining on
+genomic DNA sequences (<a href="#Benegas2023">Benegas, et al., 2023</a>). It is
+particularly notable for its application to predicting the functional impact of
+genetic variants in Arabidopsis thaliana, a model organism for plant biology.</p>
+<p>GPN is based on a customized transformer-encoder where the traditional
+multi-head attention layers are replaced by convolutions. This design leverages
+the efficiency of convolutional networks in capturing local dependencies, which
+are prevalent in genomic sequences. The core of GPN consists of 25 convolutional
+blocks, each incorporating a dilated convolutional layer followed by a
+feed-forward layer, with intermediate residual connections and layer
+normalization. The model maintains a fixed embedding dimension of 512 across all
+layers. This architecture allows GPN to effectively model both local and
+long-range dependencies within genomic sequences. GPN was trained for 150,000
+steps over four days using four NVIDIA A100 80 GB GPUs.</p>
+<figure id="fig4" 
+     class="align-center ">
+    <img loading="lazy" src="https://www.pnas.org/cms/10.1073/pnas.2311219120/asset/0705e0ee-095d-44e0-a2e3-4526be34d274/assets/images/large/pnas.2311219120fig01.jpg#center"
+         alt="Fig 4. Overview of the Genomic Pre-trained Network. GPN predicts nucleotides at masked positions in a 512-bp DNA sequence. During training, 15% of positions are masked, while only the variant position is masked during variant effect prediction. The model uses a convolutional neural network to generate embeddings for each position and outputs nucleotide probabilities for masked positions. Training is performed with cross-entropy loss on the reference sequence, and the variant effect prediction score is the log-likelihood ratio between the alternate and reference alleles. Here, L represents the window length in base pairs, D denotes the embedding dimension, REF is the reference allele, and ALT is the alternate allele. The figure was Fig. 1 from Benegas, et al.,2023." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 4. Overview of the Genomic Pre-trained Network.</strong> GPN predicts nucleotides at masked positions in a 512-bp DNA sequence. During training, 15% of positions are masked, while only the variant position is masked during variant effect prediction. The model uses a convolutional neural network to generate embeddings for each position and outputs nucleotide probabilities for masked positions. Training is performed with cross-entropy loss on the reference sequence, and the variant effect prediction score is the log-likelihood ratio between the alternate and reference alleles. Here, L represents the window length in base pairs, D denotes the embedding dimension, REF is the reference allele, and ALT is the alternate allele. The figure was Fig. 1 from <a href="#Benegas2023">Benegas, et al.,2023</a>.</p>
+        </figcaption>
+</figure>
+
+<p>Unlike models that utilize k-mers or byte-pair encoding for tokenization, GPN
+uses single-nucleotide tokens. This approach simplifies the interpretation of
+model outputs, which is crucial for variant effect prediction. The model does
+not incorporate explicit positional embeddings; instead, it leverages the
+convolutional layers&rsquo; structure to capture positional information within the
+sequence. This design introduces translational equivariance as an inductive bias
+through the convolutional operations. While this assumption can be advantageous,
+it may also limit generalization when this bias does not align with the data.</p>
+<p>GPN was pretrained on unaligned reference genomes from Arabidopsis thaliana and
+seven related species within the Brassicales order. The training dataset
+included various genomic regions such as exons, promoters, and random genomic
+windows, ensuring a comprehensive representation of the genome. The model
+processes input DNA sequences of 512 base pairs, where 15% of the positions are
+masked during training. The goal is to predict the nucleotides at these masked
+positions, facilitating the learning of complex genomic features and structures.
+To address the overrepresentation of repetitive elements, the training loss was
+adjusted to down-weight these regions, improving the model&rsquo;s performance on
+non-repetitive, functionally significant regions.</p>
+<p>GPN is designed to predict the effects of genetic variants across the genome,
+making it a powerful tool for genome-wide association studies (GWAS) and
+fine-mapping of causal variants. It outperforms traditional conservation scores
+like phyloP and phastCons in predicting variant effects in Arabidopsis thaliana.</p>
+<p>The authors highlight that GPN&rsquo;s ability to learn and predict gene structures
+and DNA motifs without any supervision. This capability is crucial for
+identifying transcription factor binding sites and other regulatory elements in
+the genome. Additionally, GPN&rsquo;s predictions show a strong correlation with
+functional genomic regions, as evidenced by its high accuracy in distinguishing
+coding sequences, untranslated regions, and introns. This work should remind us
+that conventional CNN-based models can also work well sometimes.</p>
+<h3 id="hyenadna">HyenaDNA<a hidden class="anchor" aria-hidden="true" href="#hyenadna">#</a></h3>
+<figure id="fig5" 
+     class="align-center ">
+    <img loading="lazy" src="https://github.com/HazyResearch/hyena-dna/raw/main/assets/pipeline.png#center"
+         alt="Fig 5. Overview of HyenaDNA. The figure was from the GitHub profile page of the author&rsquo;s repo for this work (link)." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 5. Overview of HyenaDNA.</strong> The figure was from the GitHub profile page of the author&rsquo;s repo for this work (<a href="https://github.com/HazyResearch/hyena-dna">link</a>).</p>
+        </figcaption>
+</figure>
+
+<p>HyenaDNA is a genomic foundation model designed to handle long-range
+dependencies in DNA sequences at single nucleotide resolution (<a href="#Nguyen2024">Nguyen, et al.,
+2024</a>). HyenaDNA addresses the limitations of previous
+Transformer-based genomic models that were constrained by the quadratic scaling
+of attention mechanisms. These earlier models could only handle contexts of up
+to 4k tokens, significantly limiting their ability to model long-range
+interactions in genomic sequences.</p>
+<p>HyenaDNA is based on the Hyena operator (<a href="#fig6">Fig. 6</a>), a convolutional model
+that can process long contexts with sub-quadratic time complexity. This
+architecture allows HyenaDNA to scale linearly with sequence length, enabling
+the modeling of up to 1 million tokens in a single context. The key components
+of the HyenaDNA architecture include:</p>
+<ul>
+<li>
+<p>Implicit Convolutions: The Hyena operator uses long convolutions parameterized
+by a neural network, which are evaluated using Fast Fourier Transform (FFT)
+for efficient computation.</p>
+</li>
+<li>
+<p>Element-wise Gating: These gates modulate the input based on learned
+parameters, allowing the model to apply context-specific operations at each
+token position.</p>
+</li>
+<li>
+<p>Single Nucleotide Tokenization: Unlike previous models that relied on k-mers
+or other aggregation techniques, HyenaDNA tokenizes DNA sequences at the
+single nucleotide level, preserving fine-grained information crucial for
+understanding genetic variations.</p>
+</li>
+</ul>
+<figure id="fig6" 
+     class="align-center ">
+    <img loading="lazy" src="https://hazyresearch.stanford.edu/static/posts/2023-06-29-hyena-dna/hyena_arch.png#center"
+         alt="Fig 6. HyenaDNA Block. (left) The HyenaDNA block resembles a Transformer-decoder block, but with the attention mechanism replaced by a Hyena Operator. (middle) The Hyena Operator integrates long convolutions with element-wise gates, where the gates are derived from projections of the input using dense and short convolutional layers. (right) The long convolutions are parameterized implicitly through an MLP, which generates the weights for the long Hyena filters. The figure was from (https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna)." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 6. HyenaDNA Block.</strong> (left) The HyenaDNA block resembles a Transformer-decoder block, but with the attention mechanism replaced by a Hyena Operator. (middle) The Hyena Operator integrates long convolutions with element-wise gates, where the gates are derived from projections of the input using dense and short convolutional layers. (right) The long convolutions are parameterized implicitly through an MLP, which generates the weights for the long Hyena filters. The figure was from (<a href="https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna">https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna</a>).</p>
+        </figcaption>
+</figure>
+
+<p>HyenaDNA is a <em>decoder-only</em> model that was pretrained on the <em>human reference
+genome</em> using next-nucleotide prediction. This autoregressive training employed
+a sequence length warm-up technique, gradually increasing the context length to
+stabilize training and improve efficiency. The model demonstrated significant
+improvements in perplexity with longer contexts, indicating better prediction
+accuracy. The pretraining used a minimal DNA vocabulary consisting of &lsquo;A&rsquo;, &lsquo;C&rsquo;,
+&lsquo;G&rsquo;, &lsquo;T&rsquo;, and special tokens.</p>
+<p>HyenaDNA was pretrained using Nvidia A100 GPUs (exact number was not disclosed
+by authors), with training times varying based on sequence length and model
+size. For example, training a model with a context length of 1 million tokens
+took approximately 4 weeks. The model sizes used in training ranged from 400k
+to 6.6M parameters, and it employed gradient checkpointing to manage memory
+usage efficiently during training.</p>
+<p>Despite being as an auto-regressive, decoder-only model for predicting the next
+nucleotide, HyenaDNA can be used in discriminative tasks such as classification.
+This adaptability is achieved through techniques like sequence-level pooling and
+soft prompting.</p>
+<ul>
+<li>
+<p>In sequence-level pooling, the outputs of HyenaDNA are
+aggregated across the genomic sequence to form a cohesive representation, which
+can then be funneled through a classification head to predict labels for the
+entire sequence. This method leverages the contextual information encoded by the
+model to classify sequences based on their entire compositional makeup.</p>
+</li>
+<li>
+<p>For discriminative tasks, HyenaDNA can also leverage soft prompting (check
+<a href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/#493-soft-prompting-and-prefix-tuning">relevant information in the first post of this
+series</a>),
+which involves integrating trainable tokens directly into the input sequence.
+These tokens are optimized during training to adapt the model&rsquo;s focus towards
+relevant features for the classification task, enabling effective in-context
+learning without extensive retraining of the model. This method seems elegant as
+it allows for flexible adaptation to new tasks by modifying only a small part of
+the model’s input, making HyenaDNA a powerful tool for genomic classifications
+and other discriminative tasks, while preserving computational efficiency and
+model integrity.</p>
+</li>
+</ul>
+<p>In authors&rsquo; evaluation, HyenaDNA excels in various genomic tasks, including
+species classification and regulatory element identification. HyenaDNA achieved
+SOTA performance on 12 out of 18 benchmarks from the Nucleotide Transformer
+dataset, despite using significantly fewer parameters and pretraining data. On
+the GenomicBenchmarks dataset, HyenaDNA surpassed the SOTA on 7 out of 8
+datasets, with notable improvements in enhancer identification.</p>
+<figure id="fig7" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/junk_dna_motif.png#center"
+         alt="Fig 7. Why single nuceotide resolution and long context are important. (a) DNA motifs play a crucial role in gene regulation. Variants in regulatory regions such as promoters, silencers, and enhancers influence the binding of transcription factors and RNA polymerases to DNA, ultimately affecting gene expression. (b) Single-nucleotide resolution is essential for precise variant analysis, but not all DNA sequences are relevant to gene expression. Relevant sequences may be located far apart within the genome, necessitating a long contextual span to capture their interactions effectively. The figure was adapted from (https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna)." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 7. Why single nuceotide resolution and long context are important.</strong> (a) DNA motifs play a crucial role in gene regulation. Variants in regulatory regions such as promoters, silencers, and enhancers influence the binding of transcription factors and RNA polymerases to DNA, ultimately affecting gene expression. (b) Single-nucleotide resolution is essential for precise variant analysis, but not all DNA sequences are relevant to gene expression. Relevant sequences may be located far apart within the genome, necessitating a long contextual span to capture their interactions effectively. The figure was adapted from (<a href="https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna">https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna</a>).</p>
+        </figcaption>
+</figure>
+
+<p>HyenaDNA offers significant advancements in genomic sequence modeling due to its
+ability to handle long-range contexts of up to 1 million tokens, which allows it
+to capture intricate dependencies across vast genomic sequences. This capability
+is particularly beneficial for tasks that require understanding long-range
+interactions, such as regulatory element identification and species
+classification. Additionally, the model&rsquo;s use of single nucleotide tokenization
+ensures that every subtle genetic variation is preserved, enabling precise
+detection of single nucleotide polymorphisms (SNPs) and mutations. Check
+<a href="#fig7">Fig.7</a> to better understand such biological significance further.
+Moreoever, the architecture, based on implicit convolutions, provides efficient
+computation with sub-quadratic scaling, making it more effective and faster than
+traditional Transformer-based models. This efficiency is further enhanced by
+techniques like gradient checkpointing and sequence length warm-up during
+training.</p>
+<p>Despite its innovations, the pretraining of HyenaDNA was conducted on a single
+human reference genome, which may limit the model&rsquo;s generalizability to broader
+genomic datasets or to genomes from different species. Incorporating multiple
+genomes in the training process could enhance its robustness and applicability.
+Expanding the model&rsquo;s application beyond DNA sequences to other biological
+sequences, such as proteins and RNA, also presents an area for future research
+and potential enhancement.</p>
+<h3 id="evo">Evo<a hidden class="anchor" aria-hidden="true" href="#evo">#</a></h3>
+<p>Evo is a cutting-edge DNA foundation model that generalizes to prediction tasks
+and generative design at scales ranging from molecular to whole genomes
+(<a href="#Nguyen2024">Nguyen, et al., 2024</a>). Developed by key contributors of HyenaDNA
+in collaboration with <a href="https://www.stanford.edu/">Stanford University</a>, <a href="https://arcinstitute.org/">Arc
+Institute</a>, and
+<a href="https://www.together.ai/">TogetherAI</a>, Evo represents a significant advancement
+in leveraging machine learning for genomic data.</p>
+<figure id="fig8" 
+     class="align-center ">
+    <img loading="lazy" src="https://arcinstitute.org/blog/evo/arch.png#center"
+         alt="Fig 8. The Evo model architecture, based on StripedHyena. The figure was adapted from https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 8. The Evo model architecture, based on StripedHyena.</strong> The figure was adapted from <a href="https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna">https://hazyresearch.stanford.edu/blog/2023-06-29-hyena-dna</a>.</p>
+        </figcaption>
+</figure>
+
+<p>Evo is built on the <a href="https://www.together.ai/blog/stripedhyena-7b">StripedHyena</a>
+architecture, a hybrid model combining 29 layers of data-controlled
+convolutional operators with 3 layers of multi-head attention equipped with
+rotary position embeddings (RoPE). (Check <a href="#fig8">Fig. 8</a> and reference about
+<a href="https://www.together.ai/blog/stripedhyena-7b">StripedHyena</a> for detailed
+information about the archtecture.) This design enables efficient processing of
+long DNA sequences while maintaining single-nucleotide resolution. Evo scales up
+to 7B parameters and utilizes a context length of 131 kilobases (kb) at
+single-nucleotide resolution. Evo employs byte-level, single-nucleotide
+tokenization for input DNA sequences, allowing it to model sequences with fine
+granularity. During pretraining, Evo uses an effective vocabulary of four tokens
+(A, T, C, G) from a total vocabulary of 512 characters. The additional 508
+characters beyond <code>ATCG</code> enable prompting with special tokens during generation
+with finetuned models. Meanwhile, RoPE aids in maintaining positional
+information over long contexts, crucial for genomic sequences where the relative
+position of nucleotides can impact biological function.</p>
+<p>Evo was pretrained on a vast dataset of 300 billion nucleotide tokens,
+encompassing 2.7 million <em>prokaryotic</em> and <em>phage</em> genomes from databases such
+as the Genome Taxonomy Database (GTDB), Integrated Microbial Genomes/Virus
+(IMG/VR), and Integrated Microbial Genomes/Plasmid (IMG/PR). The authors
+introduced <em>OpenGenome</em> in this work, compiling over 80,000 bacterial and
+archaeal genomes, and millions of predicted prokaryotic phage and plasmid
+sequences. The training followed a two-stage process: an initial phase with an
+8k token context length, followed by a context extension phase to 131k tokens.
+Evo was trained using an autoregressive modeling approach, predicting the
+likelihood of the next token given a sequence of tokens. This next-token
+prediction task was purely on raw genome sequences with no explicit supervision
+or annotations, which is fundamental for learning how to capture complex
+patterns in DNA sequences. Evo employs a decoder-only framework, enabling it to
+efficiently handle long context lengths and maintain single-nucleotide
+resolution.</p>
+<figure id="fig9" 
+     class="align-center ">
+    <img loading="lazy" src="https://arcinstitute.org/blog/evo/concept.png#center"
+         alt="Fig 9. Evo models the fundamental modalities of biology as seen in the centra dogma of molecular biology. The figure was from https://arcinstitute.org/news/blog/evo, which is also Fig. 1a from Evo&rsquo;s paper." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 9. Evo models the fundamental modalities of biology as seen in the centra dogma of molecular biology.</strong> The figure was from <a href="https://arcinstitute.org/news/blog/evo">https://arcinstitute.org/news/blog/evo</a>, which is also Fig. 1a from Evo&rsquo;s paper.</p>
+        </figcaption>
+</figure>
+
+<p>Evo supports RNA and protein sequence modeling through its DNA outputs by
+leveraging the central dogma of molecular biology (<a href="#fig9">Fig. 9</a>). By modeling
+genome sequences at single-nucleotide resolution, Evo captures the information
+encoded in regulatory DNA, protein-coding DNA, coding RNA, and non-coding RNA,
+etc. It can learn covariation involving multiple genes and regulatory elements,
+making DNA a productive modality for developing a biological foundation model.
+However, it is important to note that Evo&rsquo;s tokenization approach focuses on DNA
+sequences, and while it can model RNA-related functionality through their DNA
+counterparts, it does not directly accept RNA sequences as inputs. The training
+data primarily consists of DNA sequences, and any RNA-related functionality is
+derived from the model&rsquo;s understanding of DNA sequences. This approach is also
+applied to protein sequences.</p>
+<p>To support structure-related predictions, Evo&rsquo;s generated DNA sequences can be
+processed using tools like
+<a href="https://www.science.org/doi/10.1126/science.ade2574">ESMFold</a>,
+<a href="https://www.nature.com/articles/s41586-021-03819-2">AlphaFold2</a>, and
+<a href="https://www.tbi.univie.ac.at/RNA/RNAmultifold.1.html">RNAMultiFold</a>. These
+tools help predict the 3D structures of proteins and RNA sequences that Evo
+generates through its DNA-based learning.</p>
+<p>Evo excels in various applications:</p>
+<ul>
+<li><strong>Zero-shot Function Prediction</strong>: Evo outperforms domain-specific models
+(e.g. ESMs, NTs, RNA-FM) in predicting the effects of mutations on protein and
+ncRNA functions without task-specific finetuning. This capability is derived
+from its understanding of the DNA sequences encoding these molecules.</li>
+<li><strong>Generative Design</strong>: Evo can generate synthetic CRISPR-Cas systems,
+including coherent protein and non-coding RNA sequences. This is achieved by
+generating DNA sequences that code for these molecules, which can then be
+transcribed and translated into functional RNA and proteins.</li>
+<li><strong>Gene Essentiality Prediction</strong>: Using long genomic contexts, Evo accurately
+predicts essential genes in bacteria and phages. By analyzing the DNA
+sequences, Evo can determine which genes are crucial for an organism&rsquo;s
+survival, providing insights into organismal fitness and potential targets for
+drug discovery.</li>
+<li><strong>Whole-genome Sequence Generation</strong>: Evo generates sequences up to 650 kb,
+demonstrating high coding density and plausible genomic organization. These
+sequences can include coding regions for proteins and RNAs, enabling further
+studies on their structure and function using tools like ESMFold, AlphaFold2,
+and RNAMultiFold.</li>
+</ul>
+<p>The authors conducted a comprehensive scaling laws analysis, comparing over 300
+models across four architectures: Transformer++, Mamba, Hyena, and StripedHyena.
+They found that StripedHyena demonstrates favorable scaling laws on DNA sequence
+data, outperforming other architectures, including state-of-the-art Transformers
+and modern data-controlled state-space models like Mamba. However, training Evo
+required substantial computational resources, including 64 Nvidia H100 GPUs and
+128 Nvidia A100 GPUs. It was trained on ~340B tokens using ~$2 \times 10^{22}$
+FLOPS.</p>
+<p>Evo&rsquo;s primary advantage lies in its ability to handle long genomic sequences at
+single-nucleotide resolution, enabling comprehensive modeling of biological
+systems. Its hybrid architecture ensures efficient processing and scalability,
+outperforming traditional Transformer models on genomic data. Currently trained
+exclusively on prokaryotic data, Evo’s predictions for eukaryotic sequences,
+including human genomes, remain limited. Expanding Evo to include eukaryotic
+genomes will require addressing the much higher complexity of these genomes,
+along with significant investments in engineering, computational resources, and
+safety-related model alignment. While Evo is capable of generating broad genomic
+organization, further improvements are needed in the detail and completeness of
+generated sequences. Additionally, the model’s substantial computational demands
+during both training and inference could limit accessibility for smaller
+research groups.</p>
+<h2 id="methylation-awared-language-models">Methylation-awared Language Models<a hidden class="anchor" aria-hidden="true" href="#methylation-awared-language-models">#</a></h2>
+<h3 id="methylbert">MethylBert<a hidden class="anchor" aria-hidden="true" href="#methylbert">#</a></h3>
+<p>MethylBERT (<a href="#Jeong2023">Jeong, et al. 2023</a>) is a deep learning model designed
+for read-level DNA methylation pattern classification and tumour purity
+estimation. Built on the DNABert architecture, it processes overlapping 3-mer
+DNA sequences (comprising 69 unique tokens, including DNA bases A, T, C, G and
+special tokens like [MASK], [UNK]) combined with methylation states to encode
+read-level methylomes. Unlike traditional methods that rely on microarray-based
+beta-values, MethylBERT directly analyzes sequencing-based methylation data,
+preserving single-molecule signals and improving sensitivity for detecting rare
+cell types. The model&rsquo;s primary goal is to classify sequencing reads as either
+tumor or normal cells, facilitating tumor fraction estimation in bulk DNA
+methylation samples.</p>
+<figure id="fig10" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/methylbert.png#center"
+         alt="Fig 10. Overview of MethylBERT. The figure is Fig. 1 from its paper." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 10. Overview of MethylBERT.</strong> The figure is Fig. 1 from its paper.</p>
+        </figcaption>
+</figure>
+
+<p>MethylBERT&rsquo;s training process consists of two major stages (<a href="#fig10">Fig. 10</a>).
+During the pre-training stage, the model employs an unsupervised Masked Language
+Model (MLM) objective on the hg19 genome (or mouse mm10 for cross-species
+applications). It learns to predict missing 3-mer DNA sequences using contextual
+embeddings, processing DNA sequences in 510 bp segments. Through this process,
+the model develops a deep understanding of sequence dependencies, CpG
+distributions, and genome-wide structures.</p>
+<p>In the fine-tuning stage, MethylBERT focuses on specialized read-level
+methylation classification using supervised learning with tissue-derived data,
+such as Diffuse Large B-cell Lymphoma and Non-neoplastic B-cells. The model
+classifies reads based on CpG methylation patterns and genomic context,
+processing methylation states in a categorical format where 0 represents
+unmethylated CpG (unmodified cytosine), 1 indicates methylated CpG (cytosine
+with methyl group), and 2 denotes non-CpG sites (other nucleotides, not used in
+classification). The model converts these methylation states into embedding
+vectors and combines them with DNA sequence embeddings for comprehensive
+representation.</p>
+<p>For final predictions, MethylBERT follows a three-step process (<a href="#fig10">Fig.
+10</a>): first, it classifies each read as tumor-derived or normal using
+model embeddings; second, it incorporates additional genomic region information
+such as DMR labels; and finally, it estimates tumor purity in bulk samples using
+Bayesian probability inversion and maximum likelihood estimation.</p>
+<p>The model&rsquo;s architecture mirrors DNABert, featuring 12 Transformer encoder
+layers with 768 hidden units and 12 attention heads. Additionally, the authors
+developed a smaller variant with 6 encoder layers optimized for longer read
+sequences (500 bp), which achieved comparable performance to the larger model.</p>
+<p>The computational requirements for MethylBERT varied significantly between
+training stages. The pre-training phase required several days using 4 NVIDIA
+V100 GPUs, while the subsequent fine-tuning phase completed much more quickly.</p>
+<p>MethylBERT exhibited remarkable capabilities in analyzing complex methylation
+patterns, significantly outperforming traditional statistical approaches like
+CancerDetector and Hidden Markov Models (HMM). Its particular strength lies in
+read-level DNA methylation analysis, demonstrating high accuracy and
+sensitivity. These results highlight MethylBERT&rsquo;s potential as a powerful tool
+for liquid biopsy applications, where precise methylation pattern detection is
+crucial for early disease detection and monitoring.</p>
+<h3 id="methylgpt">MethylGPT<a hidden class="anchor" aria-hidden="true" href="#methylgpt">#</a></h3>
+<p>Unlike MethylBert, which is a BERT-like encoder model that embeds full sequences
+with methylation status, MethylGPT is a decoder-only generative model designed
+to analyze DNA methylation patterns across large numbers of CpG sites (<a href="#Ying2024">Ying, et
+al. 2024</a>). The model was trained on a large-scale dataset of 154,063
+human methylation profiles, capturing 49,156 physiologically relevant CpG sites
+and processing a total of 7.6 billion training tokens. Unlike conventional
+linear models, MethylGPT leverages deep learning to recognize both local and
+higher-order genomic features, enabling robust predictions in various epigenetic
+applications.</p>
+<figure id="fig11" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/methylgpt.png#center"
+         alt="Fig 11. Overview of MethylGPT. The figure is Fig. 1a from its paper." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 11. Overview of MethylGPT.</strong> The figure is Fig. 1a from its paper.</p>
+        </figcaption>
+</figure>
+
+<p>MethylGPT employs a transformer architecture consisting of six transformer
+blocks, with each block containing four multi-head self-attention layers
+followed by a feed-forward network. The model&rsquo;s tokenization strategy involves
+two key components: CpG site positions and methylation states. Each CpG site is
+assigned a unique integer identifier for position encoding, while methylation
+states are embedded separately. These two types of embeddings are combined
+through an element-wise operation before being processed by the transformer
+layers. This dual embedding approach enables the model to simultaneously capture
+both the genomic context of CpG sites and their methylation states through the
+attention mechanism. The model uses a 64-dimensional embedding space for
+representation learning, and includes a special [CLS] token at the beginning of
+each sequence to generate sample-level representations for downstream tasks.</p>
+<p>During pretraining, the model was optimized using two complementary loss
+functions:</p>
+<ul>
+<li>Masked Language Modeling (MLM): Predicts methylation levels for 30% randomly
+masked CpG sites.</li>
+<li>Profile Reconstruction Loss: Uses the [CLS] token to
+reconstruct full DNA methylation profiles.</li>
+</ul>
+<p>The training dataset was curated from the <a href="https://ngdc.cncb.ac.cn/ewas/datahub/index">EWAS Data
+Hub</a> and
+<a href="https://www.biorxiv.org/content/10.1101/2023.02.28.530532v1">Clockbase</a>,
+covering over 20 tissue types. The selection of 49,156 CpG sites was based on
+their association with Epigenome-Wide Association Study (EWAS) traits and their
+prevalence across datasets. Methylation values were normalized, and missing
+values were handled through masking during training.</p>
+<p>The training process proceeded for 10 epochs using the AdamW optimizer, starting
+with a 0.001 learning rate and implementing a 10% per-epoch decay. The
+implementation utilized NVIDIA A100 GPUs with a batch size of 16 and
+incorporated FlashAttention for efficient memory usage.</p>
+<p>MethylGPT was shown to generalizes well across epigenetic tasks, including
+methylation imputation, age prediction, missing data handling, and intervention
+analysis. It excels in biological interpretability, scalability, and resilience
+to missing data, outperforming traditional models in accuracy. However, its high
+computational cost and training on bulk methylation data may limit
+generalization to single-cell methylation data. Furthermore, the model only
+considers CpG sites rather than incorporating the full sequence context, which
+may limit its ability to efficiently capture sequence-dependent patterns during
+both training and inference.</p>
+<h2 id="rna-language-models">RNA Language Models<a hidden class="anchor" aria-hidden="true" href="#rna-language-models">#</a></h2>
+<!-- ### GenSLMs
+
+The GenSLMs (Genome-scale Language Models) represent a series of language models
+specifically engineered to analyze and predict evolutionary patterns in viral
+genomes, with a primary focus on SARS-CoV-2 ([Zvyagin, et al.
+2023](#Zvyagin2023)). These models were pretrained on over 110 million
+prokaryotic gene sequences from Bacterial and Viral Bioinformatics Resource
+Center ([BV-BRC](https://www.bv-brc.org/)) dataset and subsequently fine-tuned
+on 1.5 million SARS-CoV-2-related genome sequences, enabling them to accurately
+and rapidly identify variants of concern in viral populations.
+
+<figure id="fig11" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/genslm.png#center"
+         alt="Fig 11.Illustration of GenSLMs. (a) Input DNA sequence is tokenized into condon inputs for transformer layers. (b) GenSLMs adopt a denoising diffusion model to long range sequence dynamtics." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 11.Illustration of GenSLMs.</strong> (a) Input DNA sequence is tokenized into condon inputs for transformer layers. (b) GenSLMs adopt a denoising diffusion model to long range sequence dynamtics.</p>
+        </figcaption>
+</figure>
+
+
+GenSLMs employ codon-level tokenization, which converts every three nucleotides
+into a single token following the central dogma of molecular biology ([Fig.
+10](#fig11)). This approach reduces the SARS-CoV-2 genome sequence length from
+approximately 30,000 nucleotides to roughly 10,000 codons/amino acids, enabling
+complete genome coverage while maintaining biological relevance. The model
+incorporates learned positional embeddings within its transformer layers,
+allowing it to understand both the relative positioning of these tokens and
+their contextual relationships. This dual capability enables the model to
+effectively capture both local sequence patterns and global genomic
+dependencies, essential for understanding viral evolution and function.
+
+The models utilize a hierarchical transformer-based architecture that
+incorporates *Generative Pre-trained Transformers (GPT)* for individual gene
+sequences and a *stable diffusion* model to capture long-range interactions
+within the genome. This diffusion-based hierarchical modeling in GenSLMs
+involves segmenting the genome into smaller parts, referred to as "sentences" of
+512 codons, and learning high-level representations for these segments using an
+encoder trained with contrastive loss. A diffusion model is then applied to
+these high-level representations to learn their distribution through a denoising
+process, where the model gradually adds noise and then learns to predict the
+original representations from the noisy versions. These high-level
+representations guide a decoder to generate the full genome sequence, capturing
+both local and global contexts. While I am not 100% sure I fully understand
+their multitask training details (such as exact loss function and training
+dynamics), the authors claim that this hierarchical approach ensure that
+the model captures long-range dependencies, which are typically poorly captured
+by GPT models. 
+
+GenSLMs were pre-trained on over 110 million prokaryotic gene sequences to
+create a robust foundation model. This pre-training phase involved substantial
+computational resources, achieving over 1.63 Zettaflops of operations with a
+sustained performance of 121 PFLOPS in mixed precision, and a peak of 850
+PFLOPS. For tasks specific to SARS-CoV-2, the models were fine-tuned on 1.5
+million high-quality SARS-CoV-2 genome sequences.
+
+GenSLMs range in size, including versions with 25M, 250M, 2.5B, and 25B
+parameters. This structure allows the models to effectively process sequences
+with lengths up to 10,240 tokens. Training the GenSLMs required powerful
+computing infrastructure, including GPU-based supercomputers (Polaris at ALCF
+and Selene at NVIDIA) and AI accelerators (Cerebras CS-2 systems). For instance,
+training runs on the Polaris system involved scaling to 512 GPUs, leveraging
+DeepSpeed optimizations to handle large model sizes efficiently. The
+pre-training phase involved over 1.63 Zettaflops of operations with a sustained
+performance of 121 PFLOPS in mixed precision, and a peak of 850 PFLOPS.  -->
+<h3 id="rinalmo">RiNALMo<a hidden class="anchor" aria-hidden="true" href="#rinalmo">#</a></h3>
+<p>RiNALMo (RiboNucleic Acid Language Model) (<a href="#Peni%C4%872024">Penić, et al. 2024</a>) is
+a RNA language model designed to understand and predict RNA structures
+and functions. It employs a BERT-style Transformer encoder architecture, which
+consists of 33 Transformer blocks with an embedding dimension of 1280. Each
+block includes multi-head attention (20 heads) and feed-forward networks,
+utilizing advanced techniques such as rotary positional embeddings (RoPE) and
+the SwiGLU activation function. RiNALMo has a total of 650M parameters.</p>
+<p>The model tokenizes RNA sequences by treating each nucleotide as a single token.
+During preprocessing, all instances of  uracil (U) in the sequences are replaced
+with thymine (T). The resulting vocabulary includes primary nucleotides (A, C,
+G, T) and various ambiguous nucleotide combinations and special tokens. These
+ambiguous combinations cover multiple nucleotide possibilities and are used to
+handle sequences where the exact nucleotide is not known or where multiple
+nucleotides are possible due to sequencing uncertainties or biological
+variability:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Symbol</th>
+          <th>Nucleotides Represented</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>R</td>
+          <td>A or G</td>
+      </tr>
+      <tr>
+          <td>Y</td>
+          <td>C or U</td>
+      </tr>
+      <tr>
+          <td>K</td>
+          <td>G or U</td>
+      </tr>
+      <tr>
+          <td>M</td>
+          <td>A or C</td>
+      </tr>
+      <tr>
+          <td>S</td>
+          <td>G or C</td>
+      </tr>
+      <tr>
+          <td>W</td>
+          <td>A or U</td>
+      </tr>
+      <tr>
+          <td>B</td>
+          <td>C, G, or U</td>
+      </tr>
+      <tr>
+          <td>D</td>
+          <td>A, G, or U</td>
+      </tr>
+      <tr>
+          <td>H</td>
+          <td>A, C, or U</td>
+      </tr>
+      <tr>
+          <td>V</td>
+          <td>A, C, or G</td>
+      </tr>
+      <tr>
+          <td>N</td>
+          <td>Any nucleotide (A, C, G, U)</td>
+      </tr>
+  </tbody>
+</table>
+<p>Additional special tokens used in the model include [CLS], [EOS], [PAD], and
+[MASK]. The positional information of tokens is encoded using RoPE, which
+captures both relative and absolute positional data, enhancing the model&rsquo;s
+ability to learn sequence relationships effectively.</p>
+<p>RiNALMo was pre-trained on a dataset of 36 million non-coding RNA (ncRNA)
+sequences curated from multiple sources including RNAcentral, Rfam, and Ensembl.
+The model&rsquo;s pre-training involved a masked language modeling (MLM) task, where
+15% of the tokens in the input sequences were masked and the model was trained
+to predict these masked tokens. This approach helps the model learn the
+underlying structure and function of RNA sequences from vast amounts of
+unannotated data.</p>
+<p>The pre-training of RiNALMo was conducted over six epochs on a cluster of seven
+A100 GPUs, each with 80 GB of memory. The training utilized a batch size of 192
+per GPU and employed a cosine annealing learning rate schedule with a linear
+warm-up. The training process involved intensive computational resources to
+handle the large-scale data and model parameters efficiently.</p>
+<p>RiNALMo has demonstrated good performance across various RNA-related tasks. Key
+applications include:</p>
+<ul>
+<li>
+<p>Secondary Structure Prediction: RiNALMo&rsquo;s embeddings were fine-tuned for
+predicting RNA secondary structures, exhibiting superior generalization
+capabilities compared to existing deep learning methods. It was able to
+generalize well on unseen RNA families, a significant advancement over
+traditional models.</p>
+</li>
+<li>
+<p>Splice-Site Prediction: The model was fine-tuned to predict splice sites in
+RNA sequences, outperforming other RNA language models (e.g.
+<a href="https://arxiv.org/abs/2204.00300">RNA-FM</a>) and established methods. RiNALMo&rsquo;s
+ability to generalize across different species&rsquo; RNA sequences underscores its
+robustness and versatility.</p>
+</li>
+<li>
+<p>Mean Ribosome Loading (MRL) Prediction: RiNALMo was also fine-tuned to predict
+MRL values for mRNA sequences, showing superior performance and generalization
+on human UTRs despite being trained on random sequences.</p>
+</li>
+</ul>
+<p>RiNALMo&rsquo;s primary advantage lies in its large-scale pre-training on diverse RNA
+sequences, which equips it with powerful representations that can be effectively
+utilized across various downstream tasks.</p>
+<p>While RiNALMo excels in secondary structure prediction, it struggles with
+specific RNA families, such as telomerase RNAs. Overall, RiNALMo is a RNA
+embedding modeling, providing a powerful tool for RNA structure and function
+prediction tasks. Its ability to generalize across different RNA families and
+its superior performance on a range of downstream tasks highlight its potential
+to drive forward our understanding of RNA biology and its applications in
+biomedical research.</p>
+<!-- 
+### RNA-FM
+
+RNA-FM is a foundation model designed for RNA sequences, leveraging the architecture of the BERT
+language model. It consists of 12 transformer-based bidirectional encoder blocks, each equipped with
+a 640-dimensional hidden size feed-forward layer and a 20-head self-attention mechanism. Layer
+normalization and residual connections are applied before and after each block to enhance stability
+and performance. 
+
+RNA-FM is primarily trained via masked language modeling (MLM), where approximately 15% of
+nucleotide tokens are masked and the model is trained to predict these masked tokens. This approach
+helps the model learn rich representations of RNA sequences, capturing both structural and
+functional information. 
+
+The model is pre-trained on RNAcentral100, a dataset derived from the RNAcentral database, which
+includes 23.7 million non-coding RNA (ncRNA) sequences. This dataset encompasses a broad range of
+ncRNA types from various organisms, ensuring the model is exposed to diverse RNA sequences during
+training. It's not clear to me why this dataset contains sequences with thymine ('T') but the
+authors indicate that they replaced any "T" with uracil ('U') in the sequences in the preprocessing.
+This results in a dataset involving 4 main types of bases (16 counted types of combination in total,
+‘A’, ‘C’, ‘G’, ‘U’, ‘R’, ‘Y’, ‘K’, ‘M’, ‘S’, ‘W’, ‘B’, ‘D’, ‘H’, ‘V’, ‘N’, ‘-’). After that,
+duplicate sequences were removed using cd-hit-est with a 100% cut-off.
+
+The model treats each nucleotide as a token, and each nucleotide token is mapped to a
+640-dimensional vector. This embedding matrix is then passed through the transformer layers to
+produce contextualized embeddings. It's not clear from their preprint that whether any particular
+positional embeddings were used and added to the token embeddings before being fed into the
+transformer layers. 
+
+RNA-FM was trained using eight NVIDIA A100 GPUs, each with 80 GB of memory, over the course of one
+month. The training process utilized an inverse square root learning rate schedule, a base learning
+rate of 0.0001, weight decay of 0.01, and 10,000 warm-up steps. The maximum input sequence length
+was set to 1024 tokens to optimize memory usage and increase batch sizes .
+
+RNA-FM has demonstrated its utility in a variety of downstream tasks, including RNA secondary and 3D
+structure prediction, SARS-CoV-2 genome structure and evolution prediction, protein-RNA binding
+preference modeling, and gene expression regulation modeling. Its embeddings have been shown to
+improve performance across these tasks, offering significant advantages in terms of accuracy and
+generalization.
+
+One of the key advantages of RNA-FM is its ability to produce high-quality embeddings that capture
+the structural and functional nuances of RNA sequences. This capability allows it to outperform
+state-of-the-art models in several RNA-related tasks. However, the improvement in functional
+prediction tasks is less pronounced compared to structural tasks, potentially due to differences in
+sequence distribution between the training and application datasets. Additionally, the relationship
+between RNA structure and function is complex, which may limit the direct applicability of the
+learned embeddings to some functional tasks.
+
+According to their paper, RNA-FM consistently outperforms other models like LinearFold and SPOT-RNA
+in RNA secondary structure prediction, achieving up to a 30% improvement in F1 score on
+cross-dataset validation. In protein-RNA interaction prediction, RNA-FM's embeddings provide
+performance comparable to experimentally measured structural information, highlighting its
+effectiveness even without labeled data. -->
+<h3 id="rnaernie">RNAErnie<a hidden class="anchor" aria-hidden="true" href="#rnaernie">#</a></h3>
+<p>RNAErnie (<a href="#Wang2024">Wang, et al. 2024</a>) is a RNA language model that
+integrates biological knowledge through RNA motifs (<a href="#fig11">Fig. 11</a>). The model employs a
+transformer-based architecture consisting of 12 layers of multihead transformer
+blocks, with each layer maintaining a hidden state dimension of 768. At its
+core, RNAErnie builds upon the Enhanced Representation through Knowledge
+Integration (ERNIE) framework, which systematically incorporates external domain
+knowledge during the pretraining process. This knowledge integration enables the
+model to capture and represent intricate biological relationships within RNA
+sequences more effectively. Specifically, RNAErnie leverages RNA motifs and RNA
+type information as biological priors, significantly enhancing its capabilities
+across various RNA analysis tasks.</p>
+<figure id="fig11" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/RNAErnie.png#center"
+         alt="Fig 11.Illustration of RNAErnie. The model uses 12 transformer encoder layers and employs motif-aware pretraining on 23M RNAcentral sequences. It then performs type-guided fine-tuning by predicting RNA types and using them as auxiliary information for downstream tasks. Fig. 1 from original paper." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 11.Illustration of RNAErnie.</strong> The model uses 12 transformer encoder layers and employs motif-aware pretraining on 23M RNAcentral sequences. It then performs type-guided fine-tuning by predicting RNA types and using them as auxiliary information for downstream tasks. Fig. 1 from original paper.</p>
+        </figcaption>
+</figure>
+
+<p>During pretraining, RNAErnie employs a sophisticated motif-aware multilevel
+masking strategy that incorporates biological knowledge (<a href="#fig12">Fig. 12a</a>). This hierarchical
+masking approach consists of:</p>
+<ul>
+<li>Base-level Masking: Randomly masks 15% of nucleobases within an RNA sequence,
+aiding in learning fundamental token representations.</li>
+<li>Subsequence-level Masking: Masks contiguous segments of nucleobases, ranging
+from 4 to 8 bases, to capture deeper biological information.</li>
+<li>Motif-level Masking: Incorporates biologically significant motifs from
+databases like ATtRACT and SpliceAid, masking these motifs to embed complex
+structural and functional elements within the model.</li>
+</ul>
+<figure id="fig12" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/RNAErnie2.png#center"
+         alt="Fig 12. RNAErnie&rsquo;s training strategies. a, Motif-aware masking with three levels (base, subsequence, motif) during pretraining. b, Type-guided fine-tuning predicts RNA types first, then uses ensemble learning with shared parameters for downstream tasks." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 12. RNAErnie&rsquo;s training strategies.</strong> a, Motif-aware masking with three levels (base, subsequence, motif) during pretraining. b, Type-guided fine-tuning predicts RNA types first, then uses ensemble learning with shared parameters for downstream tasks.</p>
+        </figcaption>
+</figure>
+
+<p>RNAErnie utilizes a type-guided fine-tuning approach, leveraging predicted RNA
+types as auxiliary information (<a href="#fig12">Fig. 12b</a>). This strategy employs three neural
+architectures:</p>
+<ul>
+<li>FBTH (Frozen Backbone with Trainable Head): Extracts embeddings from the
+pretrained RNAErnie block and uses them to train a separate task-specific
+head.</li>
+<li>TBTH (Trainable Backbone with Trainable Head): Combines the RNAErnie block
+with task-specific heads into an end-to-end neural network for supervised
+learning tasks.</li>
+<li>STACK: Uses the RNAErnie block to predict the top-K possible RNA types,
+followed by ensemble learning through multiple downstream modules.</li>
+</ul>
+<p>RNAErnie has approximately 105M trainable parameters and processes RNA sequences
+by tokenizing the bases &lsquo;A&rsquo;, &lsquo;U&rsquo;, &lsquo;C&rsquo;, and &lsquo;G&rsquo;. Each sequence is appended with
+an initial classification embedding ([CLS]) and an indication embedding ([IND]),
+which helps cluster similar RNA sequences in a latent space for more effective
+retrieval-based learning. The model accepts input sequences up to 512
+nucleotides in length, though this limitation may pose challenges when
+analyzing complex three-dimensional RNA structural motifs.</p>
+<p>The model was pretrained on approximately 23 million RNA sequences from
+<a href="https://rnacentral.org/">RNAcentral</a>. Training was conducted on four Nvidia
+Tesla V100 32GB GPUs over approximately 250 hours, using the AdamW optimizer
+with a learning rate scheduler that incorporates anneal warm-up and decay
+techniques. The initial learning rate was set to 1×10^-4.</p>
+<p>RNAErnie demonstrates robust performance across various RNA analytical tasks in
+both supervised and unsupervised learning scenarios. The model has been
+successfully evaluated on RNA sequence classification, RNA-RNA interaction
+prediction, and RNA secondary structure prediction tasks. Its effectiveness is
+particularly evident in RNA sequence classification on the nRC dataset, where
+RNAErnie+ achieved an impressive 96.88% accuracy, significantly outperforming
+baseline models (e.g.
+<a href="https://academic.oup.com/nargab/article/4/1/lqac012/6534363">RNABERT</a>,
+<a href="https://academic.oup.com/nar/article/52/1/e3/7369930">RNA-MSM</a> and
+<a href="https://arxiv.org/abs/2204.00300">RNA-FM</a>).</p>
+<!-- 
+### BigRNA
+
+BigRNA is a deep learning model designed to predict various RNA biology aspects
+directly from DNA sequences. It is technically a DNA LLM for RNAseq instead of a
+LLM for RNA sequences. Leveraging a transformer-based architecture, BigRNA was
+trained on extensive RNA-seq datasets paired with genomic information to predict
+tissue-specific RNA expression, splicing, microRNA sites, and RNA binding
+protein (RBP) specificity. This model provides an interesting angle to model and
+predict RNA biology, addressing the limitations of previous methods restricted
+to missense variants by also accurately identifying pathogenic non-coding
+variant effects. This model was devoloped by a team from Deep Genomics in
+Toronto. 
+
+BigRNA processes the transcribed into complementary DNA sequences from RNAseq
+into 128bp windows to match its model architecture. This tokenization method
+helps the model capture local sequence features crucial for RNA expression and
+splicing. Two types of data tracks are generated from RNA-seq data: coverage and
+junction.
+
+- Coverage Track: Represents read depth at each position along the RNA
+  transcript, averaged within 128bp windows to create a smooth signal.
+
+- Junction Track: Captures splice junction read counts, summed within 128bp
+  windows to represent splicing events effectively.
+
+To accurately reflect individual genetic variations, the RNA-seq data is
+re-aligned to incorporate insertions and deletions introduced by each
+individual's haplotype. This step ensures that the model inputs reflect the
+genetic diversity of the training data.
+
+BigRNA employs positional embeddings to retain information about the position of
+tokens within the sequence, essential for understanding the spatial context of
+genomic features. The model also utilizes a transformer-based architecture with
+a 192kb receptive field, enabling it to consider extensive sequence context for
+accurate predictions.
+
+BigRNA was trained using RNA-seq data from the Genotype-Tissue Expression (GTEx)
+project, focusing on individuals with the most extensive tissue data (70
+individuals, 51 tissues). The RNA-seq data was processed to generate coverage
+and junction tracks, which were then tokenized into 128bp windows for model
+input.
+
+The training involved several key steps:
+
+Re-alignment: RNA-seq data was re-aligned to match insertions and deletions due
+to each individual's haplotype, ensuring accurate representation of genetic
+variations. Model Training: BigRNA was trained on 2,956 RNA-seq datasets, with
+the model learning to predict RNA expression and splicing from paired genotype
+and RNA-seq data. Separate output "heads" were used for each tissue type to
+capture tissue-specific expression patterns. Fine-Tuning: After initial
+training, the model was fine-tuned using large-scale datasets for RNA binding
+proteins (eCLIP data) and microRNA binding sites (CLIP-Seq data). This involved
+updating the model's weights to improve its predictive accuracy for these
+specific regulatory features. During inference, shifted intervals were used to
+increase prediction resolution to 64 base pairs. This technique involves making
+multiple predictions for overlapping segments of the input sequence and
+combining these predictions to achieve higher spatial resolution.
+
+BigRNA's training infrastructure involved high-performance GPUs to handle the
+extensive RNA-seq and genomic datasets, with the training process taking weeks
+to months depending on the computational resources available. The comprehensive
+approach to training and fine-tuning enables BigRNA to accurately predict and
+model complex RNA biology from DNA sequences.
+
+Applications and Performance
+
+BigRNA excels in various applications, including predicting tissue-specific RNA
+expression, discovering pathogenic non-coding variants, and designing RNA-based
+therapeutics like steric blocking oligonucleotides (SBOs). It accurately
+predicted the effects of variants on splicing and intron retention,
+outperforming specialized models such as DeepRiPe for RBP binding site
+prediction and TargetScan for microRNA site prediction.
+
+In benchmarking tasks, BigRNA demonstrated superior performance in predicting
+the impact of pathogenic variants within the 3' and 5' untranslated regions
+(UTRs) compared to models like Enformer, Framepool, and Saluki. Additionally,
+BigRNA's ability to design SBOs that modulate splicing and increase gene
+expression without specific SBO training data highlights its versatility and
+potential for therapeutic applications.
+
+Training Infrastructure and Time
+
+The training of BigRNA involved significant computational resources, utilizing
+high-performance GPUs to handle the large-scale RNA-seq and genomic datasets.
+The exact training duration is not specified, but such models typically require
+weeks to months of training time, depending on the computational infrastructure
+and the volume of data.
+
+Advantages and Limitations
+
+BigRNA's primary advantage lies in its comprehensive approach to modeling RNA
+biology, capturing a wide range of RNA-related mechanisms from DNA sequences. It
+surpasses specialized models in several benchmarks, providing a unified
+framework for various RNA-related predictions. However, the model's performance
+can be further enhanced by increasing its resolution beyond 128bp and
+incorporating more extensive training datasets. Future improvements could also
+focus on fine-tuning with specific SBO treatment data to optimize its
+therapeutic design capabilities.
+
+In summary, BigRNA is a groundbreaking model that advances our ability to
+predict and understand RNA biology, offering significant potential for
+personalized RNA therapeutics and disease mechanism discovery. Its ability to
+integrate long-range genomic interactions and accurately model complex RNA
+phenomena sets a new standard in the field of computational genomics.
+ -->
+<!-- ### GEMORNA -->
+<h3 id="helm">HELM<a hidden class="anchor" aria-hidden="true" href="#helm">#</a></h3>
+<p>HELM (Hierarchical Encoding for mRNA Language Modeling) (<a href="#Yazdani2024">Yazdani-Jahromi, et
+al. 2024</a>) is a new LLM pretraining method specifically designed
+for analyzing messenger RNA (mRNA) sequences. HELM introduces a pretraining
+strategy that explicitly incorporates the biological hierarchy of mRNA
+sequences, particularly at the codon level. This approach better reflects the
+inherent structure of genetic information, where three nucleotides form a codon
+that codes for a specific amino acid. By aligning the model architecture and
+training process with these fundamental biological principles, HELM aims to
+achieve more accurate and biologically meaningful sequence analysis.</p>
+<figure id="fig13" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/helm.png#center"
+         alt="Fig 13.Hierarchical codon-aware tokenization and loss function in HELM. Left: The hierarchical structure of codons used in HELM for tokenization and modeling. Codons are categorized into Start, Coding (grouped by amino acids), and Stop codons. This biologically informed hierarchy influences the training loss function by prioritizing synonymous relationships between codons. Right: Codon prediction probabilities visualized on an amino acid codon wheel. Orange bars represent HELM’s Hierarchical Cross-Entropy (HXE) loss, while blue bars correspond to the standard Cross-Entropy (XE) loss. HELM assigns higher probabilities to synonymous codons when making predictions, better capturing biological redundancy, whereas XE tends to misassign probability to non-synonymous codons." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 13.Hierarchical codon-aware tokenization and loss function in HELM.</strong> Left: The hierarchical structure of codons used in HELM for tokenization and modeling. Codons are categorized into Start, Coding (grouped by amino acids), and Stop codons. This biologically informed hierarchy influences the training loss function by prioritizing synonymous relationships between codons. Right: Codon prediction probabilities visualized on an amino acid codon wheel. Orange bars represent HELM’s Hierarchical Cross-Entropy (HXE) loss, while blue bars correspond to the standard Cross-Entropy (XE) loss. HELM assigns higher probabilities to synonymous codons when making predictions, better capturing biological redundancy, whereas XE tends to misassign probability to non-synonymous codons.</p>
+        </figcaption>
+</figure>
+
+<p>HELM proposes to adopt Hierarchical Cross-Entropy Loss (HXE, see <a href="#eq1">eq1</a>) to
+better capture synonymous codon relationships.</p>
+<p><a id="eq1"></a>
+\begin{equation}
+\begin{aligned}
+L_{HXE} = -\sum_{i} w_i \cdot y_i \log \hat{y}_i
+\end{aligned}
+\end{equation}</p>
+<p>where:</p>
+<ul>
+<li>$y_i$ is the true one-hot label,</li>
+<li>$\hat{y}_i$ is the predicted probability for codon $i$,</li>
+<li>$w_i$ is a weight assigned based on codon similarity based on $\lambda (C) =
+exp(-\alpha h(C))$, and $h(C)$ is the height of the node C in the hierarchy
+and ($\alpha &gt; 0$).</li>
+</ul>
+<p>Unlike standard cross-entropy loss which treats all prediction errors equally,
+HXE implements a structured hierarchy where prediction errors are penalized
+differently based on their biological significance within the codon structure.
+In another words, This encourages the model to prefer synonymous codons over
+random codon assignments, improving biological plausibility in sequence
+predictions.</p>
+<p>The pretraining dataset consists of 15.3 million curated mRNA sequences from the
+<a href="https://opig.stats.ox.ac.uk/webapps/oas/">Observed Antibody Space (OAS)
+database</a>, which includes sequences
+from over 80 studies. The model was trained using 8 NVIDIA A100 GPUs over 40
+epochs. HELM is implemented using multiple architectures, including Transformer,
+Mamba, and Hyena models, each with 50M parameters.</p>
+<p>Key technical features include:</p>
+<ul>
+<li>Codon-level tokenization strategy (64 codons plus special tokens)</li>
+<li>Hierarchical Cross-Entropy Loss (HXE) for biologically-informed error weighting</li>
+<li>Support for both Masked Language Modeling (MLM) and Causal Language Modeling
+(CLM)  training objectives</li>
+</ul>
+<p>HELM has demonstrated superior performance than a few baseline methods (e.g.
+RNA-FM, SpliceBERT, and CodonBERT) in several critical areas:</p>
+<ul>
+<li>Accurate prediction of mRNA properties including protein expression and
+thermostability</li>
+<li>Precise annotation of antibody regions</li>
+<li>High-quality mRNA sequence generation</li>
+</ul>
+<p>In comparative evaluations, HELM achieved significant improvements:</p>
+<ul>
+<li>8% performance gain over standard bio-language models</li>
+<li>2x parameter efficiency compared to state-of-the-art models like RNA-FM and
+CodonBERT</li>
+<li>Enhanced biological plausibility in generated sequences</li>
+<li>Improved accuracy in property prediction tasks through better capture of codon
+hierarchies</li>
+</ul>
+<p>The model shows particular promise for therapeutic applications, especially in
+vaccine development and gene therapy. However, authors also acknowledged the
+following limitations:</p>
+<ul>
+<li>Training in Euclidean space may not optimally capture hierarchical
+relationships compared to hyperbolic space</li>
+<li>The specialized tokenization and pretraining approaches may present
+integration challenges with existing bioinformatics pipelines</li>
+</ul>
+<p>Overall, HELM demonstrates how incorporating domain-specific biological
+knowledge into both data preprocessing and model training can significantly
+enhance LLM performance. By explicitly modeling the hierarchical nature of
+codons and using biologically-informed loss functions, HELM achieves better
+results with fewer parameters compared to conventional approaches. This suggests
+a promising direction for developing more efficient and biologically meaningful
+language models in genomics.</p>
+<h2 id="gene-language-models">Gene Language Models<a hidden class="anchor" aria-hidden="true" href="#gene-language-models">#</a></h2>
+<h3 id="scgpt">scGPT<a hidden class="anchor" aria-hidden="true" href="#scgpt">#</a></h3>
+<p>scGPT (<a href="#Cui2024">Cui, et al. 2024</a>) is a generative pre-trained transformer
+model specifically designed for analyzing single-cell RNA sequencing (scRNA-seq)
+and multi-omics data (<a href="#fig14">Fig. 14</a>). Built on a decoder-only transformer
+architecture, scGPT processes gene expression data by treating individual genes
+as tokens and converting each cell&rsquo;s expression profile into a sequence. This
+approach allows the model to capture complex relationships between genes, cells,
+and tissues, learning intricate biological patterns in a manner analogous to how
+traditional GPT models learn linguistic structures.</p>
+<figure id="fig14" 
+     class="align-center ">
+    <img loading="lazy" src="../../images/scgpt.png#center"
+         alt="Fig 14. Overview of scGPT." width="auto"/> <figcaption style="text-align: center; width: 100%;"> 
+            <p style="text-align: left;"> <strong>Fig 14. Overview of scGPT.</strong></p>
+        </figcaption>
+</figure>
+
+<p>scGPT employs a sophisticated tokenization strategy:</p>
+<ul>
+<li>Gene names serve as the primary vocabulary tokens</li>
+<li>Expression values undergo pre-defined binning transformations to standardize
+data across different sequencing modalities</li>
+<li>Condition tokens capture important metadata such as batch identity for
+technical variation tracking, modality type (e.g., RNA, ATAC-seq, proteomics)
+and perturbation conditions (e.g., drug treatments, CRISPR knockouts). These
+condition tokens are crucial for integrating data across different
+experiments, enabling scGPT to generalize beyond individual datasets and infer
+biological relationships across diverse conditions.</li>
+</ul>
+<p>As a fundatational model, scGPT was pre-trained on an extensive dataset of 33
+million single-cell RNA sequencing profiles from the <a href="https://cellxgene.cziscience.com/">CELLxGENE
+repository</a>. This dataset encompasses 51
+organs and 441 studies, providing broad tissue diversity across healthy human
+cells. The comprehensive training data enables zero-shot generalization to
+disease-related tasks, as demonstrated in studies involving multiple sclerosis
+(MS) and cancer datasets.</p>
+<p>The pre-training process utilizes a comprehensive self-supervised learning
+approach with four main tasks:</p>
+<ol>
+<li>
+<p>Masked Gene Prediction: Similar to BERT&rsquo;s masked language modeling, the model
+predicts expression values for randomly masked gene tokens based on
+surrounding context.</p>
+</li>
+<li>
+<p>Gene Expression Imputation: The model learns to reconstruct missing gene
+expression values, addressing the common challenge of sparse data in
+single-cell datasets.</p>
+</li>
+<li>
+<p>Modality-Aware Pre-training: Integration of RNA, ATAC-seq, and proteomics
+data to develop unified multi-omic representations.</p>
+</li>
+<li>
+<p>Batch Effect Reduction: Implementation of contrastive learning techniques to
+minimize technical variations while preserving biological signals.</p>
+</li>
+</ol>
+<p>The pre-training process leverages high-performance A100 GPU clusters and
+employs FlashAttention for optimized self-attention computations.</p>
+<p>After pre-training, scGPT demonstrates remarkable versatility through
+fine-tuning for various downstream tasks:</p>
+<ul>
+<li>Cell-type annotation</li>
+<li>Batch effect correction</li>
+<li>Multi-omic data integration</li>
+<li>Perturbation response prediction</li>
+<li>Gene Regulatory Network (GRN) inference</li>
+</ul>
+<p>This adaptability makes scGPT a powerful tool for diverse applications in
+single-cell genomics research. However, like most LLMs, scGPT faces certain
+limitations like biases in the training data. Since it is pretrained primarily
+on publicly available single-cell datasets, rare or underrepresented cell types
+may not be adequately captured in the model&rsquo;s learned representations. This can
+potentially impact the model&rsquo;s performance when analyzing low-abundance cell
+populations or rare cell states, highlighting the importance of considering
+dataset bias in model applications.</p>
+<h2 id="citation">Citation<a hidden class="anchor" aria-hidden="true" href="#citation">#</a></h2>
+<p>If you find this post helpful and are interested in referencing it in your write-up, you can cite it as</p>
+<blockquote>
+<p>Xiao, Jiajie. (May 2023). <em>Biomedical LLMs (2): Genomics</em>. JX&rsquo;s log. Available
+at: <a href="https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/">https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/</a>.</p>
+</blockquote>
+<p>or add the following to your BibTeX file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bib" data-lang="bib"><span style="display:flex;"><span><span style="color:#a6e22e">@article</span>{xiao2024_biollm_genomics,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">title</span>   = <span style="color:#e6db74">&#34;Biomedical LLMs (2): Genomics&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">author</span>  = <span style="color:#e6db74">&#34;Xiao, Jiajie&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">journal</span> = <span style="color:#e6db74">&#34;JX&#39;s log&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">year</span>    = <span style="color:#e6db74">&#34;2024&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">month</span>   = <span style="color:#e6db74">&#34;May&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span>     = <span style="color:#e6db74">&#34;https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
+<ul>
+<li>
+<p><a id="Ji2021"></a> Ji, Y., Zhou, Z., Liu, H., &amp; Davuluri, R. V. (2021).
+DNABERT: pre-trained Bidirectional Encoder Representations from Transformers
+model for DNA-language in genome. Bioinformatics, 37(15), 2112-2120.</p>
+</li>
+<li>
+<p><a id="Zhou2023"></a> Zhou, Z., Ji, Y., Li, W., Dutta, P., Davuluri, R., &amp;
+Liu, H. (2023). Dnabert-2: Efficient foundation model and benchmark for
+multi-species genome. arXiv preprint arXiv:2306.15006.</p>
+</li>
+<li>
+<p><a id="Kudo2018"></a> Kudo, T., &amp; Richardson, J. (2018). Sentencepiece: A
+simple and language independent subword tokenizer and detokenizer for neural
+text processing. arXiv preprint arXiv:1808.06226.</p>
+</li>
+<li>
+<p><a id="Sennrich2015"></a> Sennrich, R., Haddow, B., &amp; Birch, A. (2015). Neural
+machine translation of rare words with subword units. arXiv preprint
+arXiv:1508.07909.</p>
+</li>
+<li>
+<p><a id="Press2021"></a> Press, O., Smith, N. A., &amp; Lewis, M. (2021). Train
+short, test long: Attention with linear biases enables input length
+extrapolation. arXiv preprint arXiv:2108.12409.</p>
+</li>
+<li>
+<p><a id="Dao2022"></a> Dao, T., Fu, D. Y., Ermon, S., Rudra, A., &amp; Ré, C. F.
+fast and memory-efficient exact attention with IO-awareness. arXiv; 2022.
+arXiv preprint arXiv:2205.14135.</p>
+</li>
+<li>
+<p><a id="Dalla-Torre2023"></a> Dalla-Torre, H., Gonzalez, L., Mendoza-Revilla,
+J., Carranza, N. L., Grzywaczewski, A. H., Oteri, F., &hellip; &amp; Pierrot, T.
+(2023). The nucleotide transformer: Building and evaluating robust foundation
+models for human genomics. BioRxiv, 2023-01.</p>
+</li>
+<li>
+<p><a id="Su2024"></a> Su, J., Ahmed, M., Lu, Y., Pan, S., Bo, W., &amp; Liu, Y.
+(2024). Roformer: Enhanced transformer with rotary position embedding.
+Neurocomputing, 568, 127063.</p>
+</li>
+<li>
+<p><a id="Shazeer2020"></a> Shazeer, N. (2020). Glu variants improve transformer.
+arXiv preprint arXiv:2002.05202.</p>
+</li>
+<li>
+<p><a id="Kaplan2020"></a> Kaplan, J., McCandlish, S., Henighan, T., Brown, T.
+B., Chess, B., Child, R., &hellip; &amp; Amodei, D. (2020). Scaling laws for neural
+language models. arXiv preprint arXiv:2001.08361.</p>
+</li>
+<li>
+<p><a id="Avsec2021"></a> Avsec, Ž., Agarwal, V., Visentin, D., Ledsam, J. R.,
+Grabska-Barwinska, A., Taylor, K. R., &hellip; &amp; Kelley, D. R. (2021). Effective
+gene expression prediction from sequence by integrating long-range
+interactions. Nature methods, 18(10), 1196-1203.</p>
+</li>
+<li>
+<p><a id="Benegas2023"></a> Benegas, G., Batra, S. S., &amp; Song, Y. S. (2023). DNA
+language models are powerful predictors of genome-wide variant effects.
+Proceedings of the National Academy of Sciences, 120(44), e2311219120.</p>
+</li>
+<li>
+<p><a id="Nguyen2024"></a> Nguyen, E., Poli, M., Faizi, M., Thomas, A., Wornow,
+M., Birch-Sykes, C., &hellip; &amp; Baccus, S. (2024). Hyenadna: Long-range genomic
+sequence modeling at single nucleotide resolution. Advances in neural
+information processing systems, 36.</p>
+</li>
+<li>
+<p><a id="Jeong2023"></a> Jeong, Y., Gerhäuser, C., Sauter, G., Schlomm, T.,
+Rohr, K., &amp; Lutsik, P. (2023). MethylBERT: A Transformer-based model for
+read-level DNA methylation pattern identification and tumour deconvolution.
+bioRxiv, 2023-10.</p>
+</li>
+<li>
+<p><a id="Ying2024"></a> Ying, K., Song, J., Cui, H., Zhang, Y., Li, S., Chen,
+X., &hellip; &amp; Gladyshev, V. N. (2024). MethylGPT: a foundation model for the DNA
+methylome. bioRxiv, 2024-10.</p>
+</li>
+<li>
+<p><a id="Zvyagin2023"></a> Zvyagin, M., Brace, A., Hippe, K., Deng, Y., Zhang,
+B., Bohorquez, C. O., &hellip; &amp; Ramanathan, A. (2023). GenSLMs: Genome-scale
+language models reveal SARS-CoV-2 evolutionary dynamics. The International
+Journal of High Performance Computing Applications, 37(6), 683-705.</p>
+</li>
+<li>
+<p><a id="Penić2024"></a> Penić, R. J., Vlašić, T., Huber, R. G., Wan, Y., &amp;
+Šikić, M. (2024). Rinalmo: General-purpose rna language models can generalize
+well on structure prediction tasks. arXiv preprint arXiv:2403.00043.</p>
+</li>
+<li>
+<p><a id="Wang2024"></a> Wang, N., Bian, J., Li, Y., Li, X., Mumtaz, S., Kong,
+L., &amp; Xiong, H. (2024). Multi-purpose RNA language modelling with motif-aware
+pretraining and type-guided fine-tuning. Nature Machine Intelligence, 1-10.</p>
+</li>
+<li>
+<p><a id="Yazdani2024"></a> Yazdani-Jahromi, M., Prakash, M., Mansi, T.,
+Moskalev, A., &amp; Liao, R. (2024). HELM: Hierarchical Encoding for mRNA Language
+Modeling. arXiv preprint arXiv:2410.12459.</p>
+</li>
+<li>
+<p><a id="Cui2024"></a>  Cui, H., Wang, C., Maan, H., Pang, K., Luo, F., Duan,
+N., &amp; Wang, B. (2024). scGPT: toward building a foundation model for single-cell
+multi-omics using generative AI. Nature Methods, 1-11.</p>
+</li>
+</ul>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>SentencePiece is a tokenization method that segments text into smaller
+units such as subwords or characters, allowing for efficient handling of
+various languages and scripts. It employs techniques like Byte-Pair Encoding
+(BPE) or unigram language model to create a unified vocabulary, facilitating
+better representation of rare or out-of-vocabulary words.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>Byte-Pair Encoding (BPE) tokenization is a data compression algorithm that
+constructs tokens by iteratively merging the most frequent (statistics from
+the training corpus) pair of consecutive bytes or characters in a corpus to
+create new tokens, effectively reducing the vocabulary size while preserving
+meaningful units. This process continues until a predefined vocabulary size
+or iteration limit is reached, resulting in a compact representation of the
+original text data. More reading materials and examples can be found from
+<a href="https://huggingface.co/learn/nlp-course/en/chapter6/5">Huggingface</a>.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>Information leakage could happen if one generates k-mer vocabulary by
+checking all corpus including test data.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>The DNABERT-2 paper says the input limit for DNABERT is 512bps.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>Each token has 6bps. Therefore, 1k tokens lead to 6kb sequence length.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>RoPE encodes absolute positions using a rotation matrix while
+incorporating relative position dependencies directly into the
+self-attention mechanism. This approach allows models to handle sequences of
+different lengths and gradually reduces the influence of distant tokens.
+RoPE is especially beneficial for extrapolating to longer sequences than
+those seen during training and has been widely adopted in modern transformer
+models. Additionally, It also integrates seamlessly with linear
+self-attention architectures, enabling efficient positional encoding even in
+models optimized for large-scale processing of long sequences.&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p>The Poisson negative log-likelihood loss is a loss function often used
+when modeling count data, such as predicting the number of occurrences of an
+event. This loss is particularly suitable for data that follows a Poisson
+distribution: $P(k|\lambda) = \frac{\lambda^k e^{-\lambda}}{k!}$, where the
+rate parameter $\lambda$ equals both mean and variance of the distribution.
+Corresponding loss is $\text{PoissonNLLLoss} = -\log(P(k|\lambda)) = \lambda</p>
+<ul>
+<li>k\log(\lambda) + \log(k!)$, where $k$ is the target and $\lambda$ is the
+expected count that the model would like to predict. Pytorch has provided a
+built-in loss for this
+<a href="https://pytorch.org/docs/stable/generated/torch.nn.PoissonNLLLoss.html">here</a>.</li>
+</ul>
+&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+</ol>
+</div>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://jiajiexiao.github.io/posts/2024-05-10_biollm_intro/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Biomedical LLMs (1): Intro</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Biomedical LLMs (2): Genomics on x"
+            href="https://x.com/intent/tweet/?text=Biomedical%20LLMs%20%282%29%3a%20Genomics&amp;url=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-05-12_biollm_genomics%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Biomedical LLMs (2): Genomics on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-05-12_biollm_genomics%2f&amp;title=Biomedical%20LLMs%20%282%29%3a%20Genomics&amp;summary=Biomedical%20LLMs%20%282%29%3a%20Genomics&amp;source=https%3a%2f%2fjiajiexiao.github.io%2fposts%2f2024-05-12_biollm_genomics%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023-2025 <a href="https://jiajiexiao.github.io/">JX&#39;s log</a> | <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" 
+        target="_blank" rel="license noopener noreferrer">CC BY-NC-SA 4.0 </a> | </span>
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+
+    
+
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
