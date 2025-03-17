@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Stats for multiple-instance learning | JX&#39;s log</title>
+<meta name="keywords" content="">
+<meta name="description" content="Intro
+In this post, we&rsquo;ll explore a statistical problem: how to accurately estimate
+the mean and quantify uncertainty when dealing with grouped measurements. At
+first glance, this may seem straightforward, but the problem becomes nuanced in
+the context of multiple-instance learning (MIL) and similar settings.
+To provide some helpful context, let&rsquo;s briefly look at how this type of data
+arises in practice. Consider these real-world scenarios:
+
+
+Product Defect Rates Across Factories: A manufacturer tracks product quality
+across multiple factories. Each factory tests a different number of units
+daily, with each unit providing a pass/fail measurement. These measurements
+are naturally grouped by factory, with potential batch effects from different
+equipments or quality control processes.">
+<meta name="author" content="Jiajie Xiao">
+<link rel="canonical" href="http://localhost:1313/posts/2025-03-01-stats-for-mil-copy/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.c292a07dea08ffa7274e381a70305fb0723ab31bafbf10e470c03a04b23c11b6.css" integrity="sha256-wpKgfeoI/6cnTjgacDBfsHI6sxuvvxDkcMA6BLI8EbY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/2025-03-01-stats-for-mil-copy/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload='renderMathInElement(
+          document.body, 
+          {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\(", right: "\\)", display: false},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "\\begin{equation}", right: "\\end{equation}", display: true},
+                {left: "\\begin{align}", right: "\\end{align}", display: true},
+                {left: "\\begin{alignat}", right: "\\end{alignat}", display: true},
+                {left: "\\begin{gather}", right: "\\end{gather}", display: true},
+                {left: "\\begin{CD}", right: "\\end{CD}", display: true},
+            ]
+          }
+        );'></script>
+  </head>
+</html>
+
+
+
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="JX&#39;s log (Alt + H)">JX&#39;s log</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/posts/" title="Blog">
+                    <span>Blog</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tag">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Stats for multiple-instance learning
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-meta"><span title='2025-03-01 22:32:12 -0800 PST'>2025-03-01</span>&nbsp;·&nbsp;21 min&nbsp;·&nbsp;Jiajie Xiao
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">Table of Contents</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#intro" aria-label="Intro">Intro</a></li>
+                    <li>
+                        <a href="#problem-statement" aria-label="Problem Statement">Problem Statement</a></li>
+                    <li>
+                        <a href="#complete-pooling-analyzing-identically-distributed-measurements-as-a-single-dataset" aria-label="Complete Pooling: Analyzing Identically Distributed Measurements as a Single Dataset">Complete Pooling: Analyzing Identically Distributed Measurements as a Single Dataset</a></li>
+                    <li>
+                        <a href="#cluster-weighted-approaches-macro-averaging-and-meta-analysis" aria-label="Cluster-Weighted Approaches: Macro-Averaging and Meta-Analysis">Cluster-Weighted Approaches: Macro-Averaging and Meta-Analysis</a><ul>
+                            
+                    <li>
+                        <a href="#macro-averaging-equal-weighting-of-samples" aria-label="Macro-Averaging: Equal Weighting of Samples">Macro-Averaging: Equal Weighting of Samples</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#meta-analytic-approaches-a-framework-for-combining-multiple-samples" aria-label="Meta-Analytic Approaches: A Framework for Combining Multiple Samples">Meta-Analytic Approaches: A Framework for Combining Multiple Samples</a><ul>
+                            
+                    <li>
+                        <a href="#fixed-effects-model-fe" aria-label="Fixed-Effects Model (FE)">Fixed-Effects Model (FE)</a></li>
+                    <li>
+                        <a href="#random-effects-model-re-accounting-for-between-sample-heterogeneity" aria-label="Random-Effects Model (RE): Accounting for Between-Sample Heterogeneity">Random-Effects Model (RE): Accounting for Between-Sample Heterogeneity</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#bayesian-hierarchical-modeling-a-probabilistic-framework" aria-label="Bayesian Hierarchical Modeling: A Probabilistic Framework">Bayesian Hierarchical Modeling: A Probabilistic Framework</a><ul>
+                            
+                    <li>
+                        <a href="#the-hierarchical-structure" aria-label="The Hierarchical Structure">The Hierarchical Structure</a></li>
+                    <li>
+                        <a href="#key-assumptions-and-model-properties" aria-label="Key Assumptions and Model Properties">Key Assumptions and Model Properties</a><ul>
+                            
+                    <li>
+                        <a href="#fundamental-assumptions" aria-label="Fundamental Assumptions">Fundamental Assumptions</a></li>
+                    <li>
+                        <a href="#advantages" aria-label="Advantages">Advantages</a></li>
+                    <li>
+                        <a href="#limitations" aria-label="Limitations">Limitations</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#practical-considerations" aria-label="Practical Considerations">Practical Considerations</a><ul>
+                            
+                    <li>
+                        <a href="#method-comparison-table" aria-label="Method Comparison Table">Method Comparison Table</a></li>
+                    <li>
+                        <a href="#selection-guidelines" aria-label="Selection Guidelines">Selection Guidelines</a></li>
+                    <li>
+                        <a href="#bayesian-approaches" aria-label="Bayesian Approaches">Bayesian Approaches</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#model-specification" aria-label="Model Specification">Model Specification</a></li>
+                    <li>
+                        <a href="#prior-selection-rationale" aria-label="Prior Selection Rationale">Prior Selection Rationale</a><ul>
+                            
+                    <li>
+                        <a href="#1-%ce%bc--normal0-10" aria-label="1. μ ~ Normal(0, 10)">1. μ ~ Normal(0, 10)</a></li>
+                    <li>
+                        <a href="#2-%cf%84--halfcauchy0-2" aria-label="2. τ ~ HalfCauchy(0, 2)">2. τ ~ HalfCauchy(0, 2)</a></li>
+                    <li>
+                        <a href="#3-%cf%83_i--exponential1" aria-label="3. σ_i ~ Exponential(1)">3. σ_i ~ Exponential(1)</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#prior-data-balance" aria-label="Prior-Data Balance">Prior-Data Balance</a></li>
+                    <li>
+                        <a href="#random-effects-model-re-accounting-for-between-sample-heterogeneity-1" aria-label="Random-Effects Model (RE): Accounting for Between-Sample Heterogeneity">Random-Effects Model (RE): Accounting for Between-Sample Heterogeneity</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#bayesian-hierarchical-modeling-a-probabilistic-framework-1" aria-label="Bayesian Hierarchical Modeling: A Probabilistic Framework">Bayesian Hierarchical Modeling: A Probabilistic Framework</a><ul>
+                            
+                    <li>
+                        <a href="#the-hierarchical-structure-1" aria-label="The Hierarchical Structure">The Hierarchical Structure</a></li>
+                    <li>
+                        <a href="#key-assumptions-and-model-properties-1" aria-label="Key Assumptions and Model Properties">Key Assumptions and Model Properties</a><ul>
+                            
+                    <li>
+                        <a href="#fundamental-assumptions-1" aria-label="Fundamental Assumptions">Fundamental Assumptions</a></li>
+                    <li>
+                        <a href="#advantages-1" aria-label="Advantages">Advantages</a></li>
+                    <li>
+                        <a href="#limitations-1" aria-label="Limitations">Limitations</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#practical-considerations-1" aria-label="Practical Considerations">Practical Considerations</a><ul>
+                            
+                    <li>
+                        <a href="#method-comparison-table-1" aria-label="Method Comparison Table">Method Comparison Table</a></li>
+                    <li>
+                        <a href="#selection-guidelines-1" aria-label="Selection Guidelines">Selection Guidelines</a></li>
+                    <li>
+                        <a href="#bayesian-approaches-1" aria-label="Bayesian Approaches">Bayesian Approaches</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#model-specification-1" aria-label="Model Specification">Model Specification</a></li>
+                    <li>
+                        <a href="#implementation-example-stan" aria-label="Implementation Example (Stan)">Implementation Example (Stan)</a>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+
+  <div class="post-content"><h2 id="intro">Intro<a hidden class="anchor" aria-hidden="true" href="#intro">#</a></h2>
+<p>In this post, we&rsquo;ll explore a statistical problem: how to accurately estimate
+the mean and quantify uncertainty when dealing with grouped measurements. At
+first glance, this may seem straightforward, but the problem becomes nuanced in
+the context of multiple-instance learning (MIL) and similar settings.</p>
+<p>To provide some helpful context, let&rsquo;s briefly look at how this type of data
+arises in practice. Consider these real-world scenarios:</p>
+<ol>
+<li>
+<p>Product Defect Rates Across Factories: A manufacturer tracks product quality
+across multiple factories. Each factory tests a different number of units
+daily, with each unit providing a pass/fail measurement. These measurements
+are naturally grouped by factory, with potential batch effects from different
+equipments or quality control processes.</p>
+</li>
+<li>
+<p>Survey Response Across Regions: A nationwide survey collects responses from
+different geographical regions. Each region contributes a different number of
+responses based on population size, creating natural groups where responses
+are clustered by region. Regional cultural or demographic factors may
+introduce biases in how people respond.</p>
+</li>
+<li>
+<p>Disease Prevalence Across Clinics: Medical researchers study disease
+occurrence patterns across multiple clinics. Each clinic reports data from
+their patient population, with varying sample sizes due to clinic size and
+local demographics.</p>
+</li>
+<li>
+<p>Digital Pathology: Pathologists analyze tissue samples by examining multiple
+regions within each sample. Each region provides specific measurements about
+cell characteristics or tissue features. These measurements naturally group
+together under the same patient sample, with the number of regions varying
+based on the tissue sample size.</p>
+</li>
+<li>
+<p>Liquid Biopsy Analysis: When analyzing blood samples from cancer patients,
+researchers examine millions of DNA molecules, including both normal
+cell-free DNA and tumor-derived DNA. Each molecule provides a distinct
+measurement, and these measurements are naturally grouped by patient sample,
+with molecule counts varying between samples.</p>
+</li>
+</ol>
+<p>These examples share a common pattern: the data consists of groups (referred to
+as samples), where each group contains a varying number of individual
+measurements (referred to as instances). This dual-level variation structure
+presents an interesting statistical problem as seen in the following section.
+Our focus will be on developing robust methods for analyzing data where
+measurements naturally cluster into groups of different sizes, considering both
+the variations that occur within groups and those that emerge between different
+groups.</p>
+<h2 id="problem-statement">Problem Statement<a hidden class="anchor" aria-hidden="true" href="#problem-statement">#</a></h2>
+<div style="background-color: #FFFFE0; padding: 10px; border-left: 6px solid #FFD700; border-radius: 5px; margin: 10px 0; color: #000000;">
+<strong>Problem Statement</strong>
+<p>Given a set of $N$ samples $S = {S_1, &hellip;, S_N}$, where:</p>
+<ul>
+<li>Each sample $S_i$ contains $n_i$ instances: $S_i = {x_{i,1}, &hellip;,
+x_{i,n_i}}$;</li>
+<li>Each instance $x_{i,j} ∈ ℝ$ provides a measured value;</li>
+<li>The measured values may vary within a sample and between samples (e.g.
+$x_{i,j} \sim D_i$ for some distribution $D_i$). This can be
+reflected by some population and observed sampled statistical properties:
+<ul>
+<li>population mean $μ_i = \mathbb{E}_j[x_{i,j}]$</li>
+<li>population variance $\sigma_i^2 = \mathbb{Var}_j[x_{i,j}]$</li>
+<li>sample mean $\overline{x}_i = \frac{1}{n_i}\sum_j x_{i,j}$</li>
+<li>sample variance $s_i^2 = \frac{1}{n_i-1}\sum_j (x_{i,j}-\overline{x}_i)^2$</li>
+</ul>
+</li>
+</ul>
+<p>How do we estimate a reliable overall mean $μ = \mathbb{E}[x_{i,j}]$ across all
+samples $S_i$ and instances $x_{i,j}$? How can we properly quantify the
+uncertainty (e.g. standard error $σ_{\overline{μ}}$) in this estimate?</p>
+</div>
+<p>This problem requires careful consideration of how the data is generated and
+structured, particularly when dealing with varying group sizes and potential
+batch effects. We need to derive an unbiased formula for the mean that accounts
+for samples of different sizes, while providing uncertainty estimates (e.g.
+standard error, confidence intervals) that consider both within-sample and
+between-sample variability.</p>
+<!-- 
+## When every measurement is from the same distribution
+Let's start with the simplest case: when all measurements are independently and
+identically distributed (i.i.d.) from the same underlying distribution. In this
+scenario, we can estimate the population parameters by treating all measurements
+equally, regardless of their group assignments.
+
+The population mean μ can be estimated using the sample mean, calculated as the
+arithmetic average of all measurements or maximum-likelihood estimation:
+
+<a id="eq1"></a>
+\begin{equation}
+\begin{aligned}
+\overline{x} &= \frac{\sum_{i=1}^{N}  \sum_{j=1}^{n_i} x_{i, j}}{ \sum_{i=1}^{N}n_i } \\,
+\end{aligned}
+\end{equation}
+
+To assess the precision of our estimate, we calculate the standard error using the pooled sample variance:
+
+<a id="eq2"></a>
+\begin{equation}
+\begin{aligned}
+\mathrm{SE} = \frac{s}{\sqrt{\sum_{i=1}^{N} n_i}} 
+= \sqrt{\frac{\sum_{i=1}^{N} \sum_{j=1}^{n_i} (x_{i,j} - \overline{x})^2}
+{\sum_{i=1}^{N} n_i \cdot \left( \sum_{i=1}^{N} n_i - 1 \right) }} \\,
+\end{aligned}
+\end{equation} -->
+<h2 id="complete-pooling-analyzing-identically-distributed-measurements-as-a-single-dataset">Complete Pooling: Analyzing Identically Distributed Measurements as a Single Dataset<a hidden class="anchor" aria-hidden="true" href="#complete-pooling-analyzing-identically-distributed-measurements-as-a-single-dataset">#</a></h2>
+<p>Consider the ideal scenario where all measurements are independently and
+identically distributed (i.i.d.) from a single underlying distribution. In this
+case, we can disregard group structure and estimate population parameters
+directly through simple aggregation.</p>
+<p>For finite samples, we can estimate the population mean μ optimally through the
+pooled sample mean:</p>
+<p><a id="eq1"></a> \begin{equation} \overline{x} =
+\frac{\sum_{i=1}^{N}  \sum_{j=1}^{n_i} x_{i,j}}{ \sum_{i=1}^{N}n_i }
+\end{equation}</p>
+<p>This estimator corresponds to both the arithmetic mean of all observations and
+the maximum likelihood estimate under i.i.d. assumptions.</p>
+<p>The standard error of this estimate can be derived from the Central Limit
+Theorem as:</p>
+<p><a id="eq2"></a>
+\begin{equation}
+\mathrm{SE} = \frac{s_{\text{pooled}}}{\sqrt{\sum_{i=1}^{N} n_i}}
+= \sqrt{\frac{\sum_{i=1}^{N} \sum_{j=1}^{n_i} (x_{i,j} - \overline{x})^2}
+{\left( \sum_{i=1}^{N} n_i \right) \left( \sum_{i=1}^{N} n_i - 1 \right) }}
+\end{equation}</p>
+<p>where $s_{\text{pooled}}$ represents the pooled standard deviation. Here we use
+Student approximation to use the sample standard deviation $s_{pooled}$ instead
+of the unknown true standard deviation $σ$.</p>
+<p>This approach, also known as micro-averaging or weighted average of the
+sample-level proportions, weighted by each sample size, is statistically optimal
+when the i.i.d. assumption holds. Under this assumption, the group structure
+becomes irrelevant since each measurement provides an equally informative signal
+about the underlying distribution. However, this method can lead to biased
+estimates when the i.i.d. assumption is violated. For example, if a sample with
+large instance numbers has some sampling biases such that corresponding
+measurements are biased toward a particular interval of measurment values, the
+results will be biased by this group.</p>
+<h2 id="cluster-weighted-approaches-macro-averaging-and-meta-analysis">Cluster-Weighted Approaches: Macro-Averaging and Meta-Analysis<a hidden class="anchor" aria-hidden="true" href="#cluster-weighted-approaches-macro-averaging-and-meta-analysis">#</a></h2>
+<p>As seen, when samples have different underlying distributions and varying numbers of
+instances (cluster sizes), which can occur due to sample collection biases or
+batch effects in data generation processes, the complete pooling approach may
+lead to biased estimates. Samples with more instances will disproportionately
+influence both the mean estimate and uncertainty quantification. To address
+this, analysts often employ alternative approaches that treat samples as
+clusters rather than pooling all measurements.</p>
+<h3 id="macro-averaging-equal-weighting-of-samples">Macro-Averaging: Equal Weighting of Samples<a hidden class="anchor" aria-hidden="true" href="#macro-averaging-equal-weighting-of-samples">#</a></h3>
+<p>The macro-averaging approach provides an alternative method for estimating the overall mean by first calculating individual sample means and then averaging them equally across all samples. This two-step process ensures each sample contributes equally to the final estimate, regardless of its size:</p>
+<p><a id="eq3"></a>
+\begin{equation}
+\overline{x}_{macro} = \frac{1}{N} \sum_{i=1}^{N} \overline{x}_i,  \quad \text{where} \quad \overline{x}_i = \frac{1}{n_i} \sum_{j=1}^{n_i} {x_{i,j}}
+\end{equation}</p>
+<p>This approach enables independent computation of sample-level means $\overline{x}_i$, ensuring that each sample&rsquo;s statistics are calculated without interference from other samples, which preserves the integrity of individual cluster information. The approach implements a democratic weighting scheme, where each sample contributes exactly $1/N$ to the final estimate, regardless of its size or variance characteristics. The method prevents larger clusters from overwhelming smaller ones, maintains accuracy even in the presence of strong within-cluster correlations, and handles substantial variations in sample sizes with remarkable stability.</p>
+<p>A basic approximation of the standard error uses the between-sample variance:</p>
+<p><a id="eq4"></a>
+\begin{equation}
+\mathrm{SE}_{\text{macro}} = \sqrt{\frac{1}{N(N-1)} \sum_{i=1}^{N} (\overline{x}_i - \overline{x}_{\text{macro}})^2}
+\end{equation}</p>
+<p>However, this simple approximation obviously neglects both within-sample variability and the effects of varying cluster sizes. Assuming minimal within-sample variation but significant cluster size differences, we can derive a more comprehensive variance decomposition using the law of total variance:</p>
+<p><a id="eq5"></a>
+\begin{equation}
+\mathrm{Var}(\overline{X}) = \underbrace{\mathbb{E}[N]\mathrm{Var}(X)}_{\text{between-sample}} + \underbrace{\mathrm{Var}(N)(\mathbb{E}[X])^2}_{\text{cluster-size effect}}
+\end{equation}</p>
+<p>This leads to a more accurate standard error estimation:</p>
+<p>\begin{equation}
+\mathrm{SE}_{\text{total}} = \sqrt{\frac{\mathbb{E}[N]\hat{s}^2 + \hat{s}_N^2(\overline{x}_{\text{macro}})^2}{N}}
+\end{equation}</p>
+<p>where:</p>
+<ul>
+<li>$\mathbb{E}[N] = \overline{n} = \frac{1}{N}\sum_{i=1}^N n_i$ is the average cluster size</li>
+<li>$\hat{s}^2 = \frac{1}{N-1}\sum_{i=1}^N (\overline{x}_i - \overline{x}_{\text{macro}})^2$ is the pooled between-sample variance</li>
+<li>$\hat{s}_N^2 = \frac{1}{N-1}\sum_{i=1}^N (n_i - \overline{n})^2$ captures the variance in cluster sizes</li>
+</ul>
+<p>While this approach provides a more comprehensive treatment of cluster size
+effects and helps mitigate potential biases from grouped measurements, it
+becomes increasingly complex when incorporating within-sample variability in
+addition. This complexity motivates the need for a more elegant analytical
+framework, which we&rsquo;ll explore in the following section on meta-analytic
+approaches.</p>
+<h2 id="meta-analytic-approaches-a-framework-for-combining-multiple-samples">Meta-Analytic Approaches: A Framework for Combining Multiple Samples<a hidden class="anchor" aria-hidden="true" href="#meta-analytic-approaches-a-framework-for-combining-multiple-samples">#</a></h2>
+<p>Meta-analysis, first introduced by Gene Glass in 1976 for the &ldquo;analysis of analyses&rdquo;, has become an important methodology in evidence synthesis across many fields. Originally developed to combine results from multiple clinical trials, it has evolved into a sophisticated statistical framework used in diverse areas from social sciences to engineering. The method arose from the need to make sense of sometimes conflicting results across multiple studies and to increase statistical power by pooling data systematically.</p>
+<p>In our context of multiple-instance learning, meta-analysis provides powerful frameworks for combining estimates from multiple samples while accounting for different variance components. While meta-analysis can handle various types of estimates (like correlations or odds ratios), we&rsquo;ll focus specifically on combining mean estimates across samples, which is our key quantity of interest from each sample.</p>
+<p>When combining mean estimates from multiple samples, two critical types of variance need consideration:</p>
+<ol>
+<li>Within-sample variance: Captures the uncertainty in individual sample mean
+estimates, expressed through standard errors that depend on both the sample
+size and the spread of measurements within each sample</li>
+<li>Between-sample variance: Reflects true heterogeneity in means across
+different samples, which could arise from batch effects or systematic
+differences between samples</li>
+</ol>
+<p>Meta-analytical approaches are particularly valuable for analyzing hierarchical
+data structures like multiple-instance learning because they:</p>
+<ol>
+<li>Combine sample means while appropriately weighting by their precision
+(inverse variance)</li>
+<li>Model both within-sample and between-sample variability simultaneously</li>
+<li>Account for varying sample sizes and potential dependencies within groups</li>
+<li>Provide frameworks for testing whether samples are homogeneous or
+heterogeneous</li>
+</ol>
+<p>The development of meta-analytic methods has seen several key advances, from DerSimonian and Laird&rsquo;s random-effects model (1986) to modern multilevel and Bayesian approaches. These methods have proven especially valuable in fields dealing with grouped or clustered data, making them particularly relevant for multiple-instance learning scenarios.</p>
+<p>Let&rsquo;s examine two fundamental meta-analytic approaches for combining estimates across multiple samples:</p>
+<h3 id="fixed-effects-model-fe">Fixed-Effects Model (FE)<a hidden class="anchor" aria-hidden="true" href="#fixed-effects-model-fe">#</a></h3>
+<p>The fixed-effects model assumes:</p>
+<ol>
+<li>All samples share a single true mean μ</li>
+<li>Observed between-sample differences in means arise solely from:
+<ul>
+<li>Random sampling variation within samples (quantified by $s_i^2/n_i$)</li>
+<li>No systematic between-sample heterogeneity</li>
+</ul>
+</li>
+</ol>
+<p>This is equivalent to assuming perfect transportability <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> across samples - any
+apparent differences in their estimates would disappear given infinite
+within-sample measurements ($\lim_{n_i \to \infty} \overline{x}_i = \mu,
+\forall i $).</p>
+<p>Under this model, we employ an inverse-variance weighted estimator that optimally combines estimates by assigning greater weight to more precise measurements <sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>:</p>
+<p>\begin{equation}
+\overline{x}_{\text{FE}} = \frac{\sum_{i=1}^{N} w_i
+\overline{x}_i}{\sum_{i=1}^{N} w_i}, \quad w_i =
+\frac{1}{\mathrm{Var}(\overline{x}_i)} = \frac{n_i}{s_i^2}
+\end{equation}</p>
+<p>Where:</p>
+<ul>
+<li>Variance of the sample mean (standard error squared): $\mathrm{Var}(\overline{x}_i) = \mathrm{SE}^2(\overline{x}_i) =
+{s_i^2}/{n_i}$</li>
+<li>Sample variance of individual instances within sample $i$: $s_i^2 =
+\frac{1}{n_i-1}\sum_{j=1}^{n_i}(x_{i,j}-\overline{x}_i)^2$</li>
+</ul>
+<p>The uncertainty estimate on $\overline{x}_{\text{FE}}$ can be measured by
+standard error:
+\begin{equation}
+\mathrm{SE}_{\text{FE}} = \frac{1} {\sqrt{\sum_{i=1}^{N} w_i}} = \sqrt{\frac{1}
+{\sum_{i=1}^{N} \frac{n_i} {s_i^2} }}
+\end{equation}</p>
+<!-- 
+
+**Key assumptions**:
+1. Homogeneity of true means ($\mu_i = \mu,\ \forall i$)
+2. Within-sample variances estimated accurately
+3. Observations independent both within and between samples -->
+<h3 id="random-effects-model-re-accounting-for-between-sample-heterogeneity">Random-Effects Model (RE): Accounting for Between-Sample Heterogeneity<a hidden class="anchor" aria-hidden="true" href="#random-effects-model-re-accounting-for-between-sample-heterogeneity">#</a></h3>
+<p>While the fixed-effects model efficiently combines estimates when samples are homogeneous, its fundamental assumption of a single true underlying mean (perfect transportability) often proves unrealistic in practice. Different samples frequently exhibit systematically different means due to various factors:</p>
+<ul>
+<li>Data collection procedures and protocols</li>
+<li>Population characteristics and selection biases</li>
+<li>Environmental conditions and temporal variations</li>
+<li>Batch effects and instrumental drift</li>
+<li>Laboratory-specific practices</li>
+<li>Geographic variations</li>
+<li>Other unobserved confounding factors</li>
+</ul>
+<p>To account for this between-sample heterogeneity, DerSimonian and Laird (1986)
+proposed the random-effects model. This approach extends the fixed-effects
+framework by introducing an additional variance component $\tau^2$ that captures
+true differences between sample means. The model takes a hierarchical form:</p>
+<p>\begin{equation}
+\overline{x}_i \sim \mathcal{N}(\mu_i, \sigma_i^2/n_i)
+\end{equation}</p>
+<p>\begin{equation}
+\mu_i \sim \mathcal{N}(\mu, \tau^2)
+\end{equation}</p>
+<p>This hierarchical structure acknowledges two distinct sources of variation:</p>
+<ol>
+<li>Within-sample variation ($\sigma_i^2/n_i$): Captures measurement uncertainty</li>
+<li>Between-sample variation ($\tau^2$): Models true heterogeneity between samples</li>
+</ol>
+<p>The DerSimonian-Laird estimator combines sample means using modified weights $w^*$
+that incorporate both variance components:</p>
+<p>\begin{equation}
+\overline{x}_{\text{RE}} = \frac{\sum w_i^* \overline{x}_i}{\sum w_i^*}, \quad w_i^* = \frac{1}{s_i^2/n_i + \tau^2}
+\end{equation}</p>
+<p><strong>Variance Component Estimation</strong>:</p>
+<ol>
+<li>
+<p>Within-sample variance of the mean is estimated by $s_i^2/n_i =
+\frac{1}{n_i(n_i-1)}\sum_{j=1}^{n_i}(x_{i,j}-\overline{x}_i)^2$.</p>
+</li>
+<li>
+<p>Between-sample variance: $\tau^2$ estimated using the <em>DerSimonian-Laird</em> method:
+\begin{equation}
+\tau^2 = \max\left(0, \frac{Q - (N-1)}{\sum_{i=1}^N w_i - \sum_{i=1}^N w_i^2/\sum_{i=1}^N w_i}\right)
+\end{equation}</p>
+</li>
+</ol>
+<p>where $w_i$ is the weight in fixed-effects model and Cochran&rsquo;s $Q$ statistic quantifies heterogeneity:
+\begin{equation}
+Q = \sum_{i=1}^N w_i(\overline{x}_i - \overline{x}_{\text{FE}})^2
+\end{equation}</p>
+<p>The Q statistic follows a chi-square distribution under the null hypothesis of
+homogeneity, providing a formal test for between-sample heterogeneity. Large Q
+values suggest significant heterogeneity and support using the random-effects
+model over fixed-effects.</p>
+<p>Uncertainty for $\overline{x}_{\text{RE}}$ can be measured by standard error
+with the modified weights $w^*$. The standard variance estimator is:</p>
+<p>\begin{equation}
+\mathrm{SE}_{\text{RE,naive}} = \frac{1} {\sqrt{\sum_{i=1}^{N} w_i^*}} = \sqrt{\frac{1}
+{\sum_{i=1}^{N} \frac{1}{s_i^2/n_i + \tau^2} }}
+\end{equation}</p>
+<p>However, this naive variance estimation tends to underestimate uncertainty when</p>
+<ol>
+<li>working with a small number of samples (N), which limits the precision of heterogeneity estimates</li>
+<li>substantial heterogeneity exists between samples, making the simple pooled variance inadequate</li>
+<li>sample sizes or weights are unbalanced across different groups</li>
+</ol>
+<p>To address these limitations, the Hartung-Knapp-Sidik-Jonkman (HKSJ) method
+provides a more robust variance estimator that better accounts for uncertainty
+in the estimation of between-study heterogeneity:</p>
+<p>\begin{equation}
+\mathrm{SE}_{\text{RE,HKSJ}} = \sqrt{\frac{\sum_{i=1}^N w_i^{*}(\overline{x}_i - \overline{x}_{\text{RE}})^2}{(N-1)\sum_{i=1}^N w_i^{*}}}
+\end{equation}</p>
+<p>As seen, the random-effects model has a more comprehensive characterization than FE. When the between-sample heterogeneity is significant, the random-effects model captures both within-sample and between-sample variability. When the between-sample heterogeneity is not significant, the random-effects model reduces to the fixed-effects model as $\tau^2 \rightarrow 0$.</p>
+<p>Beyond DerSimonian-Laird, several alternative estimation approaches exist, including Restricted Maximum Likelihood (REML) for small samples <a href=""></a>, Paule-Mandel for non-normal data <a href=""></a>, Empirical Bayes for data-prior fusion <a href=""></a>, and Profile likelihood for improved confidence intervals <a href=""></a>.</p>
+<h2 id="bayesian-hierarchical-modeling-a-probabilistic-framework">Bayesian Hierarchical Modeling: A Probabilistic Framework<a hidden class="anchor" aria-hidden="true" href="#bayesian-hierarchical-modeling-a-probabilistic-framework">#</a></h2>
+<p>Bayesian hierarchical modeling provides a natural framework for analyzing multiple-instance learning data by explicitly modeling the data&rsquo;s inherent hierarchical structure. This approach treats all unknown parameters as random variables with associated probability distributions, allowing us to:</p>
+<ol>
+<li>Directly model the data generation process</li>
+<li>Incorporate prior knowledge about parameters</li>
+<li>Obtain full posterior distributions for uncertainty quantification</li>
+<li>Account for different sources of variation simultaneously</li>
+</ol>
+<h3 id="the-hierarchical-structure">The Hierarchical Structure<a hidden class="anchor" aria-hidden="true" href="#the-hierarchical-structure">#</a></h3>
+<p>The key insight is modeling the data generation as a three-level process:</p>
+<ol>
+<li><strong>Population Level</strong>: An overall mean μ represents the true population-wide average we want to estimate</li>
+<li><strong>Sample Level</strong>: Each sample i has its own true mean μᵢ that varies around μ</li>
+<li><strong>Instance Level</strong>: Individual measurements within each sample vary around their sample-specific mean μᵢ</li>
+</ol>
+<p>This naturally maps to a hierarchical model:</p>
+<p><a id="eq_bayes_likelihood"></a>
+\begin{equation}
+\text{Instance Level (Likelihood):} \quad \overline{x}_i \sim \mathcal{N}(\mu_i, \sigma_i^2/n_i)
+\end{equation}</p>
+<p><a id="eq_bayes_prior1"></a>
+\begin{equation}
+\text{Sample Level (Prior):} \quad \mu_i \sim \mathcal{N}(\mu, \tau^2)
+\end{equation}</p>
+<p><a id="eq_bayes_hyper1"></a>
+\begin{equation}
+\text{Population Level (Hyperpriors):} \quad \mu \sim \mathcal{N}(0, 10)
+\end{equation}</p>
+<p><a id="eq_bayes_hyper2"></a>
+\begin{equation}
+\text{Between-Sample Variation:} \quad \tau \sim \mathrm{HalfCauchy}(0, 2)
+\end{equation}</p>
+<p><a id="eq_bayes_hyper3"></a>
+\begin{equation}
+\text{Within-Sample Variation:} \quad \sigma_i \sim \mathrm{Exponential}(1)
+\end{equation}</p>
+<p>Each level captures a different source of variation:</p>
+<ul>
+<li>σᵢ²/nᵢ represents measurement uncertainty within samples</li>
+<li>τ² captures true differences between sample means</li>
+<li>The hyperpriors on μ, τ, and σᵢ encode our prior beliefs about reasonable parameter values</li>
+</ul>
+<p>This hierarchical structure automatically implements &ldquo;partial pooling&rdquo; - estimates for individual samples are shrunk toward the overall mean, with the degree of shrinkage determined by the relative magnitudes of within-sample and between-sample variation. This helps prevent extreme estimates from samples with limited data while still preserving meaningful differences between samples. differences between samples.</p>
+<h3 id="key-assumptions-and-model-properties">Key Assumptions and Model Properties<a hidden class="anchor" aria-hidden="true" href="#key-assumptions-and-model-properties">#</a></h3>
+<h4 id="fundamental-assumptions">Fundamental Assumptions<a hidden class="anchor" aria-hidden="true" href="#fundamental-assumptions">#</a></h4>
+<ol>
+<li><strong>Normality of Sample Means</strong>: The likelihood in <mcsymbol name="eq_bayes_likelihood" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="377" type="function"></mcsymbol> assumes sample means follow normal distributions, reasonable via CLT when $n_i$ ≥ 30</li>
+<li><strong>Independent Samples</strong>: No correlation between samples (could be relaxed with spatial/temporal priors)</li>
+<li><strong>Weakly Informative Hyperpriors</strong>: The <mcsymbol name="eq_bayes_hyper1" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="385" type="function"></mcsymbol>-<mcsymbol name="eq_bayes_hyper3" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="393" type="function"></mcsymbol> priors regularize estimates without being overly restrictive</li>
+<li><strong>Partial Pooling</strong>: Balances complete pooling (fixed-effects) and no pooling (macro-average) extremes</li>
+</ol>
+<h4 id="advantages">Advantages<a hidden class="anchor" aria-hidden="true" href="#advantages">#</a></h4>
+<ol>
+<li><strong>Uncertainty Propagation</strong>: Jointly models all uncertainty sources (within/between sample, hyperparameters)</li>
+<li><strong>Small Sample Robustness</strong>: Performs better than frequentist methods when N &lt; 10</li>
+<li><strong>Prior Incorporation</strong>: Enables domain knowledge integration (e.g., known biological variation bounds)</li>
+<li><strong>Flexible Inference</strong>: Posterior samples enable easy computation of complex quantities (e.g., P(μ &gt; threshold))</li>
+</ol>
+<h4 id="limitations">Limitations<a hidden class="anchor" aria-hidden="true" href="#limitations">#</a></h4>
+<ol>
+<li><strong>Computational Cost</strong>: MCMC sampling requires more resources than closed-form solutions</li>
+<li><strong>Convergence Challenges</strong>: Hierarchical models may suffer from divergent transitions in high dimensions</li>
+<li><strong>Prior Sensitivity</strong>: Poorly chosen hyperpriors (especially for τ) can bias estimates</li>
+<li><strong>Implementation Complexity</strong>: Requires probabilistic programming expertise</li>
+</ol>
+<h3 id="practical-considerations">Practical Considerations<a hidden class="anchor" aria-hidden="true" href="#practical-considerations">#</a></h3>
+<p>Summarize the writing and/or compare different methods via tables. Discuss when
+to use which methods. Dicuss frequentist vs Bayesian Approaches and how Bayesian
+may be applied here</p>
+<h4 id="method-comparison-table">Method Comparison Table<a hidden class="anchor" aria-hidden="true" href="#method-comparison-table">#</a></h4>
+<div class="table-wrapper">
+<table>
+  <thead>
+      <tr>
+          <th>Approach</th>
+          <th>Assumptions</th>
+          <th>Weighting</th>
+          <th>Variance Components Considered</th>
+          <th>Optimal When&hellip;</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Complete Pooling</strong></td>
+          <td>All instances i.i.d</td>
+          <td>By instance count</td>
+          <td>Within-instance only</td>
+          <td>Truly homogeneous data (rare in MIL)</td>
+      </tr>
+      <tr>
+          <td><strong>Macro-Averaging</strong></td>
+          <td>Samples equally important</td>
+          <td>Equal per sample</td>
+          <td>Between-sample only</td>
+          <td>Cluster sizes unreliable/biased</td>
+      </tr>
+      <tr>
+          <td><strong>Fixed-Effects</strong></td>
+          <td>No true between-sample heterogeneity</td>
+          <td>Inverse within-var</td>
+          <td>Within-sample variance</td>
+          <td>Transportability holds (Q ≈ 0)</td>
+      </tr>
+      <tr>
+          <td><strong>Random-Effects</strong></td>
+          <td>Heterogeneous samples</td>
+          <td>Inverse total var</td>
+          <td>Within + between variance</td>
+          <td>Significant heterogeneity (Q &gt; N-1)</td>
+      </tr>
+  </tbody>
+</table>
+</div>
+<h4 id="selection-guidelines">Selection Guidelines<a hidden class="anchor" aria-hidden="true" href="#selection-guidelines">#</a></h4>
+<ol>
+<li>
+<p><strong>Diagnose Heterogeneity First</strong></p>
+<ul>
+<li>Calculate Cochran&rsquo;s Q statistic <mcsymbol name="Q" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="340" type="function"></mcsymbol></li>
+<li>Use I² = (Q - (N-1))/Q × 100% to quantify heterogeneity magnitude</li>
+<li>Thresholds: I² &lt; 25% (low), 25-50% (moderate), &gt;50% (high)</li>
+</ul>
+</li>
+<li>
+<p><strong>Sample Size Considerations</strong></p>
+<ul>
+<li>Small N (&lt;10): Prefer HKSJ-adjusted RE or Bayesian</li>
+<li>Large cluster size variation: Avoid macro-averaging</li>
+<li>Many small clusters: Use FE with Shuster-weighted variance</li>
+</ul>
+</li>
+<li>
+<p><strong>Transportability Assessment</strong></p>
+<ul>
+<li>Domain knowledge: Are batch effects expected?</li>
+<li>Exploratory analysis: Cluster means vs. covariates</li>
+<li>Cross-validation: Compare methods&rsquo; generalizability</li>
+</ul>
+</li>
+</ol>
+<h4 id="bayesian-approaches">Bayesian Approaches<a hidden class="anchor" aria-hidden="true" href="#bayesian-approaches">#</a></h4>
+<p>While frequentist meta-analysis provides powerful tools for MIL problems, Bayesian hierarchical modeling offers several advantages:</p>
+<ol>
+<li><strong>Natural uncertainty quantification</strong> through posterior distributions</li>
+<li><strong>Flexible incorporation of prior knowledge</strong></li>
+<li><strong>Direct modeling of hierarchical structure</strong> without asymptotic approximations</li>
+<li><strong>Automatic shrinkage</strong> of extreme estimates through partial pooling</li>
+</ol>
+<h3 id="model-specification">Model Specification<a hidden class="anchor" aria-hidden="true" href="#model-specification">#</a></h3>
+<p>The Bayesian equivalent of the random-effects model can be specified as:</p>
+<p><a id="eq_bayes"></a>
+\begin{equation}
+\begin{aligned}
+&amp;\text{Likelihood:} &amp; \overline{x}_i &amp;\sim \mathcal{N}(\mu_i, \sigma_i^2/n_i) \
+&amp;\text{First-level prior:} &amp; \mu_i &amp;\sim \mathcal{N}(\mu, \tau^2) \
+&amp;\text{Hyperpriors:} &amp; \mu &amp;\sim \mathcal{N}(0, 10) \
+&amp;&amp; \tau &amp;\sim \mathrm{HalfCauchy}(0, 2) \
+&amp;&amp; \sigma_i &amp;\sim \mathrm{Exponential}(1) \quad (\text{if modeling individual } \sigma_i)
+\end{aligned}
+\end{equation}</p>
+<p>This three-level structure directly corresponds to:</p>
+<ul>
+<li>Within-sample variability ($\sigma_i^2/n_i$)</li>
+<li>Between-sample heterogeneity ($\tau^2$)</li>
+<li>Population-level mean ($\mu$)</li>
+</ul>
+<h3 id="prior-selection-rationale">Prior Selection Rationale<a hidden class="anchor" aria-hidden="true" href="#prior-selection-rationale">#</a></h3>
+<h4 id="1-μ--normal0-10">1. μ ~ Normal(0, 10)<a hidden class="anchor" aria-hidden="true" href="#1-μ--normal0-10">#</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Regularizes population mean estimate</li>
+<li><strong>Why</strong>:
+<ul>
+<li>Weakly informative prior covering plausible ranges for many real-world measurements</li>
+<li>10σ span (-30 to +30 at 3σ) accommodates most scenarios without being overly restrictive</li>
+<li><strong>Example</strong>: Suitable for defect rates (0-100%), survey scores (1-5 scales), biological markers</li>
+</ul>
+</li>
+<li><strong>Adjustment Tip</strong>: Tighten if domain knowledge suggests smaller ranges (e.g. Normal(0, 1) for proportions near 0.5)</li>
+</ul>
+<h4 id="2-τ--halfcauchy0-2">2. τ ~ HalfCauchy(0, 2)<a hidden class="anchor" aria-hidden="true" href="#2-τ--halfcauchy0-2">#</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Regularizes between-sample variation</li>
+<li><strong>Why</strong>:
+<ul>
+<li>HalfCauchy&rsquo;s heavy tail allows moderate-to-large τ while maintaining density near 0</li>
+<li>Scale=2 prevents overestimation of heterogeneity with small N</li>
+<li><strong>Alternative</strong>: HalfNormal(0,1) for stronger regularization</li>
+</ul>
+</li>
+<li><strong>Theoretical Basis</strong>: Recommended by Gelman (2006) for hierarchical SDs</li>
+</ul>
+<h4 id="3-σ_i--exponential1">3. σ_i ~ Exponential(1)<a hidden class="anchor" aria-hidden="true" href="#3-σ_i--exponential1">#</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Regularizes within-sample variation</li>
+<li><strong>Why</strong>:
+<ul>
+<li>Exponential prior encourages sparsity in variance estimates</li>
+<li>Rate=1 corresponds to prior expectation of σ_i = 1</li>
+<li><strong>Adjustment</strong>: Scale rate parameter by measurement units (e.g. Exponential(0.1) for σ ~10)</li>
+</ul>
+</li>
+</ul>
+<h3 id="prior-data-balance">Prior-Data Balance<a hidden class="anchor" aria-hidden="true" href="#prior-data-balance">#</a></h3>
+<p>These choices create a <strong>weakly informative</strong> prior setup that:</p>
+<ol>
+<li>Prevents overfitting with small N samples</li>
+<li>Allows data to dominate inferences when sample sizes increase</li>
+<li>Provides computational stability through mild regularization</li>
+</ol>
+<p>where:</p>
+<ul>
+<li>$\mathbb{E}[N] = \overline{n} = \frac{1}{N}\sum_{i=1}^N n_i$ is the average cluster size</li>
+<li>$\hat{s}^2 = \frac{1}{N-1}\sum_{i=1}^N (\overline{x}_i - \overline{x}_{\text{macro}})^2$ is the pooled between-sample variance</li>
+<li>$\hat{s}_N^2 = \frac{1}{N-1}\sum_{i=1}^N (n_i - \overline{n})^2$ captures the variance in cluster sizes</li>
+</ul>
+<p>While this approach provides a more comprehensive treatment of cluster size
+effects and helps mitigate potential biases from grouped measurements, it
+becomes increasingly complex when incorporating within-sample variability in
+addition. This complexity motivates the need for a more elegant analytical
+framework, which we&rsquo;ll explore in the following section on meta-analytic
+approaches.</p>
+<!-- 
+
+## Meta-Analytic Approaches: A Framework for Combining Multiple Samples
+Meta-analysis, first introduced by Gene Glass in 1976 for the "analysis of analyses", has become an important methodology in evidence synthesis across many fields. Originally developed to combine results from multiple clinical trials, it has evolved into a sophisticated statistical framework used in diverse areas from social sciences to engineering. The method arose from the need to make sense of sometimes conflicting results across multiple studies and to increase statistical power by pooling data systematically.
+
+In our context of multiple-instance learning, meta-analysis provides powerful frameworks for combining estimates from multiple samples while accounting for different variance components. While meta-analysis can handle various types of estimates (like correlations or odds ratios), we'll focus specifically on combining mean estimates across samples, which is our key quantity of interest from each sample.
+
+When combining mean estimates from multiple samples, two critical types of variance need consideration:
+
+1. Within-sample variance: Captures the uncertainty in individual sample mean
+   estimates, expressed through standard errors that depend on both the sample
+   size and the spread of measurements within each sample
+2. Between-sample variance: Reflects true heterogeneity in means across
+   different samples, which could arise from batch effects or systematic
+   differences between samples
+
+Meta-analytical approaches are particularly valuable for analyzing hierarchical
+data structures like multiple-instance learning because they:
+1. Combine sample means while appropriately weighting by their precision
+   (inverse variance)
+2. Model both within-sample and between-sample variability simultaneously
+3. Account for varying sample sizes and potential dependencies within groups
+4. Provide frameworks for testing whether samples are homogeneous or
+   heterogeneous
+
+The development of meta-analytic methods has seen several key advances, from DerSimonian and Laird's random-effects model (1986) to modern multilevel and Bayesian approaches. These methods have proven especially valuable in fields dealing with grouped or clustered data, making them particularly relevant for multiple-instance learning scenarios.
+
+Let's examine two fundamental meta-analytic approaches for combining estimates across multiple samples:
+
+### Fixed-Effects Model (FE)
+The fixed-effects model assumes:
+1. All samples share a single true mean μ 
+2. Observed between-sample differences in means arise solely from:
+   - Random sampling variation within samples (quantified by $s_i^2/n_i$)
+   - No systematic between-sample heterogeneity
+
+This is equivalent to assuming perfect transportability [^1] across samples - any
+apparent differences in their estimates would disappear given infinite
+within-sample measurements ($\lim_{n_i \to \infty} \overline{x}_i = \mu,
+\forall i $).
+
+[^1]: **Perfect Transportability** describes a strong assumption that estimation
+    results from any sample can be directly generalized to all other samples
+    without adjustments $$ \forall i,k\ \lim_{n_i,n_k \to \infty}
+    (\overline{x}_i - \overline{x}_k) = 0. $$ This implies sample collection
+    mechanisms and subpopulation characteristics do not systematically influence
+    measurements. For example, you will see perfect transportability if all
+    clinics draw from identical patient populations, factories use identical
+    processes/materials during Manufacturing. 
+
+Under this model, we employ an inverse-variance weighted estimator that optimally combines estimates by assigning greater weight to more precise measurements [^2]:
+
+[^2]: The inverse-variance weighting scheme (w = 1/SE²) naturally assigns higher weights to more precise estimates - those with smaller within-sample variance and/or larger sample sizes. This approach optimally combines heterogeneous estimates by giving more influence to more reliable measurements while downweighting less precise ones. For example, in clinical trials, larger studies with tighter confidence intervals would receive proportionally more weight than smaller studies with wider intervals.
+
+\begin{equation}
+\overline{x}\_{\text{FE}} = \frac{\sum_{i=1}^{N} w_i
+\overline{x}\_i}{\sum_{i=1}^{N} w_i}, \quad w_i =
+\frac{1}{\mathrm{Var}(\overline{x}_i)} = \frac{n_i}{s_i^2}
+\end{equation}
+
+Where:
+- Variance of the sample mean (standard error squared): $\mathrm{Var}(\overline{x}_i) = \mathrm{SE}^2(\overline{x}_i) =
+ {s_i^2}/{n_i}$
+- Sample variance of individual instances within sample $i$: $s_i^2 =
+  \frac{1}{n_i-1}\sum_{j=1}^{n_i}(x_{i,j}-\overline{x}_i)^2$ 
+
+The uncertainty estimate on $\overline{x}\_{\text{FE}}$ can be measured by
+standard error: 
+\begin{equation}
+\mathrm{SE}\_{\text{FE}} = \frac{1} {\sqrt{\sum_{i=1}^{N} w_i}} = \sqrt{\frac{1}
+{\sum_{i=1}^{N} \frac{n_i} {s_i^2} }}
+\end{equation}
+<!-- 
+
+**Key assumptions**:
+1. Homogeneity of true means ($\mu_i = \mu,\ \forall i$)
+2. Within-sample variances estimated accurately
+3. Observations independent both within and between samples -->
+<h3 id="random-effects-model-re-accounting-for-between-sample-heterogeneity-1">Random-Effects Model (RE): Accounting for Between-Sample Heterogeneity<a hidden class="anchor" aria-hidden="true" href="#random-effects-model-re-accounting-for-between-sample-heterogeneity-1">#</a></h3>
+<p>While the fixed-effects model efficiently combines estimates when samples are homogeneous, its fundamental assumption of a single true underlying mean (perfect transportability) often proves unrealistic in practice. Different samples frequently exhibit systematically different means due to various factors:</p>
+<ul>
+<li>Data collection procedures and protocols</li>
+<li>Population characteristics and selection biases</li>
+<li>Environmental conditions and temporal variations</li>
+<li>Batch effects and instrumental drift</li>
+<li>Laboratory-specific practices</li>
+<li>Geographic variations</li>
+<li>Other unobserved confounding factors</li>
+</ul>
+<p>To account for this between-sample heterogeneity, DerSimonian and Laird (1986)
+proposed the random-effects model. This approach extends the fixed-effects
+framework by introducing an additional variance component $\tau^2$ that captures
+true differences between sample means. The model takes a hierarchical form:</p>
+<p>\begin{equation}
+\overline{x}_i \sim \mathcal{N}(\mu_i, \sigma_i^2/n_i)
+\end{equation}</p>
+<p>\begin{equation}
+\mu_i \sim \mathcal{N}(\mu, \tau^2)
+\end{equation}</p>
+<p>This hierarchical structure acknowledges two distinct sources of variation:</p>
+<ol>
+<li>Within-sample variation ($\sigma_i^2/n_i$): Captures measurement uncertainty</li>
+<li>Between-sample variation ($\tau^2$): Models true heterogeneity between samples</li>
+</ol>
+<p>The DerSimonian-Laird estimator combines sample means using modified weights $w^*$
+that incorporate both variance components:</p>
+<p>\begin{equation}
+\overline{x}_{\text{RE}} = \frac{\sum w_i^* \overline{x}_i}{\sum w_i^*}, \quad w_i^* = \frac{1}{s_i^2/n_i + \tau^2}
+\end{equation}</p>
+<p><strong>Variance Component Estimation</strong>:</p>
+<ol>
+<li>
+<p>Within-sample variance of the mean is estimated by $s_i^2/n_i =
+\frac{1}{n_i(n_i-1)}\sum_{j=1}^{n_i}(x_{i,j}-\overline{x}_i)^2$.</p>
+</li>
+<li>
+<p>Between-sample variance: $\tau^2$ estimated using the <em>DerSimonian-Laird</em> method:
+\begin{equation}
+\tau^2 = \max\left(0, \frac{Q - (N-1)}{\sum_{i=1}^N w_i - \sum_{i=1}^N w_i^2/\sum_{i=1}^N w_i}\right)
+\end{equation}</p>
+</li>
+</ol>
+<p>where $w_i$ is the weight in fixed-effects model and Cochran&rsquo;s $Q$ statistic quantifies heterogeneity:
+\begin{equation}
+Q = \sum_{i=1}^N w_i(\overline{x}_i - \overline{x}_{\text{FE}})^2
+\end{equation}</p>
+<p>The Q statistic follows a chi-square distribution under the null hypothesis of
+homogeneity, providing a formal test for between-sample heterogeneity. Large Q
+values suggest significant heterogeneity and support using the random-effects
+model over fixed-effects.</p>
+<p>Uncertainty for $\overline{x}_{\text{RE}}$ can be measured by standard error
+with the modified weights $w^*$. The standard variance estimator is:</p>
+<p>\begin{equation}
+\mathrm{SE}_{\text{RE,naive}} = \frac{1} {\sqrt{\sum_{i=1}^{N} w_i^*}} = \sqrt{\frac{1}
+{\sum_{i=1}^{N} \frac{1}{s_i^2/n_i + \tau^2} }}
+\end{equation}</p>
+<p>However, this naive variance estimation tends to underestimate uncertainty when</p>
+<ol>
+<li>working with a small number of samples (N), which limits the precision of heterogeneity estimates</li>
+<li>substantial heterogeneity exists between samples, making the simple pooled variance inadequate</li>
+<li>sample sizes or weights are unbalanced across different groups</li>
+</ol>
+<p>To address these limitations, the Hartung-Knapp-Sidik-Jonkman (HKSJ) method
+provides a more robust variance estimator that better accounts for uncertainty
+in the estimation of between-study heterogeneity:</p>
+<p>\begin{equation}
+\mathrm{SE}_{\text{RE,HKSJ}} = \sqrt{\frac{\sum_{i=1}^N w_i^{*}(\overline{x}_i - \overline{x}_{\text{RE}})^2}{(N-1)\sum_{i=1}^N w_i^{*}}}
+\end{equation}</p>
+<p>As seen, the random-effects model has a more comprehensive characterization than FE. When the between-sample heterogeneity is significant, the random-effects model captures both within-sample and between-sample variability. When the between-sample heterogeneity is not significant, the random-effects model reduces to the fixed-effects model as $\tau^2 \rightarrow 0$.</p>
+<p>Beyond DerSimonian-Laird, several alternative estimation approaches exist, including Restricted Maximum Likelihood (REML) for small samples <a href=""></a>, Paule-Mandel for non-normal data <a href=""></a>, Empirical Bayes for data-prior fusion <a href=""></a>, and Profile likelihood for improved confidence intervals <a href=""></a>. &ndash;&gt;</p>
+<h2 id="bayesian-hierarchical-modeling-a-probabilistic-framework-1">Bayesian Hierarchical Modeling: A Probabilistic Framework<a hidden class="anchor" aria-hidden="true" href="#bayesian-hierarchical-modeling-a-probabilistic-framework-1">#</a></h2>
+<p>Bayesian hierarchical modeling provides a natural framework for analyzing multiple-instance learning data by explicitly modeling the data&rsquo;s inherent hierarchical structure. This approach treats all unknown parameters as random variables with associated probability distributions, allowing us to:</p>
+<ol>
+<li>Directly model the data generation process</li>
+<li>Incorporate prior knowledge about parameters</li>
+<li>Obtain full posterior distributions for uncertainty quantification</li>
+<li>Account for different sources of variation simultaneously</li>
+</ol>
+<h3 id="the-hierarchical-structure-1">The Hierarchical Structure<a hidden class="anchor" aria-hidden="true" href="#the-hierarchical-structure-1">#</a></h3>
+<p>The key insight is modeling the data generation as a three-level process:</p>
+<ol>
+<li><strong>Population Level</strong>: An overall mean μ represents the true population-wide average we want to estimate</li>
+<li><strong>Sample Level</strong>: Each sample i has its own true mean μᵢ that varies around μ</li>
+<li><strong>Instance Level</strong>: Individual measurements within each sample vary around their sample-specific mean μᵢ</li>
+</ol>
+<p>This naturally maps to a hierarchical model:</p>
+<p><a id="eq_bayes_likelihood"></a>
+\begin{equation}
+\text{Instance Level (Likelihood):} \quad \overline{x}_i \sim \mathcal{N}(\mu_i, \sigma_i^2/n_i)
+\end{equation}</p>
+<p><a id="eq_bayes_prior1"></a>
+\begin{equation}
+\text{Sample Level (Prior):} \quad \mu_i \sim \mathcal{N}(\mu, \tau^2)
+\end{equation}</p>
+<p><a id="eq_bayes_hyper1"></a>
+\begin{equation}
+\text{Population Level (Hyperpriors):} \quad \mu \sim \mathcal{N}(0, 10)
+\end{equation}</p>
+<p><a id="eq_bayes_hyper2"></a>
+\begin{equation}
+\text{Between-Sample Variation:} \quad \tau \sim \mathrm{HalfCauchy}(0, 2)
+\end{equation}</p>
+<p><a id="eq_bayes_hyper3"></a>
+\begin{equation}
+\text{Within-Sample Variation:} \quad \sigma_i \sim \mathrm{Exponential}(1)
+\end{equation}</p>
+<p>Each level captures a different source of variation:</p>
+<ul>
+<li>σᵢ²/nᵢ represents measurement uncertainty within samples</li>
+<li>τ² captures true differences between sample means</li>
+<li>The hyperpriors on μ, τ, and σᵢ encode our prior beliefs about reasonable parameter values</li>
+</ul>
+<p>This hierarchical structure automatically implements &ldquo;partial pooling&rdquo; - estimates for individual samples are shrunk toward the overall mean, with the degree of shrinkage determined by the relative magnitudes of within-sample and between-sample variation. This helps prevent extreme estimates from samples with limited data while still preserving meaningful differences between samples. differences between samples.</p>
+<h3 id="key-assumptions-and-model-properties-1">Key Assumptions and Model Properties<a hidden class="anchor" aria-hidden="true" href="#key-assumptions-and-model-properties-1">#</a></h3>
+<h4 id="fundamental-assumptions-1">Fundamental Assumptions<a hidden class="anchor" aria-hidden="true" href="#fundamental-assumptions-1">#</a></h4>
+<ol>
+<li><strong>Normality of Sample Means</strong>: The likelihood in <mcsymbol name="eq_bayes_likelihood" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="377" type="function"></mcsymbol> assumes sample means follow normal distributions, reasonable via CLT when $n_i$ ≥ 30</li>
+<li><strong>Independent Samples</strong>: No correlation between samples (could be relaxed with spatial/temporal priors)</li>
+<li><strong>Weakly Informative Hyperpriors</strong>: The <mcsymbol name="eq_bayes_hyper1" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="385" type="function"></mcsymbol>-<mcsymbol name="eq_bayes_hyper3" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="393" type="function"></mcsymbol> priors regularize estimates without being overly restrictive</li>
+<li><strong>Partial Pooling</strong>: Balances complete pooling (fixed-effects) and no pooling (macro-average) extremes</li>
+</ol>
+<h4 id="advantages-1">Advantages<a hidden class="anchor" aria-hidden="true" href="#advantages-1">#</a></h4>
+<ol>
+<li><strong>Uncertainty Propagation</strong>: Jointly models all uncertainty sources (within/between sample, hyperparameters)</li>
+<li><strong>Small Sample Robustness</strong>: Performs better than frequentist methods when N &lt; 10</li>
+<li><strong>Prior Incorporation</strong>: Enables domain knowledge integration (e.g., known biological variation bounds)</li>
+<li><strong>Flexible Inference</strong>: Posterior samples enable easy computation of complex quantities (e.g., P(μ &gt; threshold))</li>
+</ol>
+<h4 id="limitations-1">Limitations<a hidden class="anchor" aria-hidden="true" href="#limitations-1">#</a></h4>
+<ol>
+<li><strong>Computational Cost</strong>: MCMC sampling requires more resources than closed-form solutions</li>
+<li><strong>Convergence Challenges</strong>: Hierarchical models may suffer from divergent transitions in high dimensions</li>
+<li><strong>Prior Sensitivity</strong>: Poorly chosen hyperpriors (especially for τ) can bias estimates</li>
+<li><strong>Implementation Complexity</strong>: Requires probabilistic programming expertise</li>
+</ol>
+<h3 id="practical-considerations-1">Practical Considerations<a hidden class="anchor" aria-hidden="true" href="#practical-considerations-1">#</a></h3>
+<p>Summarize the writing and/or compare different methods via tables. Discuss when
+to use which methods. Dicuss frequentist vs Bayesian Approaches and how Bayesian
+may be applied here</p>
+<h4 id="method-comparison-table-1">Method Comparison Table<a hidden class="anchor" aria-hidden="true" href="#method-comparison-table-1">#</a></h4>
+<div class="table-wrapper">
+<table>
+  <thead>
+      <tr>
+          <th>Approach</th>
+          <th>Assumptions</th>
+          <th>Weighting</th>
+          <th>Variance Components Considered</th>
+          <th>Optimal When&hellip;</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Complete Pooling</strong></td>
+          <td>All instances i.i.d</td>
+          <td>By instance count</td>
+          <td>Within-instance only</td>
+          <td>Truly homogeneous data (rare in MIL)</td>
+      </tr>
+      <tr>
+          <td><strong>Macro-Averaging</strong></td>
+          <td>Samples equally important</td>
+          <td>Equal per sample</td>
+          <td>Between-sample only</td>
+          <td>Cluster sizes unreliable/biased</td>
+      </tr>
+      <tr>
+          <td><strong>Fixed-Effects</strong></td>
+          <td>No true between-sample heterogeneity</td>
+          <td>Inverse within-var</td>
+          <td>Within-sample variance</td>
+          <td>Transportability holds (Q ≈ 0)</td>
+      </tr>
+      <tr>
+          <td><strong>Random-Effects</strong></td>
+          <td>Heterogeneous samples</td>
+          <td>Inverse total var</td>
+          <td>Within + between variance</td>
+          <td>Significant heterogeneity (Q &gt; N-1)</td>
+      </tr>
+  </tbody>
+</table>
+</div>
+<h4 id="selection-guidelines-1">Selection Guidelines<a hidden class="anchor" aria-hidden="true" href="#selection-guidelines-1">#</a></h4>
+<ol>
+<li>
+<p><strong>Diagnose Heterogeneity First</strong></p>
+<ul>
+<li>Calculate Cochran&rsquo;s Q statistic <mcsymbol name="Q" filename="2025-03-01-stats-for-mil.md" path="/Users/jiajiexiao/Projects/jxlog/jxlog/content/posts/2025-03-01-stats-for-mil.md" startline="340" type="function"></mcsymbol></li>
+<li>Use I² = (Q - (N-1))/Q × 100% to quantify heterogeneity magnitude</li>
+<li>Thresholds: I² &lt; 25% (low), 25-50% (moderate), &gt;50% (high)</li>
+</ul>
+</li>
+<li>
+<p><strong>Sample Size Considerations</strong></p>
+<ul>
+<li>Small N (&lt;10): Prefer HKSJ-adjusted RE or Bayesian</li>
+<li>Large cluster size variation: Avoid macro-averaging</li>
+<li>Many small clusters: Use FE with Shuster-weighted variance</li>
+</ul>
+</li>
+<li>
+<p><strong>Transportability Assessment</strong></p>
+<ul>
+<li>Domain knowledge: Are batch effects expected?</li>
+<li>Exploratory analysis: Cluster means vs. covariates</li>
+<li>Cross-validation: Compare methods&rsquo; generalizability</li>
+</ul>
+</li>
+</ol>
+<h4 id="bayesian-approaches-1">Bayesian Approaches<a hidden class="anchor" aria-hidden="true" href="#bayesian-approaches-1">#</a></h4>
+<p>While frequentist meta-analysis provides powerful tools for MIL problems, Bayesian hierarchical modeling offers several advantages:</p>
+<ol>
+<li><strong>Natural uncertainty quantification</strong> through posterior distributions</li>
+<li><strong>Flexible incorporation of prior knowledge</strong></li>
+<li><strong>Direct modeling of hierarchical structure</strong> without asymptotic approximations</li>
+<li><strong>Automatic shrinkage</strong> of extreme estimates through partial pooling</li>
+</ol>
+<h3 id="model-specification-1">Model Specification<a hidden class="anchor" aria-hidden="true" href="#model-specification-1">#</a></h3>
+<p>The Bayesian equivalent of the random-effects model can be specified as:</p>
+<p><a id="eq_bayes"></a>
+\begin{equation}
+\begin{aligned}
+&amp;\text{Likelihood:} &amp; \overline{x}_i &amp;\sim \mathcal{N}(\mu_i, \sigma_i^2/n_i) \
+&amp;\text{First-level prior:} &amp; \mu_i &amp;\sim \mathcal{N}(\mu, \tau^2) \
+&amp;\text{Hyperpriors:} &amp; \mu &amp;\sim \mathcal{N}(0, 10) \
+&amp;&amp; \tau &amp;\sim \mathrm{HalfCauchy}(0, 2) \
+&amp;&amp; \sigma_i &amp;\sim \mathrm{Exponential}(1) \quad (\text{if modeling individual } \sigma_i)
+\end{aligned}
+\end{equation}</p>
+<p>This three-level structure directly corresponds to:</p>
+<ul>
+<li>Within-sample variability ($\sigma_i^2/n_i$)</li>
+<li>Between-sample heterogeneity ($\tau^2$)</li>
+<li>Population-level mean ($\mu$)</li>
+</ul>
+<h3 id="implementation-example-stan">Implementation Example (Stan)<a hidden class="anchor" aria-hidden="true" href="#implementation-example-stan">#</a></h3>
+<pre tabindex="0"><code class="language-stan:bayesian_mil.stan" data-lang="stan:bayesian_mil.stan">data {
+  int&lt;lower=0&gt; N;        // Number of samples
+  vector[N] x_bar;       // Sample means
+  vector&lt;lower=0&gt;[N] se; // Standard errors of sample means
+}
+parameters {
+  real mu;               // Population mean
+  real&lt;lower=0&gt; tau;     // Between-sample SD
+  vector[N] mu_i;        // Sample-specific means
+}
+model {
+  // Hyperpriors
+  μ ~ normal(0, 10);
+  τ ~ cauchy(0, 2);
+  
+  // Hierarchical structure
+  for (i in 1:N) {
+    μ_i ~ normal(μ, τ);
+    x̄[i] ~ normal(μ_i, σ[i]/sqrt(n[i]));
+  }
+}
+</code></pre><div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p><strong>Perfect Transportability</strong> describes a strong assumption that estimation
+results from any sample can be directly generalized to all other samples
+without adjustments $$ \forall i,k\ \lim_{n_i,n_k \to \infty}
+(\overline{x}_i - \overline{x}_k) = 0. $$ This implies sample collection
+mechanisms and subpopulation characteristics do not systematically influence
+measurements. For example, you will see perfect transportability if all
+clinics draw from identical patient populations, factories use identical
+processes/materials during Manufacturing.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>The inverse-variance weighting scheme (w = 1/SE²) naturally assigns higher weights to more precise estimates - those with smaller within-sample variance and/or larger sample sizes. This approach optimally combines heterogeneous estimates by giving more influence to more reliable measurements while downweighting less precise ones. For example, in clinical trials, larger studies with tighter confidence intervals would receive proportionally more weight than smaller studies with wider intervals.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/2025-03-01-stats-for-mil/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Estimating Statistical Properties in Grouped Measurements</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/2025-02-28-revisted-khalil-fong/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Revisted Khalil Fong</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Stats for multiple-instance learning on x"
+            href="https://x.com/intent/tweet/?text=Stats%20for%20multiple-instance%20learning&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2025-03-01-stats-for-mil-copy%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Stats for multiple-instance learning on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2025-03-01-stats-for-mil-copy%2f&amp;title=Stats%20for%20multiple-instance%20learning&amp;summary=Stats%20for%20multiple-instance%20learning&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2f2025-03-01-stats-for-mil-copy%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023-2025 <a href="http://localhost:1313/">JX&#39;s log</a> | <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" 
+        target="_blank" rel="license noopener noreferrer">CC BY-NC-SA 4.0 </a> | </span>
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+
+    
+
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
