@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Meta Analysis on JX&#39;s log</title>
+    <link>https://jiajiexiao.github.io/tags/meta-analysis/</link>
+    <description>Recent content in Meta Analysis on JX&#39;s log</description>
+    <generator>Hugo -- 0.142.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 01 Mar 2025 22:32:12 -0800</lastBuildDate>
+    <atom:link href="https://jiajiexiao.github.io/tags/meta-analysis/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Estimating Statistical Properties in Grouped Measurements</title>
+      <link>https://jiajiexiao.github.io/posts/2025-03-01-stats-for-mil/</link>
+      <pubDate>Sat, 01 Mar 2025 22:32:12 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/2025-03-01-stats-for-mil/</guid>
+      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In this post, we&amp;rsquo;ll explore a statistical problem: estimating population means
+and their uncertainties from hierarchically structured data or so called grouped
+measurements. While averaging measurements may seem straightforward, the
+presence of natural groupings in data introduces important statistical
+considerations that require careful treatment.&lt;/p&gt;
+&lt;p&gt;To illustrate the practical significance of this problem, let&amp;rsquo;s examine how
+hierarchically structured measurements - where individual observations are
+naturally clustered into groups - arise across diverse real-world applications.
+Multiple-Instance Learning (MIL) represents an important machine learning
+paradigm specifically designed for analyzing such grouped or clustered data
+structures. The following scenarios showcase a few situations where measurements
+naturally organize into clusters of varying sizes:&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
