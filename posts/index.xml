@@ -28,11 +28,23 @@ structures. The following scenarios showcase a few situations where measurements
 naturally organize into clusters of varying sizes:&lt;/p&gt;</description>
     </item>
     <item>
+      <title>Revisted Khalil Fong</title>
+      <link>https://jiajiexiao.github.io/posts/2025-02-28-revisted-khalil-fong/</link>
+      <pubDate>Fri, 28 Feb 2025 23:30:45 -0800</pubDate>
+      <guid>https://jiajiexiao.github.io/posts/2025-02-28-revisted-khalil-fong/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;时间等不了人。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;大同，多好的一个人，看到了心目里少年自己希望成为的那样一个人：谦逊，幽
+默，乐观，专情，坚韧，豁达，有才华，有远景，聊到热爱的人和事眼睛会有光……&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>Biomedical LLMs (2): Genomics</title>
       <link>https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/</link>
       <pubDate>Sun, 12 May 2024 12:30:32 -0800</pubDate>
       <guid>https://jiajiexiao.github.io/posts/2024-05-12_biollm_genomics/</guid>
-      <description>&lt;ul&gt;
+      <description>&lt;!-- https://hybridna-project.github.io/HybriDNA-Project/ hybriDNA --&gt;
+&lt;ul&gt;
 &lt;li&gt;&lt;span style=&#34;color: lightblue&#34;&gt;[Updated in Jan 2025]: Added &lt;a href=&#34;#helm&#34;&gt;HELM&lt;/a&gt;.&lt;/span&gt;&lt;/li&gt;
 &lt;li&gt;&lt;span style=&#34;color: lightblue&#34;&gt;[Updated in Dec 2024]: Added &lt;a href=&#34;#methylgpt&#34;&gt;MethylGPT&lt;/a&gt;.&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
